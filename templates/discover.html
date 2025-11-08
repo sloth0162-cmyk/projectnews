@@ -1,0 +1,373 @@
+
+
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap');
+    
+    body {
+      font-family: 'Inter', sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      min-height: 100vh;
+    }
+
+    /* Custom Scrollbar */
+    .scrollbar-custom::-webkit-scrollbar {
+      height: 6px;
+    }
+    .scrollbar-custom::-webkit-scrollbar-track {
+      background: rgba(203, 213, 225, 0.2);
+      border-radius: 10px;
+    }
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 10px;
+      transition: all 0.3s ease;
+    }
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+      background: linear-gradient(90deg, #764ba2 0%, #667eea 100%);
+    }
+
+    /* Card Hover Effects */
+    .discover-card {
+      position: relative;
+      overflow: hidden;
+      transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+    }
+
+    .discover-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: -100%;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.1), transparent);
+      transition: left 0.5s ease;
+    }
+
+    .discover-card:hover::before {
+      left: 100%;
+    }
+
+    .discover-card:hover {
+      transform: translateY(-8px) scale(1.02);
+      box-shadow: 0 20px 40px rgba(102, 126, 234, 0.25);
+    }
+
+    .discover-card img {
+      transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .discover-card:hover img {
+      transform: scale(1.1);
+      filter: brightness(1.1);
+    }
+
+    .card-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: linear-gradient(to bottom, transparent 0%, rgba(0, 0, 0, 0.7) 100%);
+      opacity: 0;
+      transition: opacity 0.3s ease;
+    }
+
+    .discover-card:hover .card-overlay {
+      opacity: 1;
+    }
+
+    .card-title {
+      position: relative;
+      z-index: 10;
+      transition: all 0.3s ease;
+    }
+
+    .discover-card:hover .card-title {
+      transform: translateY(-4px);
+      color: #667eea;
+    }
+
+    /* Gradient Title */
+    .section-title {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      position: relative;
+      display: inline-block;
+    }
+
+    .section-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 4px;
+      background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+      border-radius: 2px;
+    }
+
+    /* Scroll Navigation Buttons */
+    .scroll-btn {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: rgba(255, 255, 255, 0.95);
+      backdrop-filter: blur(10px);
+      border: 2px solid rgba(102, 126, 234, 0.2);
+      width: 44px;
+      height: 44px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      z-index: 10;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    .scroll-btn:hover {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      transform: translateY(-50%) scale(1.1);
+      box-shadow: 0 6px 20px rgba(102, 126, 234, 0.4);
+    }
+
+    .scroll-btn.left {
+      left: 10px;
+    }
+
+    .scroll-btn.right {
+      right: 10px;
+    }
+
+    /* Card Badge */
+    .card-badge {
+      position: absolute;
+      top: 12px;
+      right: 12px;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 10;
+      opacity: 0;
+      transform: translateY(-10px);
+      transition: all 0.3s ease;
+    }
+
+    .discover-card:hover .card-badge {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Pulse Animation for New Badge */
+    @keyframes pulse {
+      0%, 100% {
+        box-shadow: 0 0 0 0 rgba(102, 126, 234, 0.7);
+      }
+      50% {
+        box-shadow: 0 0 0 8px rgba(102, 126, 234, 0);
+      }
+    }
+
+    .badge-new {
+      animation: pulse 2s infinite;
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 640px) {
+      .scroll-btn {
+        display: none;
+      }
+    }
+  </style>
+</head>
+<body class="p-8">
+
+<section class="px-4 mt-6 max-w-7xl mx-auto">
+  <div class="text-center mb-8">
+    <h1 class="text-4xl font-bold mb-2 section-title">Discover</h1>
+    <p class="text-gray-600 text-sm mt-4">Explore trending topics and financial insights</p>
+  </div>
+
+  <!-- Scrollable Container with Navigation -->
+  <div class="relative">
+    <!-- Left Scroll Button -->
+    <div class="scroll-btn left" id="scrollLeft">
+      <i class="fas fa-chevron-left"></i>
+    </div>
+
+    <!-- Right Scroll Button -->
+    <div class="scroll-btn right" id="scrollRight">
+      <i class="fas fa-chevron-right"></i>
+    </div>
+
+    <!-- Cards Container -->
+    <div class="flex justify-center">
+      <div class="flex overflow-x-auto gap-6 pb-4 px-8 scrollbar-custom scroll-smooth" id="cardContainer">
+
+        <!-- Card 1: Crypto -->
+        <div class="min-w-[280px] discover-card rounded-xl shadow-lg flex-shrink-0 relative group">
+          <div class="card-badge badge-new">🔥 Trending</div>
+          <div class="overflow-hidden rounded-t-xl relative">
+            <img
+              src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?auto=format&fit=crop&w=400&q=80"
+              class="w-full h-48 object-cover"
+              alt="Crypto"
+            />
+            <div class="card-overlay"></div>
+          </div>
+          <div class="p-4 text-center">
+            <div class="card-title font-bold text-lg text-gray-800 mb-1">Cryptocurrency</div>
+            <p class="text-gray-500 text-sm">Digital assets & blockchain</p>
+            <div class="flex justify-center gap-2 mt-3">
+              <span class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs font-semibold">Bitcoin</span>
+              <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">Ethereum</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 2: Stock Market -->
+        <div class="min-w-[280px] discover-card rounded-xl shadow-lg flex-shrink-0 relative group">
+          <div class="card-badge">📈 Popular</div>
+          <div class="overflow-hidden rounded-t-xl relative">
+            <img
+              src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=400&q=80"
+              class="w-full h-48 object-cover"
+              alt="Stock Market"
+            />
+            <div class="card-overlay"></div>
+          </div>
+          <div class="p-4 text-center">
+            <div class="card-title font-bold text-lg text-gray-800 mb-1">Stock Market</div>
+            <p class="text-gray-500 text-sm">Equities & trading insights</p>
+            <div class="flex justify-center gap-2 mt-3">
+              <span class="px-3 py-1 bg-green-100 text-green-700 rounded-full text-xs font-semibold">NYSE</span>
+              <span class="px-3 py-1 bg-indigo-100 text-indigo-700 rounded-full text-xs font-semibold">NASDAQ</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 3: India Finance -->
+        <div class="min-w-[280px] discover-card rounded-xl shadow-lg flex-shrink-0 relative group">
+          <div class="card-badge">🇮🇳 Local</div>
+          <div class="overflow-hidden rounded-t-xl relative">
+            <img
+              src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=400&q=80"
+              class="w-full h-48 object-cover"
+              alt="India Finance"
+            />
+            <div class="card-overlay"></div>
+          </div>
+          <div class="p-4 text-center">
+            <div class="card-title font-bold text-lg text-gray-800 mb-1">India Market</div>
+            <p class="text-gray-500 text-sm">NSE, BSE & Indian economy</p>
+            <div class="flex justify-center gap-2 mt-3">
+              <span class="px-3 py-1 bg-orange-100 text-orange-700 rounded-full text-xs font-semibold">NSE</span>
+              <span class="px-3 py-1 bg-red-100 text-red-700 rounded-full text-xs font-semibold">BSE</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 4: Real Estate -->
+        <div class="min-w-[280px] discover-card rounded-xl shadow-lg flex-shrink-0 relative group">
+          <div class="card-badge">🏠 New</div>
+          <div class="overflow-hidden rounded-t-xl relative">
+            <img
+              src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80"
+              class="w-full h-48 object-cover"
+              alt="Real Estate"
+            />
+            <div class="card-overlay"></div>
+          </div>
+          <div class="p-4 text-center">
+            <div class="card-title font-bold text-lg text-gray-800 mb-1">Real Estate</div>
+            <p class="text-gray-500 text-sm">Property & investment</p>
+            <div class="flex justify-center gap-2 mt-3">
+              <span class="px-3 py-1 bg-teal-100 text-teal-700 rounded-full text-xs font-semibold">REITs</span>
+              <span class="px-3 py-1 bg-cyan-100 text-cyan-700 rounded-full text-xs font-semibold">Commercial</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 5: Commodities -->
+        <div class="min-w-[280px] discover-card rounded-xl shadow-lg flex-shrink-0 relative group">
+          <div class="card-badge">⚡ Active</div>
+          <div class="overflow-hidden rounded-t-xl relative">
+            <img
+              src="https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=400&q=80"
+              class="w-full h-48 object-cover"
+              alt="Commodities"
+            />
+            <div class="card-overlay"></div>
+          </div>
+          <div class="p-4 text-center">
+            <div class="card-title font-bold text-lg text-gray-800 mb-1">Commodities</div>
+            <p class="text-gray-500 text-sm">Gold, oil & raw materials</p>
+            <div class="flex justify-center gap-2 mt-3">
+              <span class="px-3 py-1 bg-yellow-100 text-yellow-700 rounded-full text-xs font-semibold">Gold</span>
+              <span class="px-3 py-1 bg-gray-100 text-gray-700 rounded-full text-xs font-semibold">Silver</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Card 6: Tech Stocks -->
+        <div class="min-w-[280px] discover-card rounded-xl shadow-lg flex-shrink-0 relative group">
+          <div class="card-badge">💎 Premium</div>
+          <div class="overflow-hidden rounded-t-xl relative">
+            <img
+              src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80"
+              class="w-full h-48 object-cover"
+              alt="Tech Stocks"
+            />
+            <div class="card-overlay"></div>
+          </div>
+          <div class="p-4 text-center">
+            <div class="card-title font-bold text-lg text-gray-800 mb-1">Tech Stocks</div>
+            <p class="text-gray-500 text-sm">Innovation & growth</p>
+            <div class="flex justify-center gap-2 mt-3">
+              <span class="px-3 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-semibold">AI</span>
+              <span class="px-3 py-1 bg-violet-100 text-violet-700 rounded-full text-xs font-semibold">Cloud</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  const container = document.getElementById('cardContainer');
+  const scrollLeft = document.getElementById('scrollLeft');
+  const scrollRight = document.getElementById('scrollRight');
+
+  scrollLeft.addEventListener('click', () => {
+    container.scrollBy({ left: -320, behavior: 'smooth' });
+  });
+
+  scrollRight.addEventListener('click', () => {
+    container.scrollBy({ left: 320, behavior: 'smooth' });
+  });
+
+  // Add click functionality to cards
+  document.querySelectorAll('.discover-card').forEach(card => {
+    card.style.cursor = 'pointer';
+    card.addEventListener('click', function() {
+      const title = this.querySelector('.card-title').textContent;
+      console.log(`Navigating to: ${title}`);
+      // Add your navigation logic here
+    });
+  });
+</script>
+

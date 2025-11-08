@@ -1,0 +1,67 @@
+<style>
+    footer{
+         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+    }
+</style>
+<footer class="backdrop-blur-md border-bg-blue-500/30 shadow-md mt-1">
+  <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-slate-700">
+    
+    <!-- Brand Section -->
+    <div>
+      <h2 class="text-2xl font-extrabold bg-gradient-to-r from-amber-700 to-yellow-500 bg-clip-text text-transparent">
+        FinPulse Daily
+      </h2>
+      <p class="mt-3 text-sm text-slate-500">
+        Stay updated with the latest in finance, crypto, and business insights — designed for modern professionals.
+      </p>
+    </div>
+
+    <!-- Quick Links -->
+    <div>
+      <h3 class="text-lg font-semibold text-slate-800 mb-3">Quick Links</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="/dashboard" class="hover:text-indigo-600 transition">Home</a></li>
+        <li><a href="finance.html" class="hover:text-indigo-600 transition">Finance</a></li>
+        <li><a href="crypto.html" class="hover:text-indigo-600 transition">Crypto</a></li>
+        <li><a href="business.html" class="hover:text-indigo-600 transition">Business</a></li>
+        <li><a href="/editorial" class="hover:text-indigo-600 transition">Editorial</a></li>
+        <li><a href="about.html" class="hover:text-indigo-600 transition">About</a></li>
+      </ul>
+    </div>
+
+    <!-- Resources -->
+    <div>
+      <h3 class="text-lg font-semibold text-slate-800 mb-3">Resources</h3>
+      <ul class="space-y-2 text-sm">
+        <li><a href="#" class="hover:text-indigo-600 transition">Help Center</a></li>
+        <li><a href="#" class="hover:text-indigo-600 transition">Privacy Policy</a></li>
+        <li><a href="#" class="hover:text-indigo-600 transition">Terms & Conditions</a></li>
+        <li><a href="#" class="hover:text-indigo-600 transition">Advertise</a></li>
+      </ul>
+    </div>
+
+    <!-- Social / Contact -->
+    <div>
+      <h3 class="text-lg font-semibold text-slate-800 mb-3">Connect</h3>
+      <div class="flex space-x-4">
+        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-twitter"></i></a>
+        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-linkedin"></i></a>
+        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-github"></i></a>
+        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-youtube"></i></a>
+      </div>
+      <p class="mt-4 text-sm text-slate-500">
+        Email: <a href="mailto:contact@finpulse.com" class="hover:text-indigo-600">contact@finpulse.com</a>
+      </p>
+    </div>
+
+  </div>
+
+  <!-- Bottom Strip -->
+  <div class="border-t border-white/30 mt-8 py-4 text-center text-sm text-slate-500">
+    © <span id="year"></span> <span class="font-semibold text-slate-700">FinPulse Daily</span>. All rights reserved.
+  </div>
+</footer>
+
+<script>
+  document.getElementById("year").textContent = new Date().getFullYear();
+</script>

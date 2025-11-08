@@ -1,0 +1,29 @@
+<section class="cardbox">
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="">Finance Highlights</h2>
+    <a href="/finance" class="text-blue-600 hover:text-blue-800 font-medium transition-all">
+      View all →
+    </a>
+  </div>
+
+  {% if finance_articles %}
+  <div class="card-container">
+    {% for article in finance_articles %}
+      <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+        <!-- Header Banner -->
+        <div class="bg-sky-200 text-sky-900 font-semibold text-lg p-3">
+          {{ article.title[:70] }}{% if article.title|length > 70 %}...{% endif %}
+        </div>
+
+        <!-- Body -->
+        <div class="p-4">
+          <p class="text-gray-700 text-sm line-clamp-3">{{ article.summary or "No summary available." }}</p>
+          <p class="text-xs text-gray-500 mt-2">{{ article.source or "Finance Feed" }}</p>
+        </div>
+      </div>
+    {% endfor %}
+  </div>
+  {% else %}
+    <p class="text-gray-600 text-sm">No finance articles available right now.</p>
+  {% endif %}
+</section>

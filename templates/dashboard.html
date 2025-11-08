@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="/static/style/nav.css" />
+  <link rel="stylesheet" href="/static/style/style.css" />
+  <title>News Dashboard</title>
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+  
+
+  <style>
+    /* Modern horizontal scrollbar */
+    .scrollbar-custom::-webkit-scrollbar {
+      height: 8px;
+    }
+    .scrollbar-custom::-webkit-scrollbar-thumb {
+      background-color: #cbd5e1;
+      border-radius: 10px;
+    }
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
+      background-color: #94a3b8;
+    }
+  </style>
+</head>
+
+<body class="bg-gray-100">
+  <header></header>
+{%include 'searchbar.html' %}
+
+  <main class="max-w-6xl mx-auto mt-10 p-4">
+    <div class="flex items-center justify-between mb-6">
+      <h1 class="text-3xl font-bold">Top News</h1>
+
+      <!-- Tag Filter -->
+      <form method="get" class="ml-7">
+        <label for="tag" class="text-gray-700 mr-2 font-medium">Filter by Tag:</label>
+        <select
+          name="tag"
+          id="tag"
+          onchange="this.form.submit()"
+          class="border border-gray-300 rounded-md p-2"
+        >
+          <option value="All" {% if current_tag == "All" %}selected{% endif %}>All</option>
+          <option value="India" {% if current_tag == "India" %}selected{% endif %}>India</option>
+          <option value="Finance" {% if current_tag == "Finance" %}selected{% endif %}>Finance</option>
+          <option value="Economy" {% if current_tag == "Economy" %}selected{% endif %}>Economy</option>
+          <option value="Geopolitics" {% if current_tag == "Geopolitics" %}selected{% endif %}>Geopolitics</option>
+          <option value="Technology" {% if current_tag == "Technology" %}selected{% endif %}>Technology</option>
+          <option value="Energy" {% if current_tag == "Energy" %}selected{% endif %}>Energy</option>
+          <option value="Conflict" {% if current_tag == "Conflict" %}selected{% endif %}>Conflict</option>
+          <option value="Policy" {% if current_tag == "Policy" %}selected{% endif %}>Policy</option>
+          <option value="Global" {% if current_tag == "Global" %}selected{% endif %}>Global</option>
+          <option value="Market" {% if current_tag == "Market" %}selected{% endif %}>Market</option>
+        </select>
+      </form>
+    </div>
+
+    <!-- 📰 Top News Scroll Section -->
+    {% if articles %}
+      <section>
+        <h2 class="text-2xl font-semibold mb-4">Top Headlines</h2>
+        <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
+          {% for article in articles %}
+            {% if article.id > 85 and article.id < 91 %}
+              <div class="min-w-[300px] bg-white shadow-md rounded-lg overflow-hidden">
+               <img src="{{ article.image }}" alt="News image" class="w-full h-40 object-cover">
+
+
+                <div class="p-4">
+                  <h3 class="text-lg font-semibold mb-2">{{ article.title }}</h3>
+                  <p class="text-gray-700 text-sm line-clamp-3">{{ article.summary }}</p>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+      </section>
+    {% else %}
+      <p class="text-gray-600 mt-4">No articles found.</p>
+    {% endif %}
+  </main>
+<section id="">
+  {% include 'discover.html' %}
+  {% include 'finance.html' %}
+  {% include 'india.html' %}
+  {% include 'page123.html' %}
+  {% include 'footer.html' %}
+</section>
+
+
+
+  <script src="/static/nav.js"></script>
+</body>
+</html>

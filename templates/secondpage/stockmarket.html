@@ -1,0 +1,72 @@
+<section class="cardbox">
+  
+    <div class="flex items-center justify-between mb-4">
+    <h2 class="">Stock Market</h2>
+    <a href="/finance" class="text-blue-600 hover:text-blue-800 font-medium transition-all">
+      View all →
+    </a>
+  </div>
+  <div class="card-container scrollbar-custom">
+    
+  
+
+    <!-- Card 2 -->
+    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+      <span class="card-badge">📈 Popular</span>
+      <div class="card-image">
+        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=400&q=80" alt="Stock market">
+      </div>
+      <div class="card-content">
+        <h3>Market Update</h3>
+        <p>Global markets show positive momentum with technology stocks leading the charge in today's trading session.</p>
+      </div>
+    </div>
+
+    <!-- Card 3 -->
+    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+      <span class="card-badge">🇮🇳 Local</span>
+      <div class="card-image">
+        <img src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=400&q=80" alt="India finance">
+      </div>
+      <div class="card-content">
+        <h3>India GDP Growth</h3>
+        <p>Indian economy shows robust growth with strong performance in manufacturing and services sectors this quarter.</p>
+      </div>
+    </div>
+
+    <!-- Card 4 -->
+    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+      <span class="card-badge">💎 Premium</span>
+      <div class="card-image">
+        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" alt="Financial data">
+      </div>
+      <div class="card-content">
+        <h3>Investment Strategies</h3>
+        <p>Expert analysis on portfolio diversification and risk management for the upcoming fiscal year.</p>
+      </div>
+    </div>
+
+    <!-- Card 5 -->
+    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
+      <div class="card-image">
+        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" alt="Real estate">
+      </div>
+      <div class="card-content">
+        <h3>Real Estate Trends</h3>
+        <p>Housing market analysis reveals shifting patterns in urban development and investment opportunities.</p>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<script>
+  // Add click handlers to cards
+  document.querySelectorAll('.card').forEach(card => {
+    card.addEventListener('click', function() {
+      const title = this.querySelector('h3').textContent;
+      console.log(`Card clicked: ${title}`);
+      // Add your navigation logic here
+    });
+  });
+</script>
