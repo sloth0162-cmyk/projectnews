@@ -1,5 +1,6 @@
 Flask
-beautifulsoup4
+gunicorn
 requests
+beautifulsoup4
 python-dotenv
 supabase
