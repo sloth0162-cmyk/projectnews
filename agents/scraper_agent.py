@@ -12,6 +12,11 @@ RSS_FEEDS = [
 def fetch_all_articles(limit_per_source=3):
     """Fetch articles from multiple RSS feeds."""
     articles = []
+    print(f"🌐 Reading feed: {feed['source']}")
+    print(response.status_code)
+    soup = BeautifulSoup(response.content, "xml")
+    items = soup.find_all("item")
+    print(f"{feed['source']} items: {len(items)}")
 
     for feed in RSS_FEEDS:
         print(f"\n🌐 Reading feed: {feed['source']}")
