@@ -185,35 +185,43 @@ def auth_callback():
 # -----------------------------
 @app.route('/run_pipeline', methods=['POST', 'GET'])
 def run_pipeline():
-    """Scrapes general news → summarizes → generates image → saves to Supabase."""
+    print("🚀 Pipeline started")
 
     articles = scrape_news(limit_per_source=1)
+    print(f"📰 Scraped {len(articles)} articles")
 
     for article in articles:
         title = article['title']
+        print(f"➡️ Processing: {title}")
+
         content = article['content']
 
-        # Skip if article already exists
         exists = supabase.table('articles').select('id').eq('title', title).execute()
+
         if exists.data:
             print(f"⏭️ Skipping existing article: {title}")
             continue
 
-        print(f"🧠 Summarizing: {title}")
+        print("🧠 Summarizing...")
         summary = summarize_text(content)
 
-        print(f"🎨 Generating image: {title}")
+        print("🎨 Generating image...")
         image_path = create_news_image(title, summary)
 
-        image_url = upload_image (image_path)
+        print("☁️ Uploading image...")
+        image_url = upload_image(image_path)
 
+        print("💾 Saving to Supabase...")
         save_summary_to_db(title, summary, image_url)
+
+        print("✅ Article saved")
+
+    print("🏁 Pipeline finished")
 
     return {
         "status": "success",
         "articles_processed": len(articles)
     }
-
 # -----------------------------
 # 🧠 Editorial (Manual Posts)
 # -----------------------------
