@@ -1,0 +1,16 @@
+name: Daily News Pipeline
+
+on:
+  schedule:
+    - cron: '30 2 * * *'
+
+  workflow_dispatch:
+
+jobs:
+  update-news:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Trigger Project Newz
+        run: |
+          curl https://projectnews-mocha.vercel.app/run_pipeline
