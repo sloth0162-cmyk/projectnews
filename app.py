@@ -8,6 +8,8 @@ from config import Config
 from supabase import create_client
 from finance.finance_pipeline import run_finance_pipeline
 import requests
+from image_generation.image_generate import create_news_image
+from image_generation.upload_image_to_supabase import upload_image
 
 
 # -----------------------------
@@ -19,18 +21,12 @@ app.secret_key = Config.FLASK_SECRET_KEY
 supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 
 
-# -----------------------------
-# 🏠 Home Route
-# -----------------------------
-@app.route('/')
-def home():
-    return "🌍 Geo AI Platform Running ✅"
 
 
 # -----------------------------
 # 📰 Dashboard (Main Page)
 # -----------------------------
-@app.route('/dashboard')
+@app.route('/')
 def dashboard_page():
     """Main dashboard displaying summarized geopolitical + finance news"""
     tag = request.args.get("tag")
@@ -71,17 +67,10 @@ def dashboard_page():
     except Exception as e:
         print(f"⚠️ Error fetching finance_articles: {e}")
         finance_articles = []
-
-    # Add image mapping
-    image_map = {
-        86: "/static/images/article_86.jpg",
-        87: "/static/images/article_87.jpg",
-        88: "/static/images/article_88.jpg",
-        89: "/static/images/article_89.jpg",
-        90: "/static/images/article_90.jpg",
-    }
-    for a in articles:
-        a["image"] = image_map.get(a["id"], "/static/images/default.jpg")
+   #test below
+    for a in articles[:3]:
+        print(a)
+    print(articles[0])
 
     return render_template(
         "dashboard.html",
@@ -196,8 +185,9 @@ def auth_callback():
 # -----------------------------
 @app.route('/run_pipeline', methods=['POST', 'GET'])
 def run_pipeline():
-    """Scrapes general news → summarizes → saves to Supabase."""
-    articles = scrape_news(limit_per_source=2)
+    """Scrapes general news → summarizes → generates image → saves to Supabase."""
+
+    articles = scrape_news(limit_per_source=1)
 
     for article in articles:
         title = article['title']
@@ -211,10 +201,18 @@ def run_pipeline():
 
         print(f"🧠 Summarizing: {title}")
         summary = summarize_text(content)
-        save_summary_to_db(title, summary)
 
-    return {"status": "success", "articles_processed": len(articles)}
+        print(f"🎨 Generating image: {title}")
+        image_path = create_news_image(title, summary)
 
+        image_url = upload_image (image_path)
+
+        save_summary_to_db(title, summary, image_url)
+
+    return {
+        "status": "success",
+        "articles_processed": len(articles)
+    }
 
 # -----------------------------
 # 🧠 Editorial (Manual Posts)

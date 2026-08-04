@@ -1,4 +1,3 @@
-from dotenv import load_dotenv
-import os
-load_dotenv()
-print(os.getenv("SUPABASE_KEY"))
+from services.supabase_client import supabase
+
+print(supabase.storage.list_buckets())

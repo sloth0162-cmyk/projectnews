@@ -1,11 +1,11 @@
 # services/llm_utils.py
-
+import os
 import requests
 import json
 
 # ⚠️ Replace this with your actual key (no leading space)
-OPENROUTER_API_KEY = "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"
-MODEL = "meta-llama/llama-3-8b-instruct"
+OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+MODEL = "meta-llama/llama-3.1-8b-instruct"
 
 
 def generate_summary(text: str):

@@ -13,7 +13,7 @@ const navLinks = document.createElement('ul');
 navLinks.className = 'nav-links';
 
 const links = [
-  { text: 'Home', href: '/dashboard' },
+  { text: 'Home', href: '/' },
   { text: 'Finance', href: '/finance' },
   { text: 'Crypto', href: 'crypto.html' },
   { text: 'Business', href: 'business.html' },
@@ -110,7 +110,7 @@ const dropdown = profileContainer.querySelector('.dropdown-menu');
 // Functions
 function toggleMobileMenu() {
   const isActive = mobileMenu.classList.contains('active');
-  
+
   if (isActive) {
     closeMobileMenu();
   } else {
