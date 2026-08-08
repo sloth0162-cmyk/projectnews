@@ -20,7 +20,7 @@ app.secret_key = Config.FLASK_SECRET_KEY
 
 supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 
-
+PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 
 
 # -----------------------------
@@ -183,8 +183,20 @@ def auth_callback():
 # -----------------------------
 # ⚙️ Run News Pipeline (General)
 # -----------------------------
-@app.route('/run_pipeline', methods=['POST', 'GET'])
+@app.route('/run_pipeline', methods=['GET', 'POST'])
 def run_pipeline():
+
+    if request.method == 'GET':
+        return render_template('pipeline/run_pipeline.html')
+
+    password = request.form.get('password')
+
+    if password != PIPELINE_PASSWORD:
+        return render_template(
+            'pipeline/run_pipeline.html',
+            error="Incorrect password"
+        )
+
     print("🚀 Pipeline started")
 
     articles = scrape_news(limit_per_source=1)
@@ -196,7 +208,10 @@ def run_pipeline():
 
         content = article['content']
 
-        exists = supabase.table('articles').select('id').eq('title', title).execute()
+        exists = supabase.table('articles') \
+            .select('id') \
+            .eq('title', title) \
+            .execute()
 
         if exists.data:
             print(f"⏭️ Skipping existing article: {title}")
@@ -218,10 +233,7 @@ def run_pipeline():
 
     print("🏁 Pipeline finished")
 
-    return {
-        "status": "success",
-        "articles_processed": len(articles)
-    }
+    return render_template('pipeline/run_pipeline.html')
 # -----------------------------
 # 🧠 Editorial (Manual Posts)
 # -----------------------------

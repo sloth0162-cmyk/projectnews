@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Welcome to the Pipeline</h1>
+    <p>If you can use correct password, you can run the pipeline.</p>
+    <p>where maybe you can run pipeline</p>
+    <p>If any guy found bug or password here then pls report it.</p>
+
+    <h2>Best of luck</h2>
+    <h2>Run News Pipeline</h2>
+
+{% if error %}
+    <p>{{ error }}</p>
+{% endif %}
+
+<form method="post">
+    <label for="password">Password:</label>
+    <input type="password" id="password" name="password">
+    <button type="submit">Run Pipeline</button>
+</form>
+</body>
+</html>
