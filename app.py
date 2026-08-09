@@ -10,7 +10,7 @@ from finance.finance_pipeline import run_finance_pipeline
 import requests
 from image_generation.image_generate import create_news_image
 from image_generation.upload_image_to_supabase import upload_image
-
+from routes.route import article_bp
 
 # -----------------------------
 # 🔧 Flask App Setup
@@ -21,6 +21,7 @@ app.secret_key = Config.FLASK_SECRET_KEY
 supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 
 PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
+app.register_blueprint(article_bp)
 
 
 # -----------------------------

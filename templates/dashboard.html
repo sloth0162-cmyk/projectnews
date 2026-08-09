@@ -62,6 +62,8 @@
       <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
         {% for article in articles %}
         <div class="min-w-[300px] bg-white shadow-md rounded-lg overflow-hidden">
+          <a href="{{ url_for('article.article', article_id=article.id) }}"
+   class="min-w-[300px] bg-white shadow-md rounded-lg overflow-hidden block">
           <img src="{{ article.image_url }}" alt="News image" class="w-full h-40 object-cover">
 
 
@@ -69,6 +71,7 @@
             <h3 class="text-lg font-semibold mb-2">{{ article.title }}</h3>
             <p class="text-gray-700 text-sm line-clamp-3">{{ article.summary }}</p>
           </div>
+        </a>
         </div>
 
         {% endfor %}
