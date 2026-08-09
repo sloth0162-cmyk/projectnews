@@ -381,5 +381,6 @@ Current functionality includes:
 Project Newz is currently under active development.
 
 ## License
+MIT License
 
-This project does not currently specify a license.
+Copyright (c) 2026 ProjectNewzz
