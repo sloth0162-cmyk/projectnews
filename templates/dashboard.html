@@ -67,10 +67,17 @@
           <img src="{{ article.image_url }}" alt="News image" class="w-full h-40 object-cover">
 
 
-          <div class="p-4">
-            <h3 class="text-lg font-semibold mb-2">{{ article.title }}</h3>
-            <p class="text-gray-700 text-sm line-clamp-3">{{ article.summary }}</p>
-          </div>
+        <div class="p-4 h-[200px]">
+
+            <h3 class="text-lg font-semibold mb-2 line-clamp-3 leading-7">
+                {{ article.title }}
+            </h3>
+
+            <p class="text-gray-700 text-sm line-clamp-3 leading-5">
+                {{ article.summary }}
+            </p>
+
+        </div>
         </a>
         </div>
 
