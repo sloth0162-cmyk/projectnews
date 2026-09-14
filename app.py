@@ -188,57 +188,232 @@ def auth_callback():
 @app.route('/run_pipeline', methods=['GET', 'POST'])
 def run_pipeline():
 
+    # -----------------------------
+    # GET → Show pipeline page
+    # -----------------------------
     if request.method == 'GET':
         return render_template('pipeline/run_pipeline.html')
 
+    # -----------------------------
+    # Check password
+    # -----------------------------
     password = request.form.get('password')
 
     if password != PIPELINE_PASSWORD:
+        print("❌ Pipeline rejected: Incorrect password")
+
         return render_template(
             'pipeline/run_pipeline.html',
             error="Incorrect password"
         )
 
-    print("🚀 Pipeline started")
+    print("\n========================================")
+    print("🚀 PIPELINE STARTED")
+    print("========================================")
 
-    articles = scrape_news(limit_per_source=1)
-    print(f"📰 Scraped {len(articles)} articles")
+    # -----------------------------
+    # 1. SCRAPE NEWS
+    # -----------------------------
+    print("\n🔎 STEP 1: Starting news scraper...")
 
-    for article in articles:
-        title = article['title']
-        print(f"➡️ Processing: {title}")
+    try:
+        articles = scrape_news(limit_per_source=1)
 
-        content = article['content']
+        print("✅ scrape_news() returned successfully")
+        print(f"📰 Articles returned: {len(articles)}")
 
-        exists = supabase.table('articles') \
-            .select('id') \
-            .eq('title', title) \
-            .execute()
+    except Exception as e:
+        print("❌ SCRAPER FAILED")
+        print(f"❌ Error type: {type(e).__name__}")
+        print(f"❌ Error: {e}")
+
+        return render_template(
+            'pipeline/run_pipeline.html',
+            error=f"Scraper failed: {e}"
+        )
+
+    # Nothing returned
+    if not articles:
+        print("⚠️ SCRAPER RETURNED ZERO ARTICLES")
+        print("🏁 Pipeline stopped because there is nothing to process.")
+
+        return render_template(
+            'pipeline/run_pipeline.html',
+            error="No new articles were returned by the scraper."
+        )
+
+    # -----------------------------
+    # 2. PROCESS ARTICLES
+    # -----------------------------
+    print(f"\n📦 STEP 2: Processing {len(articles)} articles...")
+
+    for index, article in enumerate(articles, start=1):
+
+        print("\n========================================")
+        print(f"📄 ARTICLE {index}/{len(articles)}")
+        print("========================================")
+
+        title = article.get('title', '')
+        content = article.get('content', '')
+
+        print(f"📰 Title: {title}")
+        print(f"🌐 Source: {article.get('source', 'Unknown')}")
+        print(f"🔗 URL: {article.get('url', 'Unknown')}")
+        print(f"📝 Content length: {len(content)} characters")
+
+        if not title:
+            print("⚠️ Article has no title. Skipping.")
+            continue
+
+        if not content:
+            print("⚠️ Article has no content. Skipping.")
+            continue
+
+        # -----------------------------
+        # 3. CHECK SUPABASE
+        # -----------------------------
+        print("\n🔎 STEP 3: Checking Supabase for duplicate...")
+
+        try:
+
+            exists = supabase.table('articles') \
+                .select('id') \
+                .eq('title', title) \
+                .execute()
+
+            print("✅ Supabase duplicate check completed")
+            print(f"🔎 Matching articles: {len(exists.data)}")
+
+        except Exception as e:
+
+            print("❌ SUPABASE DUPLICATE CHECK FAILED")
+            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Error: {e}")
+
+            continue
 
         if exists.data:
-            print(f"⏭️ Skipping existing article: {title}")
+            print(f"⏭️ Article already exists. Skipping:")
+            print(f"   {title}")
             continue
 
-        print("🧠 Summarizing...")
-        summary = summarize_text(content)
-        if not summary:
-            print(f"❌ Summary failed for: {title}")
+        print("🆕 Article is NEW")
+
+
+        # -----------------------------
+        # 4. SUMMARIZE
+        # -----------------------------
+        print("\n🧠 STEP 4: Starting summarizer...")
+
+        try:
+
+            summary = summarize_text(content)
+
+            if not summary:
+                print("❌ SUMMARIZER RETURNED EMPTY RESULT")
+                print(f"❌ Article skipped: {title}")
+                continue
+
+            print("✅ SUMMARIZER SUCCESS")
+            print(f"📝 Summary length: {len(summary)} characters")
+
+        except Exception as e:
+
+            print("❌ SUMMARIZER FAILED")
+            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Error: {e}")
+
             continue
-        print("✅ Summary generated successfully")
-        print("🎨 Generating image...")
-        image_path = create_news_image(title, summary)
 
-        print("☁️ Uploading image...")
-        image_url = upload_image(image_path)
 
-        print("💾 Saving to Supabase...")
-        save_summary_to_db(title, summary, image_url)
+        # -----------------------------
+        # 5. GENERATE IMAGE
+        # -----------------------------
+        print("\n🎨 STEP 5: Starting image generation...")
 
-        print("✅ Article saved")
+        try:
 
-    print("🏁 Pipeline finished")
+            image_path = create_news_image(
+                title,
+                summary
+            )
 
-    return render_template('pipeline/run_pipeline.html')
+            if not image_path:
+                print("❌ IMAGE GENERATION RETURNED EMPTY RESULT")
+                continue
+
+            print("✅ IMAGE GENERATION SUCCESS")
+            print(f"🖼️ Image path: {image_path}")
+
+        except Exception as e:
+
+            print("❌ IMAGE GENERATION FAILED")
+            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Error: {e}")
+
+            continue
+
+
+        # -----------------------------
+        # 6. UPLOAD IMAGE
+        # -----------------------------
+        print("\n☁️ STEP 6: Uploading image...")
+
+        try:
+
+            image_url = upload_image(image_path)
+
+            if not image_url:
+                print("❌ IMAGE UPLOAD RETURNED EMPTY RESULT")
+                continue
+
+            print("✅ IMAGE UPLOAD SUCCESS")
+            print(f"🔗 Image URL: {image_url}")
+
+        except Exception as e:
+
+            print("❌ IMAGE UPLOAD FAILED")
+            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Error: {e}")
+
+            continue
+
+
+        # -----------------------------
+        # 7. SAVE ARTICLE
+        # -----------------------------
+        print("\n💾 STEP 7: Saving article to Supabase...")
+
+        try:
+
+            result = save_summary_to_db(
+                title,
+                summary,
+                image_url
+            )
+
+            print("✅ ARTICLE SAVED TO SUPABASE")
+            print(f"📰 {title}")
+
+        except Exception as e:
+
+            print("❌ DATABASE SAVE FAILED")
+            print(f"❌ Error type: {type(e).__name__}")
+            print(f"❌ Error: {e}")
+
+            continue
+
+
+    # -----------------------------
+    # PIPELINE COMPLETE
+    # -----------------------------
+    print("\n========================================")
+    print("🏁 PIPELINE FINISHED")
+    print("========================================")
+
+    return render_template(
+        'pipeline/run_pipeline.html'
+    )
 # -----------------------------
 # 🧠 Editorial (Manual Posts)
 # -----------------------------
