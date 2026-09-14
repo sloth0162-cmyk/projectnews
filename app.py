@@ -26,6 +26,12 @@ PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
 app.register_blueprint(second)
 
+# Vercel Hobby plan hard-kills functions at 10s. We stop starting new work
+# at 8.5s elapsed so we can return a clean response instead of getting cut
+# off mid-write.
+PIPELINE_HARD_DEADLINE_SECONDS = 8.5
+
+
 # -----------------------------
 # 📰 Dashboard (Main Page)
 # -----------------------------
@@ -186,21 +192,50 @@ def auth_callback():
 # -----------------------------
 # ⚙️ Run News Pipeline (General)
 # -----------------------------
+def _pipeline_time_left(start_time):
+    return PIPELINE_HARD_DEADLINE_SECONDS - (time.monotonic() - start_time)
+
+
+def _pipeline_respond(debug_log, error=None):
+    """?debug=1 returns raw JSON so you can see exactly what happened
+    without digging through Vercel's log dashboard."""
+    if request.args.get("debug") == "1":
+        return jsonify({"error": error, "log": debug_log})
+
+    return render_template(
+        'pipeline/run_pipeline.html',
+        error=error,
+        debug_log=debug_log,
+    )
+
 
 @app.route('/run_pipeline', methods=['GET', 'POST'])
 def run_pipeline():
+
+    # -----------------------------
+    # GET → Show pipeline page
+    # -----------------------------
     if request.method == 'GET':
-        return render_template('pipeline/run_pipeline.html')
- 
-    password = request.form.get('password')
-    if password != PIPELINE_PASSWORD:
         return render_template(
-            'pipeline/run_pipeline.html', error="Incorrect password"
+            'pipeline/run_pipeline.html'
         )
- 
+
+    # -----------------------------
+    # Check password
+    # -----------------------------
+    password = request.form.get('password')
+
+    if password != PIPELINE_PASSWORD:
+        print("❌ Pipeline rejected: Incorrect password")
+
+        return render_template(
+            'pipeline/run_pipeline.html',
+            error="Incorrect password"
+        )
+
     start_time = time.monotonic()
     debug_log = []
- 
+
     def log_step(step, status, detail=""):
         debug_log.append({
             "step": step,
@@ -209,38 +244,45 @@ def run_pipeline():
             "elapsed_s": round(time.monotonic() - start_time, 2),
         })
         print(f"[{status}] {step}: {detail}")
- 
+
+    log_step("pipeline", "start")
+
     # -----------------------------
     # 1. SCRAPE NEWS
     # -----------------------------
     log_step("scrape", "start")
+
     try:
         articles = scrape_news()
+
         scraper_errors = getattr(scrape_news, "last_errors", [])
+
         if scraper_errors:
             log_step("scrape", "warning", f"{len(scraper_errors)} feed error(s): {scraper_errors}")
+
         log_step("scrape", "ok", f"{len(articles)} article(s) fetched")
+
     except Exception as e:
         log_step("scrape", "failed", f"{type(e).__name__}: {e}")
-        return _respond(debug_log, error=f"Scraper failed: {e}")
- 
+        return _pipeline_respond(debug_log, error=f"Scraper failed: {e}")
+
     if not articles:
         log_step("scrape", "failed", "0 articles returned")
-        return _respond(debug_log, error="No articles were returned by the scraper.")
- 
+        return _pipeline_respond(debug_log, error="No articles were returned by the scraper.")
+
     # -----------------------------
     # 2. PROCESS ARTICLES (time-budget aware)
     # -----------------------------
     processed = 0
     skipped_due_to_time = 0
- 
+
     for index, article in enumerate(articles, start=1):
-        remaining = time_left(start_time)
- 
-        # Stop starting new articles once we're too close to the deadline.
+
+        remaining = _pipeline_time_left(start_time)
+
+        # Stop starting new articles once too close to the hard deadline.
         # A full article costs roughly: dup-check + summarize + image-gen +
-        # upload + db-save. If there isn't enough runway left, bail cleanly
-        # rather than getting killed mid-write.
+        # upload + db-save. Bail cleanly rather than get hard-killed mid-write.
         if remaining < 2.5:
             skipped_due_to_time += 1
             log_step(
@@ -248,90 +290,107 @@ def run_pipeline():
                 f"only {remaining:.1f}s left in budget — stopping to avoid a hard timeout"
             )
             continue
- 
-        title = (article.get("title") or "").strip()
-        content = (article.get("content") or "").strip()
+
+        title = article.get("title", "").strip()
+        content = article.get("content", "").strip()
         source = article.get("source", "Unknown")
         url = article.get("url", "Unknown")
- 
-        if not title or not content:
-            log_step(f"article[{index}]", "skipped", "missing title or content")
+
+        if not title:
+            log_step(f"article[{index}]", "skipped", "no title")
             continue
- 
-        # --- duplicate check ---
+
+        if not content:
+            log_step(f"article[{index}]", "skipped", "no content")
+            continue
+
+        # -----------------------------
+        # 3. CHECK SUPABASE
+        # -----------------------------
         try:
             exists = (
-                supabase.table("articles")
+                supabase
+                .table("articles")
                 .select("id")
                 .eq("title", title)
                 .execute()
             )
-            if exists.data:
-                log_step(f"article[{index}]", "skipped", f"duplicate: {title}")
-                continue
+
+            matches = exists.data or []
+
         except Exception as e:
             log_step(f"article[{index}]", "failed", f"dup-check error: {type(e).__name__}: {e}")
             continue
- 
-        # --- summarize ---
+
+        if matches:
+            log_step(f"article[{index}]", "skipped", f"duplicate: {title}")
+            continue
+
+        # -----------------------------
+        # 4. SUMMARIZE
+        # -----------------------------
         try:
             summary = summarize_text(content)
+
             if not summary:
                 log_step(f"article[{index}]", "failed", "summarizer returned empty result")
                 continue
+
         except Exception as e:
             log_step(f"article[{index}]", "failed", f"summarizer error: {type(e).__name__}: {e}")
             continue
- 
-        # --- generate image (in-memory / direct upload, per your setup) ---
+
+        # -----------------------------
+        # 5. GENERATE IMAGE
+        # -----------------------------
         try:
-            image_result = create_news_image(title, summary)
-            if not image_result:
+            image_path = create_news_image(title, summary)
+
+            if not image_path:
                 log_step(f"article[{index}]", "failed", "image generation returned empty result")
                 continue
+
         except Exception as e:
             log_step(f"article[{index}]", "failed", f"image-gen error: {type(e).__name__}: {e}")
             continue
- 
-        # --- upload image ---
+
+        # -----------------------------
+        # 6. UPLOAD IMAGE
+        # -----------------------------
         try:
-            image_url = upload_image(image_result)
+            image_url = upload_image(image_path)
+
             if not image_url:
                 log_step(f"article[{index}]", "failed", "image upload returned empty result")
                 continue
+
         except Exception as e:
             log_step(f"article[{index}]", "failed", f"image-upload error: {type(e).__name__}: {e}")
             continue
- 
-        # --- save to db ---
+
+        # -----------------------------
+        # 7. SAVE ARTICLE
+        # -----------------------------
         try:
             save_summary_to_db(title, summary, image_url)
             processed += 1
             log_step(f"article[{index}]", "ok", f"saved: {title}")
+
         except Exception as e:
             log_step(f"article[{index}]", "failed", f"db-save error: {type(e).__name__}: {e}")
             continue
- 
+
+    # -----------------------------
+    # PIPELINE COMPLETE
+    # -----------------------------
     total_elapsed = round(time.monotonic() - start_time, 2)
     log_step(
         "pipeline", "finished",
         f"{processed} saved, {skipped_due_to_time} skipped for time, {total_elapsed}s total"
     )
- 
-    return _respond(debug_log)
- 
- 
-def _respond(debug_log, error=None):
-    """Central place to decide how results are surfaced. ?debug=1 returns
-    raw JSON — much easier to inspect than digging through Vercel logs."""
-    if request.args.get("debug") == "1":
-        return jsonify({"error": error, "log": debug_log})
- 
-    return render_template(
-        'pipeline/run_pipeline.html',
-        error=error,
-        debug_log=debug_log,  # render this in the template if you want it visible in the UI
-    )
+
+    return _pipeline_respond(debug_log)
+
 
 # -----------------------------
 # 🧠 Editorial (Manual Posts)
