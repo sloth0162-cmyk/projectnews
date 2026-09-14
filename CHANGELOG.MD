@@ -19,3 +19,14 @@
 
 * Reduced article generation from 6 articles at a time to 3 articles at a time.
 * Tag schema from v1 was lost and has not yet been recreated, so tag-based filtering is currently unavailable.
+
+# Version 2.1
+# Date
+14-8-2026
+
+### Fixed
+1.Navbar all links are working
+2.Worked on crypto page
+
+### Added
+1.About us page has been added

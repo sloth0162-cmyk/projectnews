@@ -1,5 +1,5 @@
 # app.py
-from flask import Flask, jsonify, render_template, request, redirect, url_for, session
+from flask import Blueprint, Flask, jsonify, render_template, request, redirect, url_for, session
 from agents.scraper_agent import scrape_news
 from agents.summarizer_agent import summarize_text
 from agents.classifier_agent import classify_article, save_tags_to_article
@@ -11,6 +11,7 @@ import requests
 from image_generation.image_generate import create_news_image
 from image_generation.upload_image_to_supabase import upload_image
 from routes.route import article_bp
+from second import second
 
 # -----------------------------
 # 🔧 Flask App Setup
@@ -22,14 +23,14 @@ supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 
 PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
-
+app.register_blueprint(second)
 
 # -----------------------------
 # 📰 Dashboard (Main Page)
 # -----------------------------
 @app.route('/')
 def dashboard_page():
-    """Main dashboard displaying summarized geopolitical + finance news"""
+    """Main dashboard displaying summarized news"""
     tag = request.args.get("tag")
     search = request.args.get("search", "").strip()
 

@@ -6,7 +6,7 @@ nav.className = 'navbar';
 // Logo
 const logo = document.createElement('div');
 logo.className = 'logo-text';
-logo.textContent = 'FinPulse Daily';
+logo.textContent = 'Sloth Newz';
 
 // Navigation links
 const navLinks = document.createElement('ul');
@@ -15,10 +15,10 @@ navLinks.className = 'nav-links';
 const links = [
   { text: 'Home', href: '/' },
   { text: 'Finance', href: '/finance' },
-  { text: 'Crypto', href: 'crypto.html' },
-  { text: 'Business', href: 'business.html' },
+  { text: 'Crypto', href: '/crypto' },
+  { text: 'Business', href: '/business' },
   { text: 'Editorial', href: '/editorial' },
-  { text: 'About', href: 'about.html' }
+  { text: 'About', href: '/about' }
 ];
 
 links.forEach(({ text, href }) => {
