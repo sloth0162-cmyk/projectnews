@@ -221,7 +221,10 @@ def run_pipeline():
 
         print("🧠 Summarizing...")
         summary = summarize_text(content)
-
+        if not summary:
+            print(f"❌ Summary failed for: {title}")
+            continue
+        print("✅ Summary generated successfully")
         print("🎨 Generating image...")
         image_path = create_news_image(title, summary)
 
