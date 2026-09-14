@@ -260,7 +260,13 @@ def run_pipeline():
         if scraper_errors:
             log_step("scrape", "warning", f"{len(scraper_errors)} feed error(s): {scraper_errors}")
 
-        log_step("scrape", "ok", f"{len(articles)} article(s) fetched")
+        #Test only one article per pipelinr run
+        articles = articles[:1]
+        if not articles:
+            log_step("scrape", "failed", "No  articles returend by the scrapper")
+            return _pipeline_respond(debug_log, error="No usuable article by scraper")
+
+        log_step("scrape", "ok",f"{len(articles)} articles feteched")
 
     except Exception as e:
         log_step("scrape", "failed", f"{type(e).__name__}: {e}")

@@ -62,7 +62,7 @@ ARTICLE_TIMEOUT = (3, 3)   # (connect, read)
 # Full article-page scraping is expensive and unreliable under a tight
 # budget. Only attempt it if there's meaningfully more than a couple of
 # seconds of budget left, and never as a blocking requirement.
-ALLOW_ARTICLE_SCRAPE = True
+ALLOW_ARTICLE_SCRAPE = False
 MIN_CONTENT_LENGTH = 300
 
 HEADERS = {
