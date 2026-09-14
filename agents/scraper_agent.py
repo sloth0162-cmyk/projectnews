@@ -28,38 +28,50 @@ HEADERS = {
         "AppleWebKit/537.36 (KHTML, like Gecko) "
         "Chrome/131.0.0.0 Safari/537.36"
     ),
-    "Accept": "application/rss+xml, application/xml, text/xml, text/html;q=0.9, */*;q=0.8"
+    "Accept": (
+        "application/rss+xml, application/xml, text/xml, "
+        "text/html;q=0.9, */*;q=0.8"
+    )
 }
 
 
 def fetch_all_articles(limit_per_source=3):
-    """Fetch article titles and URLs from RSS feeds."""
 
     articles = []
 
     print("\n========== RSS FETCH START ==========")
+    print(f"🔢 Limit per source: {limit_per_source}")
+    print(f"📡 Total RSS sources: {len(RSS_FEEDS)}")
 
     for feed in RSS_FEEDS:
 
         source = feed["source"]
         url = feed["url"]
 
-        print(f"\n🌐 Reading feed: {source}")
+        print("\n----------------------------------------")
+        print(f"🌐 START SOURCE: {source}")
         print(f"🔗 URL: {url}")
 
         try:
+
+            print(f"📡 Sending request to {source}...")
+
             response = requests.get(
                 url,
                 headers=HEADERS,
                 timeout=(5, 15)
             )
 
+            print(f"✅ Response received from {source}")
             print(f"📡 Status Code: {response.status_code}")
             print(f"📦 Response Size: {len(response.content)} bytes")
 
             response.raise_for_status()
 
+            print(f"🔍 Parsing RSS for {source}...")
+
             soup = BeautifulSoup(response.content, "xml")
+
             items = soup.find_all("item")
 
             print(f"📰 {source}: Found {len(items)} items")
@@ -67,6 +79,8 @@ def fetch_all_articles(limit_per_source=3):
             if not items:
                 print(f"⚠️ {source}: RSS returned 0 items")
                 continue
+
+            count = 0
 
             for item in items[:limit_per_source]:
 
@@ -81,7 +95,7 @@ def fetch_all_articles(limit_per_source=3):
                     print("⚠️ Skipping empty title/link")
                     continue
 
-                print(f"➡️ {title}")
+                print(f"➡️ Collected: {title}")
 
                 articles.append({
                     "title": title,
@@ -89,14 +103,25 @@ def fetch_all_articles(limit_per_source=3):
                     "source": source
                 })
 
+                count += 1
+
+            print(f"✅ {source}: Collected {count} articles")
+
         except requests.exceptions.Timeout:
             print(f"⏰ TIMEOUT while reading {source}")
+            continue
 
         except requests.exceptions.RequestException as e:
-            print(f"❌ REQUEST ERROR while reading {source}: {e}")
+            print(f"❌ REQUEST ERROR while reading {source}")
+            print(f"❌ Error: {e}")
+            continue
 
         except Exception as e:
-            print(f"❌ UNEXPECTED ERROR while reading {source}: {e}")
+            print(f"❌ UNEXPECTED ERROR while reading {source}")
+            print(f"❌ Error: {e}")
+            continue
+
+        print(f"🏁 FINISHED SOURCE: {source}")
 
     print("\n========== RSS FETCH END ==========")
     print(f"✅ Total basic articles collected: {len(articles)}")
@@ -105,26 +130,34 @@ def fetch_all_articles(limit_per_source=3):
 
 
 def scrape_article_content(url):
-    """Scrape article body from webpage."""
 
-    print(f"\n📄 Scraping article:")
-    print(f"🔗 {url}")
+    print("\n----------------------------------------")
+    print("📄 START ARTICLE SCRAPE")
+    print(f"🔗 URL: {url}")
 
     try:
+
+        print("📡 Requesting article page...")
+
         response = requests.get(
             url,
             headers=HEADERS,
             timeout=(5, 15)
         )
 
+        print("✅ Article response received")
         print(f"📡 Page Status: {response.status_code}")
         print(f"📦 Page Size: {len(response.content)} bytes")
 
         response.raise_for_status()
 
+        print("🔍 Parsing article HTML...")
+
         soup = BeautifulSoup(response.text, "html.parser")
 
         paragraphs = soup.find_all("p")
+
+        print(f"📝 Found {len(paragraphs)} paragraph elements")
 
         content = "\n".join(
             p.get_text(" ", strip=True)
@@ -138,6 +171,8 @@ def scrape_article_content(url):
             print("⚠️ Page returned no paragraph content")
             return ""
 
+        print("✅ ARTICLE SCRAPE SUCCESS")
+
         return content
 
     except requests.exceptions.Timeout:
@@ -145,44 +180,63 @@ def scrape_article_content(url):
         return ""
 
     except requests.exceptions.RequestException as e:
-        print(f"❌ REQUEST ERROR scraping article: {e}")
+        print(f"❌ REQUEST ERROR scraping article: {url}")
+        print(f"❌ Error: {e}")
         return ""
 
     except Exception as e:
-        print(f"❌ UNEXPECTED ERROR scraping article: {e}")
+        print(f"❌ UNEXPECTED ERROR scraping article: {url}")
+        print(f"❌ Error: {e}")
         return ""
 
 
 def scrape_news(limit_per_source=3):
-    """Fetch RSS articles and scrape their full content."""
 
-    print("\n========================================")
+    print("\n")
+    print("========================================")
     print("🚀 STARTING NEWS SCRAPER")
     print("========================================")
+
+    print("1️⃣ Starting RSS collection...")
 
     basic_articles = fetch_all_articles(
         limit_per_source=limit_per_source
     )
 
-    print(
-        f"\n📊 RSS stage complete. "
-        f"Received {len(basic_articles)} articles."
-    )
+    print("\n2️⃣ RSS COLLECTION COMPLETE")
+    print(f"📊 Received {len(basic_articles)} basic articles")
+
+    if not basic_articles:
+        print("⚠️ NO ARTICLES RECEIVED FROM RSS")
+        print("🛑 Scraper will return 0 articles")
+        return []
 
     full_articles = []
 
-    for index, article in enumerate(basic_articles, start=1):
+    print("\n3️⃣ Starting full article scraping...")
 
+    for index, article in enumerate(
+        basic_articles,
+        start=1
+    ):
+
+        print("\n========================================")
         print(
-            f"\n========== ARTICLE {index}/{len(basic_articles)} =========="
+            f"📄 ARTICLE {index}/{len(basic_articles)}"
         )
+        print(f"📰 {article['title']}")
+        print(f"🌐 Source: {article['source']}")
+        print("========================================")
 
         try:
-            content = scrape_article_content(article["url"])
+
+            content = scrape_article_content(
+                article["url"]
+            )
 
             if not content:
                 print(
-                    f"⚠️ No content found for: "
+                    f"⚠️ No content found: "
                     f"{article['title']}"
                 )
                 continue
@@ -194,32 +248,28 @@ def scrape_news(limit_per_source=3):
                 "content": content
             })
 
-            print(f"✅ Added: {article['title']}")
-
-        except Exception as e:
             print(
-                f"❌ ERROR processing "
-                f"'{article['title']}': {e}"
+                f"✅ FULL ARTICLE ADDED: "
+                f"{article['title']}"
             )
 
-    print("\n========================================")
-    print(f"🎉 SCRAPER FINISHED")
-    print(f"🎉 Returning {len(full_articles)} full articles")
-    print("========================================\n")
+        except Exception as e:
+
+            print(
+                f"❌ ERROR processing "
+                f"'{article['title']}'"
+            )
+
+            print(f"❌ Error: {e}")
+
+            continue
+
+    print("\n")
+    print("========================================")
+    print("🎉 SCRAPER FINISHED")
+    print(
+        f"🎉 Returning {len(full_articles)} full articles"
+    )
+    print("========================================")
 
     return full_articles
-
-
-if __name__ == "__main__":
-
-    articles = scrape_news(limit_per_source=2)
-
-    print(f"\nReturned {len(articles)} articles.\n")
-
-    for article in articles:
-
-        print("=" * 60)
-        print("Source :", article["source"])
-        print("Title  :", article["title"])
-        print("URL    :", article["url"])
-        print("Content:", article["content"][:300], "...")
