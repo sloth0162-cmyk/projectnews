@@ -192,7 +192,9 @@ def run_pipeline():
     # GET → Show pipeline page
     # -----------------------------
     if request.method == 'GET':
-        return render_template('pipeline/run_pipeline.html')
+        return render_template(
+            'pipeline/run_pipeline.html'
+        )
 
     # -----------------------------
     # Check password
@@ -217,13 +219,25 @@ def run_pipeline():
     print("\n🔎 STEP 1: Starting news scraper...")
 
     try:
-        articles = scrape_news(limit_per_source=1)
 
-        print("✅ scrape_news() returned successfully")
-        print(f"📰 Articles returned: {len(articles)}")
+        articles = scrape_news()
+
+        scraper_errors = getattr(
+            scrape_news,
+            "last_errors",
+            []
+        )
+
+        if scraper_errors:
+
+            print("\n⚠️ SCRAPER WARNINGS:")
+
+            for error in scraper_errors:
+                print(f"   - {error}")
 
     except Exception as e:
-        print("❌ SCRAPER FAILED")
+
+        print("\n❌ SCRAPER FAILED")
         print(f"❌ Error type: {type(e).__name__}")
         print(f"❌ Error: {e}")
 
@@ -232,34 +246,46 @@ def run_pipeline():
             error=f"Scraper failed: {e}"
         )
 
-    # Nothing returned
     if not articles:
-        print("⚠️ SCRAPER RETURNED ZERO ARTICLES")
-        print("🏁 Pipeline stopped because there is nothing to process.")
+
+        print("❌ Scraper returned 0 articles")
 
         return render_template(
             'pipeline/run_pipeline.html',
-            error="No new articles were returned by the scraper."
+            error="No articles were returned by the scraper."
         )
+
+    print(
+        f"\n📦 STEP 2: Processing "
+        f"{len(articles)} articles..."
+    )
 
     # -----------------------------
     # 2. PROCESS ARTICLES
     # -----------------------------
-    print(f"\n📦 STEP 2: Processing {len(articles)} articles...")
-
-    for index, article in enumerate(articles, start=1):
+    for index, article in enumerate(
+        articles,
+        start=1
+    ):
 
         print("\n========================================")
-        print(f"📄 ARTICLE {index}/{len(articles)}")
+        print(
+            f"📄 ARTICLE {index}/{len(articles)}"
+        )
         print("========================================")
 
-        title = article.get('title', '')
-        content = article.get('content', '')
+        title = article.get("title", "").strip()
+        content = article.get("content", "").strip()
+        source = article.get("source", "Unknown")
+        url = article.get("url", "Unknown")
 
         print(f"📰 Title: {title}")
-        print(f"🌐 Source: {article.get('source', 'Unknown')}")
-        print(f"🔗 URL: {article.get('url', 'Unknown')}")
-        print(f"📝 Content length: {len(content)} characters")
+        print(f"🌐 Source: {source}")
+        print(f"🔗 URL: {url}")
+        print(
+            f"📝 Content length: "
+            f"{len(content)} characters"
+        )
 
         if not title:
             print("⚠️ Article has no title. Skipping.")
@@ -272,64 +298,102 @@ def run_pipeline():
         # -----------------------------
         # 3. CHECK SUPABASE
         # -----------------------------
-        print("\n🔎 STEP 3: Checking Supabase for duplicate...")
+        print(
+            "\n🔎 STEP 3: "
+            "Checking Supabase for duplicate..."
+        )
 
         try:
 
-            exists = supabase.table('articles') \
-                .select('id') \
-                .eq('title', title) \
+            exists = (
+                supabase
+                .table("articles")
+                .select("id")
+                .eq("title", title)
                 .execute()
+            )
 
-            print("✅ Supabase duplicate check completed")
-            print(f"🔎 Matching articles: {len(exists.data)}")
+            matches = exists.data or []
+
+            print(
+                "✅ Supabase duplicate check completed"
+            )
+            print(
+                f"🔎 Matching articles: "
+                f"{len(matches)}"
+            )
 
         except Exception as e:
 
-            print("❌ SUPABASE DUPLICATE CHECK FAILED")
-            print(f"❌ Error type: {type(e).__name__}")
+            print(
+                "❌ SUPABASE DUPLICATE CHECK FAILED"
+            )
+            print(
+                f"❌ Error type: "
+                f"{type(e).__name__}"
+            )
             print(f"❌ Error: {e}")
 
             continue
 
-        if exists.data:
-            print(f"⏭️ Article already exists. Skipping:")
-            print(f"   {title}")
+        if matches:
+
+            print(
+                f"⏭️ Article already exists. "
+                f"Skipping: {title}"
+            )
+
             continue
 
         print("🆕 Article is NEW")
 
-
         # -----------------------------
         # 4. SUMMARIZE
         # -----------------------------
-        print("\n🧠 STEP 4: Starting summarizer...")
+        print(
+            "\n🧠 STEP 4: "
+            "Starting summarizer..."
+        )
 
         try:
 
-            summary = summarize_text(content)
+            summary = summarize_text(
+                content
+            )
 
             if not summary:
-                print("❌ SUMMARIZER RETURNED EMPTY RESULT")
-                print(f"❌ Article skipped: {title}")
+
+                print(
+                    "❌ SUMMARIZER RETURNED "
+                    "EMPTY RESULT"
+                )
+
                 continue
 
             print("✅ SUMMARIZER SUCCESS")
-            print(f"📝 Summary length: {len(summary)} characters")
+            print(
+                f"📝 Summary length: "
+                f"{len(summary)} characters"
+            )
 
         except Exception as e:
 
             print("❌ SUMMARIZER FAILED")
-            print(f"❌ Error type: {type(e).__name__}")
+            print(
+                f"❌ Error type: "
+                f"{type(e).__name__}"
+            )
             print(f"❌ Error: {e}")
 
             continue
 
-
         # -----------------------------
         # 5. GENERATE IMAGE
         # -----------------------------
-        print("\n🎨 STEP 5: Starting image generation...")
+        print(
+            "\n🎨 STEP 5: "
+            "Starting image generation..."
+        )
 
         try:
 
@@ -339,50 +403,82 @@ def run_pipeline():
             )
 
             if not image_path:
-                print("❌ IMAGE GENERATION RETURNED EMPTY RESULT")
+
+                print(
+                    "❌ IMAGE GENERATION "
+                    "RETURNED EMPTY RESULT"
+                )
+
                 continue
 
-            print("✅ IMAGE GENERATION SUCCESS")
-            print(f"🖼️ Image path: {image_path}")
+            print(
+                "✅ IMAGE GENERATION SUCCESS"
+            )
+            print(
+                f"🖼️ Image path: "
+                f"{image_path}"
+            )
 
         except Exception as e:
 
-            print("❌ IMAGE GENERATION FAILED")
-            print(f"❌ Error type: {type(e).__name__}")
+            print(
+                "❌ IMAGE GENERATION FAILED"
+            )
+            print(
+                f"❌ Error type: "
+                f"{type(e).__name__}"
+            )
             print(f"❌ Error: {e}")
 
             continue
-
 
         # -----------------------------
         # 6. UPLOAD IMAGE
         # -----------------------------
-        print("\n☁️ STEP 6: Uploading image...")
+        print(
+            "\n☁️ STEP 6: "
+            "Uploading image..."
+        )
 
         try:
 
-            image_url = upload_image(image_path)
+            image_url = upload_image(
+                image_path
+            )
 
             if not image_url:
-                print("❌ IMAGE UPLOAD RETURNED EMPTY RESULT")
+
+                print(
+                    "❌ IMAGE UPLOAD "
+                    "RETURNED EMPTY RESULT"
+                )
+
                 continue
 
             print("✅ IMAGE UPLOAD SUCCESS")
-            print(f"🔗 Image URL: {image_url}")
+            print(
+                f"🔗 Image URL: "
+                f"{image_url}"
+            )
 
         except Exception as e:
 
             print("❌ IMAGE UPLOAD FAILED")
-            print(f"❌ Error type: {type(e).__name__}")
+            print(
+                f"❌ Error type: "
+                f"{type(e).__name__}"
+            )
             print(f"❌ Error: {e}")
 
             continue
 
-
         # -----------------------------
         # 7. SAVE ARTICLE
         # -----------------------------
-        print("\n💾 STEP 7: Saving article to Supabase...")
+        print(
+            "\n💾 STEP 7: "
+            "Saving article to Supabase..."
+        )
 
         try:
 
@@ -392,17 +488,23 @@ def run_pipeline():
                 image_url
             )
 
-            print("✅ ARTICLE SAVED TO SUPABASE")
+            print(
+                "✅ ARTICLE SAVED TO SUPABASE"
+            )
             print(f"📰 {title}")
 
         except Exception as e:
 
-            print("❌ DATABASE SAVE FAILED")
-            print(f"❌ Error type: {type(e).__name__}")
+            print(
+                "❌ DATABASE SAVE FAILED"
+            )
+            print(
+                f"❌ Error type: "
+                f"{type(e).__name__}"
+            )
             print(f"❌ Error: {e}")
 
             continue
-
 
     # -----------------------------
     # PIPELINE COMPLETE

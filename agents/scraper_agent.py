@@ -4,10 +4,6 @@ from requests.adapters import HTTPAdapter
 from urllib3.util.retry import Retry
 
 
-# =========================================================
-# RSS SOURCES
-# =========================================================
-
 RSS_FEEDS = [
     {
         "source": "BBC",
@@ -27,10 +23,8 @@ RSS_FEEDS = [
     }
 ]
 
+MAX_ARTICLES = 4
 
-# =========================================================
-# REQUEST SESSION
-# =========================================================
 
 HEADERS = {
     "User-Agent": (
@@ -42,8 +36,7 @@ HEADERS = {
         "application/rss+xml, application/xml, text/xml, "
         "text/html;q=0.9, */*;q=0.8"
     ),
-    "Accept-Language": "en-US,en;q=0.9",
-    "Connection": "keep-alive",
+    "Accept-Language": "en-US,en;q=0.9"
 }
 
 
@@ -51,20 +44,18 @@ def create_session():
 
     session = requests.Session()
 
-    retry_strategy = Retry(
-        total=3,
-        connect=3,
-        read=3,
-        status=3,
-        backoff_factor=1,
+    retry = Retry(
+        total=2,
+        connect=2,
+        read=2,
+        status=2,
+        backoff_factor=0.5,
         status_forcelist=[429, 500, 502, 503, 504],
         allowed_methods=["GET"],
-        raise_on_status=False,
+        raise_on_status=False
     )
 
-    adapter = HTTPAdapter(
-        max_retries=retry_strategy
-    )
+    adapter = HTTPAdapter(max_retries=retry)
 
     session.mount("http://", adapter)
     session.mount("https://", adapter)
@@ -77,73 +68,35 @@ def create_session():
 session = create_session()
 
 
-# =========================================================
-# CLEAN HTML / TEXT
-# =========================================================
-
 def clean_text(value):
 
     if not value:
         return ""
 
-    soup = BeautifulSoup(
-        value,
-        "html.parser"
+    soup = BeautifulSoup(value, "html.parser")
+
+    return " ".join(
+        soup.get_text(" ", strip=True).split()
     )
 
-    text = soup.get_text(
-        " ",
-        strip=True
-    )
-
-    return " ".join(text.split())
-
-
-# =========================================================
-# EXTRACT RSS DESCRIPTION
-# =========================================================
 
 def extract_rss_content(item):
 
-    # Standard RSS
     description = item.find("description")
 
     if description:
-        text = clean_text(
-            description.get_text()
-        )
+        text = clean_text(description.get_text())
 
         if text:
             return text
 
-    # Some feeds may expose content differently
-    content_encoded = item.find(
-        "content:encoded"
-    )
-
-    if content_encoded:
-        text = clean_text(
-            content_encoded.get_text()
-        )
-
-        if text:
-            return text
-
-    # Fallback for namespace parsing
     for tag in item.find_all():
 
-        if tag.name and (
-            str(tag.name).lower()
-            in [
-                "encoded",
-                "summary",
-                "content"
-            ]
-        ):
+        name = str(tag.name).lower()
 
-            text = clean_text(
-                tag.get_text()
-            )
+        if name in ("encoded", "summary", "content"):
+
+            text = clean_text(tag.get_text())
 
             if text:
                 return text
@@ -151,241 +104,14 @@ def extract_rss_content(item):
     return ""
 
 
-# =========================================================
-# FETCH RSS FEEDS
-# =========================================================
-
-def fetch_all_articles(limit_per_source=3):
-
-    articles = []
-
-    print("\n========================================")
-    print("🚀 RSS COLLECTION START")
-    print("========================================")
-
-    print(f"🔢 Limit per source: {limit_per_source}")
-    print(f"📡 Sources: {len(RSS_FEEDS)}")
-
-    for feed in RSS_FEEDS:
-
-        source = feed["source"]
-        url = feed["url"]
-
-        print("\n----------------------------------------")
-        print(f"🌐 SOURCE: {source}")
-        print(f"🔗 URL: {url}")
-
-        try:
-
-            print("📡 Requesting RSS...")
-
-            response = session.get(
-                url,
-                timeout=(10, 20),
-                allow_redirects=True
-            )
-
-            print("✅ RSS RESPONSE RECEIVED")
-            print(f"📡 Status: {response.status_code}")
-            print(f"🔗 Final URL: {response.url}")
-            print(f"📦 Size: {len(response.content)} bytes")
-
-            response.raise_for_status()
-
-            print("🔍 Parsing RSS...")
-
-            soup = BeautifulSoup(
-                response.content,
-                "xml"
-            )
-
-            items = soup.find_all("item")
-
-            print(
-                f"📰 {source}: "
-                f"{len(items)} RSS items found"
-            )
-
-            if not items:
-
-                print(
-                    f"⚠️ {source}: "
-                    f"No RSS items found"
-                )
-
-                continue
-
-            collected = 0
-
-            for item in items:
-
-                if collected >= limit_per_source:
-                    break
-
-                # -----------------------------------------
-                # TITLE
-                # -----------------------------------------
-
-                title_tag = item.find("title")
-
-                if not title_tag:
-
-                    print(
-                        "⚠️ Missing title - skipping"
-                    )
-
-                    continue
-
-                title = clean_text(
-                    title_tag.get_text()
-                )
-
-                # -----------------------------------------
-                # LINK
-                # -----------------------------------------
-
-                link_tag = item.find("link")
-
-                if not link_tag:
-
-                    print(
-                        "⚠️ Missing link - skipping"
-                    )
-
-                    continue
-
-                link = link_tag.get_text(
-                    strip=True
-                )
-
-                # Some RSS feeds can store URL
-                # differently
-                if not link:
-
-                    href = link_tag.get(
-                        "href"
-                    )
-
-                    if href:
-                        link = href.strip()
-
-                if not title or not link:
-
-                    print(
-                        "⚠️ Empty title/link - skipping"
-                    )
-
-                    continue
-
-                # -----------------------------------------
-                # DESCRIPTION
-                # -----------------------------------------
-
-                rss_content = extract_rss_content(
-                    item
-                )
-
-                print(f"\n➡️ TITLE: {title}")
-                print(f"🔗 LINK: {link}")
-                print(
-                    f"📝 RSS CONTENT: "
-                    f"{len(rss_content)} chars"
-                )
-
-                if rss_content:
-
-                    print(
-                        "✅ RSS already contains "
-                        "article content/summary"
-                    )
-
-                else:
-
-                    print(
-                        "⚠️ RSS has no usable description"
-                    )
-
-                articles.append(
-                    {
-                        "title": title,
-                        "url": link,
-                        "source": source,
-                        "rss_content": rss_content,
-                    }
-                )
-
-                collected += 1
-
-            print(
-                f"\n✅ {source}: "
-                f"Collected {collected}"
-            )
-
-        except requests.exceptions.Timeout:
-
-            print(
-                f"⏰ TIMEOUT: {source}"
-            )
-            continue
-
-        except requests.exceptions.RequestException as e:
-
-            print(
-                f"❌ REQUEST ERROR: {source}"
-            )
-            print(
-                f"❌ {type(e).__name__}: {e}"
-            )
-            continue
-
-        except Exception as e:
-
-            print(
-                f"❌ RSS PARSING ERROR: {source}"
-            )
-            print(
-                f"❌ {type(e).__name__}: {e}"
-            )
-            continue
-
-    print("\n========================================")
-    print("✅ RSS COLLECTION FINISHED")
-    print(
-        f"📰 Total articles: {len(articles)}"
-    )
-    print("========================================")
-
-    return articles
-
-
-# =========================================================
-# WEBPAGE ARTICLE SCRAPER
-# =========================================================
-
 def scrape_article_content(url):
-
-    print("\n----------------------------------------")
-    print("📄 WEBPAGE SCRAPE START")
-    print(f"🔗 {url}")
 
     try:
 
         response = session.get(
             url,
-            timeout=(10, 20),
+            timeout=(10, 15),
             allow_redirects=True
-        )
-
-        print(
-            f"📡 Status: {response.status_code}"
-        )
-
-        print(
-            f"🔗 Final URL: {response.url}"
-        )
-
-        print(
-            f"📦 Size: {len(response.content)} bytes"
         )
 
         response.raise_for_status()
@@ -395,347 +121,221 @@ def scrape_article_content(url):
             "html.parser"
         )
 
-        # -----------------------------------------
-        # Try likely article containers first
-        # -----------------------------------------
-
-        selectors = [
-
+        # Try article containers first
+        for selector in [
             "article",
-
             "[class*='article-body']",
             "[class*='article-content']",
-
             "[class*='story-body']",
             "[class*='story-content']",
-
-            "[class*='post-content']",
-
             "main"
-        ]
+        ]:
 
-        for selector in selectors:
-
-            elements = soup.select(
-                selector
-            )
-
-            for element in elements:
+            for element in soup.select(selector):
 
                 text = element.get_text(
-                    "\n",
+                    " ",
                     strip=True
                 )
 
-                text = "\n".join(
-                    line.strip()
-                    for line in text.splitlines()
-                    if line.strip()
-                )
+                text = " ".join(text.split())
 
-                if len(text) >= 500:
-
-                    print(
-                        f"✅ ARTICLE FOUND USING: "
-                        f"{selector}"
-                    )
-
-                    print(
-                        f"📝 Characters: "
-                        f"{len(text)}"
-                    )
-
+                if len(text) >= 300:
                     return text
 
-        # -----------------------------------------
-        # Generic paragraph fallback
-        # -----------------------------------------
+        # Paragraph fallback
+        paragraphs = []
 
-        print(
-            "🔍 Article container not found."
-        )
-
-        print(
-            "🔍 Trying paragraph extraction..."
-        )
-
-        paragraphs = soup.find_all("p")
-
-        useful_paragraphs = []
-
-        for paragraph in paragraphs:
-
-            text = paragraph.get_text(
-                " ",
-                strip=True
-            )
+        for p in soup.find_all("p"):
 
             text = " ".join(
-                text.split()
+                p.get_text(" ", strip=True).split()
             )
 
             if len(text) >= 30:
+                paragraphs.append(text)
 
-                useful_paragraphs.append(
-                    text
-                )
+        content = " ".join(paragraphs)
 
-        content = "\n".join(
-            useful_paragraphs
-        )
-
-        print(
-            f"📝 Paragraphs found: "
-            f"{len(useful_paragraphs)}"
-        )
-
-        print(
-            f"📝 Extracted characters: "
-            f"{len(content)}"
-        )
-
-        if len(content) >= 500:
-
-            print(
-                "✅ ARTICLE SCRAPE SUCCESS"
-            )
-
+        if len(content) >= 300:
             return content
-
-        print(
-            "⚠️ WEBPAGE DOES NOT CONTAIN "
-            "ENOUGH ARTICLE TEXT"
-        )
-
-        return ""
-
-    except requests.exceptions.Timeout:
-
-        print(
-            f"⏰ ARTICLE TIMEOUT: {url}"
-        )
-
-        return ""
-
-    except requests.exceptions.RequestException as e:
-
-        print(
-            f"❌ ARTICLE REQUEST ERROR: {url}"
-        )
-
-        print(
-            f"❌ {type(e).__name__}: {e}"
-        )
 
         return ""
 
     except Exception as e:
 
         print(
-            f"❌ ARTICLE SCRAPE ERROR: {url}"
-        )
-
-        print(
-            f"❌ {type(e).__name__}: {e}"
+            f"⚠️ Article scrape failed: "
+            f"{type(e).__name__}: {e}"
         )
 
         return ""
 
 
-# =========================================================
-# MAIN NEWS SCRAPER
-# =========================================================
+def fetch_all_articles(errors):
 
-def scrape_news(limit_per_source=3):
+    articles = []
 
-    print("\n")
-    print("========================================")
-    print("🚀 STARTING NEWS SCRAPER")
-    print("========================================")
+    for feed in RSS_FEEDS:
 
-    # =====================================================
-    # STEP 1 — RSS
-    # =====================================================
+        if len(articles) >= MAX_ARTICLES:
+            break
 
-    print("\n1️⃣ STEP 1: RSS COLLECTION")
+        source = feed["source"]
+        url = feed["url"]
 
-    basic_articles = fetch_all_articles(
-        limit_per_source=limit_per_source
-    )
+        print(f"\n🌐 Checking {source}")
 
-    print("\n----------------------------------------")
-    print(
-        f"📊 RSS returned "
-        f"{len(basic_articles)} articles"
-    )
-    print("----------------------------------------")
+        try:
 
-    if not basic_articles:
-
-        print(
-            "❌ NO RSS ARTICLES RECEIVED"
-        )
-
-        return []
-
-    # =====================================================
-    # STEP 2 — BUILD FULL ARTICLES
-    # =====================================================
-
-    print("\n2️⃣ STEP 2: BUILDING ARTICLE CONTENT")
-
-    full_articles = []
-
-    for index, article in enumerate(
-        basic_articles,
-        start=1
-    ):
-
-        title = article["title"]
-        url = article["url"]
-        source = article["source"]
-        rss_content = article.get(
-            "rss_content",
-            ""
-        )
-
-        print("\n========================================")
-        print(
-            f"📄 ARTICLE {index}/"
-            f"{len(basic_articles)}"
-        )
-        print(f"📰 {title}")
-        print(f"🌐 Source: {source}")
-        print("========================================")
-
-        # =================================================
-        # OPTION A — RSS CONTENT
-        # =================================================
-
-        if rss_content and len(rss_content) >= 300:
-
-            print(
-                "✅ USING RSS CONTENT"
+            response = session.get(
+                url,
+                timeout=(10, 15),
+                allow_redirects=True
             )
 
             print(
-                f"📝 RSS content length: "
-                f"{len(rss_content)}"
+                f"📡 {source}: "
+                f"HTTP {response.status_code}"
             )
 
-            full_articles.append(
-                {
+            response.raise_for_status()
+
+            soup = BeautifulSoup(
+                response.content,
+                "xml"
+            )
+
+            items = soup.find_all("item")
+
+            if not items:
+                message = f"{source}: RSS returned no items"
+                print(f"⚠️ {message}")
+                errors.append(message)
+                continue
+
+            # Take the newest usable item from this feed
+            for item in items:
+
+                if len(articles) >= MAX_ARTICLES:
+                    break
+
+                title_tag = item.find("title")
+                link_tag = item.find("link")
+
+                if not title_tag or not link_tag:
+                    continue
+
+                title = clean_text(
+                    title_tag.get_text()
+                )
+
+                link = link_tag.get_text(
+                    strip=True
+                )
+
+                if not link:
+                    link = link_tag.get("href", "").strip()
+
+                if not title or not link:
+                    continue
+
+                rss_content = extract_rss_content(item)
+
+                # Prefer RSS content
+                content = rss_content
+
+                # Fallback to article page
+                if len(content) < 300:
+
+                    print(
+                        f"🌐 RSS content weak for: {title}"
+                    )
+
+                    content = scrape_article_content(
+                        link
+                    )
+
+                if not content:
+
+                    print(
+                        f"⚠️ No usable content: {title}"
+                    )
+
+                    continue
+
+                articles.append({
                     "title": title,
-                    "url": url,
+                    "url": link,
                     "source": source,
-                    "content": rss_content,
-                }
+                    "content": content
+                })
+
+                print(
+                    f"✅ Added: {source} - {title}"
+                )
+
+                # One article per feed is enough
+                break
+
+        except Exception as e:
+
+            message = (
+                f"{source}: "
+                f"{type(e).__name__}: {e}"
             )
 
-            print(
-                "✅ ARTICLE ADDED FROM RSS"
-            )
+            print(f"❌ {message}")
+            errors.append(message)
 
-            continue
+    return articles
 
-        # =================================================
-        # OPTION B — WEBPAGE FALLBACK
-        # =================================================
 
-        print(
-            "⚠️ RSS content too short."
-        )
+def scrape_news():
 
-        print(
-            "🌐 Falling back to webpage..."
-        )
-
-        webpage_content = scrape_article_content(
-            url
-        )
-
-        if webpage_content:
-
-            full_articles.append(
-                {
-                    "title": title,
-                    "url": url,
-                    "source": source,
-                    "content": webpage_content,
-                }
-            )
-
-            print(
-                "✅ ARTICLE ADDED FROM WEBPAGE"
-            )
-
-            continue
-
-        # =================================================
-        # OPTION C — USE SHORT RSS CONTENT
-        # =================================================
-
-        if rss_content:
-
-            print(
-                "⚠️ Webpage extraction failed."
-            )
-
-            print(
-                "✅ Using RSS content as final fallback."
-            )
-
-            full_articles.append(
-                {
-                    "title": title,
-                    "url": url,
-                    "source": source,
-                    "content": rss_content,
-                }
-            )
-
-            continue
-
-        # =================================================
-        # NOTHING AVAILABLE
-        # =================================================
-
-        print(
-            "❌ Could not obtain usable content."
-        )
-
-    # =====================================================
-    # FINAL RESULT
-    # =====================================================
-
-    print("\n")
+    print("\n========================================")
+    print("🚀 NEWS SCRAPER STARTED")
     print("========================================")
-    print("🎉 SCRAPER FINISHED")
+
+    errors = []
+
+    articles = fetch_all_articles(errors)
+
+    # Store errors so run_pipeline can report them
+    scrape_news.last_errors = errors
+
+    print("\n========================================")
+    print("📊 SCRAPER RESULT")
     print("========================================")
+    print(f"📰 Articles: {len(articles)}")
+    print(f"⚠️ Feed errors: {len(errors)}")
+
+    for error in errors:
+        print(f"   - {error}")
+
+    # Minimum = 1 article
+    if not articles:
+
+        message = (
+            "Scraper failed: no usable articles "
+            "were returned from any feed."
+        )
+
+        print(f"❌ {message}")
+
+        raise RuntimeError(message)
+
+    # Maximum = 4 articles
+    articles = articles[:MAX_ARTICLES]
 
     print(
-        f"📰 RSS ARTICLES: "
-        f"{len(basic_articles)}"
+        f"✅ Returning {len(articles)} articles"
     )
-
-    print(
-        f"✅ USABLE ARTICLES: "
-        f"{len(full_articles)}"
-    )
-
-    if not full_articles:
-
-        print(
-            "❌ SCRAPER PRODUCED ZERO USABLE ARTICLES"
-        )
-
-    else:
-
-        print(
-            "✅ SCRAPER HAS ARTICLES "
-            "READY FOR SUMMARIZATION"
-        )
 
     print("========================================")
 
-    return full_articles
+    return articles
+
+
+# Used by run_pipeline
+scrape_news.last_errors = []
