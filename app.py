@@ -26,7 +26,9 @@ PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
 app.register_blueprint(second)
 
-#Pipeline hard deadline in seconds to avoid vercel time out {Vercel hobby limit is 10secs}
+# Vercel Hobby plan hard-kills functions at 10s. We stop starting new work
+# at 8.5s elapsed so we can return a clean response instead of getting cut
+# off mid-write.
 PIPELINE_HARD_DEADLINE_SECONDS = 8.5
 
 
@@ -196,15 +198,21 @@ def _pipeline_time_left(start_time):
 
 def _pipeline_respond(debug_log, error=None):
     """?debug=1 returns raw JSON so you can see exactly what happened
-    without digging through Vercel's log dashboard."""
+    without digging through Vercel's log dashboard.
+
+    Status code matters: a genuine failure now returns 500, not 200, so
+    Vercel's request list actually flags it as a failure at a glance
+    instead of it looking identical to a successful run."""
+    status_code = 500 if error else 200
+
     if request.args.get("debug") == "1":
-        return jsonify({"error": error, "log": debug_log})
+        return jsonify({"error": error, "log": debug_log}), status_code
 
     return render_template(
         'pipeline/run_pipeline.html',
         error=error,
         debug_log=debug_log,
-    )
+    ), status_code
 
 
 @app.route('/run_pipeline', methods=['GET', 'POST'])
@@ -258,13 +266,7 @@ def run_pipeline():
         if scraper_errors:
             log_step("scrape", "warning", f"{len(scraper_errors)} feed error(s): {scraper_errors}")
 
-        #Test only one article per pipelinr run
-        articles = articles[:1]
-        if not articles:
-            log_step("scrape", "failed", "No  articles returend by the scrapper")
-            return _pipeline_respond(debug_log, error="No usuable article by scraper")
-
-        log_step("scrape", "ok",f"{len(articles)} articles feteched")
+        log_step("scrape", "ok", f"{len(articles)} article(s) fetched")
 
     except Exception as e:
         log_step("scrape", "failed", f"{type(e).__name__}: {e}")
