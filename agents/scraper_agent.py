@@ -55,15 +55,26 @@ MAX_ARTICLES = 4
 # returns. Scraping alone should not eat the whole budget.
 SCRAPE_TIME_BUDGET_SECONDS = 6.0
 
-# Per-request timeouts must be short since we have ~6s total, not per-call.
+# Per-request timeouts. Kept short-ish for the overall budget, but not so
+# short that normal (non-Vercel) page loads fail outright — the deadline
+# check in scrape_article_content is what actually protects the budget.
 FEED_TIMEOUT = (3, 4)      # (connect, read)
-ARTICLE_TIMEOUT = (3, 3)   # (connect, read)
+ARTICLE_TIMEOUT = (4, 5)   # (connect, read)
 
 # Full article-page scraping is expensive and unreliable under a tight
 # budget. Only attempt it if there's meaningfully more than a couple of
 # seconds of budget left, and never as a blocking requirement.
-ALLOW_ARTICLE_SCRAPE = False
+ALLOW_ARTICLE_SCRAPE = True
+
+# Preferred content length — below this we still try the page-scrape fallback.
 MIN_CONTENT_LENGTH = 300
+
+# Absolute floor. Many sites (esp. JS-rendered ones like CNBC) never yield
+# 300 chars to a plain requests.get(). Rather than discard the article
+# entirely, accept anything at or above this floor — a short RSS
+# description is still enough for summarize_text() to work with, and a
+# skipped article helps nobody.
+FALLBACK_MIN_CONTENT_LENGTH = 60
 
 HEADERS = {
     "User-Agent": (
@@ -171,7 +182,10 @@ def scrape_article_content(url, deadline):
         paragraphs = [p for p in paragraphs if len(p) >= 30]
         content = " ".join(paragraphs)
 
-        return content if len(content) >= MIN_CONTENT_LENGTH else ""
+        # Return whatever we got, even if thin — the caller compares this
+        # against the RSS description and keeps the better of the two,
+        # rather than us deciding here that "short" means "worthless".
+        return content
 
     except Exception as e:
         print(f"⚠️ Article scrape failed for {url}: {type(e).__name__}: {e}")
@@ -242,14 +256,28 @@ def fetch_all_articles(errors):
                 if not title or not link:
                     continue
 
-                content = extract_rss_content(entry)
+                rss_content = extract_rss_content(entry)
+                content = rss_content
 
                 if len(content) < MIN_CONTENT_LENGTH and ALLOW_ARTICLE_SCRAPE:
-                    content = scrape_article_content(link, deadline)
+                    scraped = scrape_article_content(link, deadline)
+                    # Keep whichever is longer — never let a failed/thin
+                    # scrape throw away a perfectly usable RSS description.
+                    if len(scraped) > len(content):
+                        content = scraped
 
-                if not content:
-                    print(f"⚠️ No usable content: {title}")
+                if len(content) < FALLBACK_MIN_CONTENT_LENGTH:
+                    print(
+                        f"⚠️ No usable content: {title} "
+                        f"(best length {len(content)} chars)"
+                    )
                     continue
+
+                if len(content) < MIN_CONTENT_LENGTH:
+                    print(
+                        f"ℹ️ Using thin content for: {title} "
+                        f"({len(content)} chars, below preferred {MIN_CONTENT_LENGTH})"
+                    )
 
                 articles.append(
                     {"title": title, "url": link, "source": source, "content": content}

@@ -26,9 +26,7 @@ PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
 app.register_blueprint(second)
 
-# Vercel Hobby plan hard-kills functions at 10s. We stop starting new work
-# at 8.5s elapsed so we can return a clean response instead of getting cut
-# off mid-write.
+#Pipeline hard deadline in seconds to avoid vercel time out {Vercel hobby limit is 10secs}
 PIPELINE_HARD_DEADLINE_SECONDS = 8.5
 
 
