@@ -29,7 +29,7 @@ app.register_blueprint(second)
 # Vercel Hobby plan hard-kills functions at 10s. We stop starting new work
 # at 8.5s elapsed so we can return a clean response instead of getting cut
 # off mid-write.
-PIPELINE_HARD_DEADLINE_SECONDS = 8.5
+
 
 
 # -----------------------------
@@ -188,54 +188,49 @@ def auth_callback():
 
     return redirect(url_for("dashboard_page"))
 
-
 # -----------------------------
 # ⚙️ Run News Pipeline (General)
 # -----------------------------
-def _pipeline_time_left(start_time):
-    return PIPELINE_HARD_DEADLINE_SECONDS - (time.monotonic() - start_time)
-
 
 def _pipeline_respond(debug_log, error=None):
-    """?debug=1 returns raw JSON so you can see exactly what happened
-    without digging through Vercel's log dashboard.
+    """?debug=1 returns raw JSON for easier debugging."""
 
-    Status code matters: a genuine failure now returns 500, not 200, so
-    Vercel's request list actually flags it as a failure at a glance
-    instead of it looking identical to a successful run."""
     status_code = 500 if error else 200
 
     if request.args.get("debug") == "1":
-        return jsonify({"error": error, "log": debug_log}), status_code
+        return jsonify({
+            "error": error,
+            "log": debug_log
+        }), status_code
 
     return render_template(
-        'pipeline/run_pipeline.html',
+        "pipeline/run_pipeline.html",
         error=error,
         debug_log=debug_log,
     ), status_code
 
 
-@app.route('/run_pipeline', methods=['GET', 'POST'])
+@app.route("/run_pipeline", methods=["GET", "POST"])
 def run_pipeline():
 
     # -----------------------------
     # GET → Show pipeline page
     # -----------------------------
-    if request.method == 'GET':
+    if request.method == "GET":
         return render_template(
-            'pipeline/run_pipeline.html'
+            "pipeline/run_pipeline.html"
         )
 
     # -----------------------------
     # Check password
     # -----------------------------
-    password = request.form.get('password')
+    password = request.form.get("password")
 
     if password != PIPELINE_PASSWORD:
         print("❌ Pipeline rejected: Incorrect password")
 
         return render_template(
-            'pipeline/run_pipeline.html',
+            "pipeline/run_pipeline.html",
             error="Incorrect password"
         )
 
@@ -247,8 +242,12 @@ def run_pipeline():
             "step": step,
             "status": status,
             "detail": detail,
-            "elapsed_s": round(time.monotonic() - start_time, 2),
+            "elapsed_s": round(
+                time.monotonic() - start_time,
+                2
+            ),
         })
+
         print(f"[{status}] {step}: {detail}")
 
     log_step("pipeline", "start")
@@ -261,54 +260,100 @@ def run_pipeline():
     try:
         articles = scrape_news()
 
-        scraper_errors = getattr(scrape_news, "last_errors", [])
+        scraper_errors = getattr(
+            scrape_news,
+            "last_errors",
+            []
+        )
 
         if scraper_errors:
-            log_step("scrape", "warning", f"{len(scraper_errors)} feed error(s): {scraper_errors}")
+            log_step(
+                "scrape",
+                "warning",
+                f"{len(scraper_errors)} feed error(s): {scraper_errors}"
+            )
 
-        log_step("scrape", "ok", f"{len(articles)} article(s) fetched")
+        log_step(
+            "scrape",
+            "ok",
+            f"{len(articles)} article(s) fetched"
+        )
 
     except Exception as e:
-        log_step("scrape", "failed", f"{type(e).__name__}: {e}")
-        return _pipeline_respond(debug_log, error=f"Scraper failed: {e}")
+        log_step(
+            "scrape",
+            "failed",
+            f"{type(e).__name__}: {e}"
+        )
+
+        return _pipeline_respond(
+            debug_log,
+            error=f"Scraper failed: {e}"
+        )
 
     if not articles:
-        log_step("scrape", "failed", "0 articles returned")
-        return _pipeline_respond(debug_log, error="No articles were returned by the scraper.")
+        log_step(
+            "scrape",
+            "failed",
+            "0 articles returned"
+        )
+
+        return _pipeline_respond(
+            debug_log,
+            error="No articles were returned by the scraper."
+        )
 
     # -----------------------------
-    # 2. PROCESS ARTICLES (time-budget aware)
+    # 2. PROCESS ARTICLES
     # -----------------------------
     processed = 0
-    skipped_due_to_time = 0
 
-    for index, article in enumerate(articles, start=1):
+    for index, article in enumerate(
+        articles,
+        start=1
+    ):
 
-        remaining = _pipeline_time_left(start_time)
+        title = article.get(
+            "title",
+            ""
+        ).strip()
 
-        # Stop starting new articles once too close to the hard deadline.
-        # A full article costs roughly: dup-check + summarize + image-gen +
-        # upload + db-save. Bail cleanly rather than get hard-killed mid-write.
-        if remaining < 2.5:
-            skipped_due_to_time += 1
+        content = article.get(
+            "content",
+            ""
+        ).strip()
+
+        source = article.get(
+            "source",
+            "Unknown"
+        )
+
+        url = article.get(
+            "url",
+            "Unknown"
+        )
+
+        if not title:
             log_step(
-                f"article[{index}]", "skipped",
-                f"only {remaining:.1f}s left in budget — stopping to avoid a hard timeout"
+                f"article[{index}]",
+                "skipped",
+                "no title"
             )
             continue
 
-        title = article.get("title", "").strip()
-        content = article.get("content", "").strip()
-        source = article.get("source", "Unknown")
-        url = article.get("url", "Unknown")
-
-        if not title:
-            log_step(f"article[{index}]", "skipped", "no title")
-            continue
-
         if not content:
-            log_step(f"article[{index}]", "skipped", "no content")
+            log_step(
+                f"article[{index}]",
+                "skipped",
+                "no content"
+            )
             continue
+
+        log_step(
+            f"article[{index}]",
+            "start",
+            f"{source}: {title}"
+        )
 
         # -----------------------------
         # 3. CHECK SUPABASE
@@ -325,11 +370,20 @@ def run_pipeline():
             matches = exists.data or []
 
         except Exception as e:
-            log_step(f"article[{index}]", "failed", f"dup-check error: {type(e).__name__}: {e}")
+            log_step(
+                f"article[{index}]",
+                "failed",
+                f"dup-check error: "
+                f"{type(e).__name__}: {e}"
+            )
             continue
 
         if matches:
-            log_step(f"article[{index}]", "skipped", f"duplicate: {title}")
+            log_step(
+                f"article[{index}]",
+                "skipped",
+                f"duplicate: {title}"
+            )
             continue
 
         # -----------------------------
@@ -339,64 +393,118 @@ def run_pipeline():
             summary = summarize_text(content)
 
             if not summary:
-                log_step(f"article[{index}]", "failed", "summarizer returned empty result")
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    "summarizer returned empty result"
+                )
                 continue
 
         except Exception as e:
-            log_step(f"article[{index}]", "failed", f"summarizer error: {type(e).__name__}: {e}")
+            log_step(
+                f"article[{index}]",
+                "failed",
+                f"summarizer error: "
+                f"{type(e).__name__}: {e}"
+            )
             continue
 
         # -----------------------------
         # 5. GENERATE IMAGE
         # -----------------------------
         try:
-            image_path = create_news_image(title, summary)
+            image_path = create_news_image(
+                title,
+                summary
+            )
 
             if not image_path:
-                log_step(f"article[{index}]", "failed", "image generation returned empty result")
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    "image generation returned empty result"
+                )
                 continue
 
         except Exception as e:
-            log_step(f"article[{index}]", "failed", f"image-gen error: {type(e).__name__}: {e}")
+            log_step(
+                f"article[{index}]",
+                "failed",
+                f"image-gen error: "
+                f"{type(e).__name__}: {e}"
+            )
             continue
 
         # -----------------------------
         # 6. UPLOAD IMAGE
         # -----------------------------
         try:
-            image_url = upload_image(image_path)
+            image_url = upload_image(
+                image_path
+            )
 
             if not image_url:
-                log_step(f"article[{index}]", "failed", "image upload returned empty result")
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    "image upload returned empty result"
+                )
                 continue
 
         except Exception as e:
-            log_step(f"article[{index}]", "failed", f"image-upload error: {type(e).__name__}: {e}")
+            log_step(
+                f"article[{index}]",
+                "failed",
+                f"image-upload error: "
+                f"{type(e).__name__}: {e}"
+            )
             continue
 
         # -----------------------------
         # 7. SAVE ARTICLE
         # -----------------------------
         try:
-            save_summary_to_db(title, summary, image_url)
+            save_summary_to_db(
+                title,
+                summary,
+                image_url
+            )
+
             processed += 1
-            log_step(f"article[{index}]", "ok", f"saved: {title}")
+
+            log_step(
+                f"article[{index}]",
+                "ok",
+                f"saved: {title}"
+            )
 
         except Exception as e:
-            log_step(f"article[{index}]", "failed", f"db-save error: {type(e).__name__}: {e}")
+            log_step(
+                f"article[{index}]",
+                "failed",
+                f"db-save error: "
+                f"{type(e).__name__}: {e}"
+            )
             continue
 
     # -----------------------------
     # PIPELINE COMPLETE
     # -----------------------------
-    total_elapsed = round(time.monotonic() - start_time, 2)
-    log_step(
-        "pipeline", "finished",
-        f"{processed} saved, {skipped_due_to_time} skipped for time, {total_elapsed}s total"
+    total_elapsed = round(
+        time.monotonic() - start_time,
+        2
     )
 
-    return _pipeline_respond(debug_log)
+    log_step(
+        "pipeline",
+        "finished",
+        f"{processed} saved, "
+        f"{total_elapsed}s total"
+    )
 
+    return _pipeline_respond(
+        debug_log
+    )
 
 # -----------------------------
 # 🧠 Editorial (Manual Posts)
