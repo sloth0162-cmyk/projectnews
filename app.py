@@ -26,9 +26,6 @@ PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
 app.register_blueprint(second)
 
-# Vercel Hobby plan hard-kills functions at 10s. We stop starting new work
-# at 8.5s elapsed so we can return a clean response instead of getting cut
-# off mid-write.
 
 
 
@@ -46,7 +43,7 @@ def dashboard_page():
 
     # Tag filter
     if tag and tag.lower() != "all":
-        query = query.ilike("tags", f"%{tag}%")
+        query = query.contains("tags", [tag])
 
     # Search filter
     if search:
@@ -76,10 +73,7 @@ def dashboard_page():
     except Exception as e:
         print(f"⚠️ Error fetching finance_articles: {e}")
         finance_articles = []
-   #test below
-    for a in articles[:3]:
-        print(a)
-    print(articles[0])
+
 
     return render_template(
         "dashboard.html",
@@ -486,6 +480,26 @@ def run_pipeline():
                 f"{type(e).__name__}: {e}"
             )
             continue
+                # -----------------------------
+        # 8. CLASSIFY ARTICLE
+        # -----------------------------
+        try:
+            tags = classify_article(title, summary)
+
+            save_tags_to_article(title, tags)
+
+            log_step(
+                f"article[{index}]",
+                "ok",
+                f"tags saved: {tags}"
+            )
+
+        except Exception as e:
+            log_step(
+                f"article[{index}]",
+                "warning",
+                f"tagging error: {type(e).__name__}: {e}"
+            )
 
     # -----------------------------
     # PIPELINE COMPLETE
