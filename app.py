@@ -541,13 +541,20 @@ def finance_page():
             .order("id", desc=True)
             .execute()
         )
+
         articles = result.data or []
+
+        print("FINANCE ARTICLES:")
+        print(articles)
+
     except Exception as e:
         print("⚠️ Error fetching finance articles:", e)
         articles = []
 
-    return render_template("finance/index.html", articles=articles)
-
+    return render_template(
+        "finance/index.html",
+        articles=articles
+    )
 
 @app.route("/run_finance_pipeline")
 def run_finance_route():

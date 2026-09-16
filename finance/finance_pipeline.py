@@ -10,7 +10,7 @@ def save_finance_article_to_db(title, summary, tag):
         supabase.table("finance_articles").insert({
             "title": title,
             "summary": summary,
-            "tag": tag,
+            "tags": [tag],
             "created_at": datetime.utcnow().isoformat()
         }).execute()
     except Exception as e:
