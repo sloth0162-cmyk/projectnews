@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 
@@ -14,9 +15,14 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap"
+        rel="stylesheet"
+    >
 
     <title>Sloth Newz</title>
 
@@ -30,38 +36,72 @@
             --mist: #f3faf1;
         }
 
-        html { scroll-behavior: auto; }
+        html {
+            scroll-behavior: auto;
+        }
 
         @media (prefers-reduced-motion: no-preference) {
-            html { scroll-behavior: smooth; }   /* smooth jump from Discover cards to #sections */
+            html {
+                scroll-behavior: smooth;
+            }
         }
 
         body {
             font-family: "DM Sans", system-ui, sans-serif;
+
             background:
-                radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
-                radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
-                radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
+                radial-gradient(
+                    900px 400px at 8% -5%,
+                    rgba(255, 201, 60, .35),
+                    transparent 60%
+                ),
+                radial-gradient(
+                    700px 380px at 95% 0%,
+                    rgba(255, 61, 129, .18),
+                    transparent 60%
+                ),
+                radial-gradient(
+                    800px 500px at 50% 110%,
+                    rgba(18, 183, 106, .20),
+                    transparent 60%
+                ),
                 var(--mist);
+
             color: var(--canopy);
         }
 
-        h1, h2, h3 {
+        h1,
+        h2,
+        h3 {
             font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
             letter-spacing: -0.02em;
         }
 
-        /* safety net so no included section can push the page sideways */
-        html, body { max-width: 100%; overflow-x: clip; }
+        /* Prevent horizontal overflow from included sections */
+        html,
+        body {
+            max-width: 100%;
+            overflow-x: clip;
+        }
 
-        /* keep the target section visible below the sticky nav + highlight it briefly when jumped to */
-        section[id] { scroll-margin-top: 100px; }
+        /* Keep anchor targets visible below the navigation */
+        section[id] {
+            scroll-margin-top: 100px;
+        }
 
         @media (prefers-reduced-motion: no-preference) {
-            section[id]:target { animation: flash 1.4s ease-out; }
+            section[id]:target {
+                animation: flash 1.4s ease-out;
+            }
+
             @keyframes flash {
-                0%   { box-shadow: inset 0 0 0 4px rgba(255, 61, 129, .55); }
-                100% { box-shadow: inset 0 0 0 4px rgba(255, 61, 129, 0); }
+                0% {
+                    box-shadow: inset 0 0 0 4px rgba(255, 61, 129, .55);
+                }
+
+                100% {
+                    box-shadow: inset 0 0 0 4px rgba(255, 61, 129, 0);
+                }
             }
         }
     </style>
@@ -71,55 +111,92 @@
 
     <header></header>
 
-    {% include 'searchbar.html' %}
+    <!-- Search bar -->
+  {% include 'searchbar.html' %}
 
 
-    <!-- Crypto Section -->
-    <section id="crypto" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/crypto.html' %}
+    <!-- ========================= -->
+    <!-- Cryptocurrency Section    -->
+    <!-- ========================= -->
+
+    <section id="crypto">
+        {% with articles=crypto_articles|default([]) %}
+            {% include 'secondpage/crypto.html' %}
+        {% endwith %}
     </section>
 
 
-    <!-- Stock Market Section -->
-    <section id="stockmarket" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/stockmarket.html' %}
+    <!-- ========================= -->
+    <!-- Stock Market Section      -->
+    <!-- ========================= -->
+
+    <section id="stockmarket">
+        {% with articles=stockmarket_articles|default([]) %}
+            {% include 'secondpage/stockmarket.html' %}
+        {% endwith %}
     </section>
 
 
-    <!-- Indian Market Section -->
-    <section id="indianmarket" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/indianmarket.html' %}
+    <!-- ========================= -->
+    <!-- Indian Market Section     -->
+    <!-- ========================= -->
+
+    <section id="indianmarket">
+        {% with articles=indianmarket_articles|default([]) %}
+            {% include 'secondpage/indianmarket.html' %}
+        {% endwith %}
     </section>
 
 
-    <!-- Business Section -->
-    <section id="business" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/business.html' %}
+    <!-- ========================= -->
+    <!-- Business Section          -->
+    <!-- ========================= -->
+
+    <section id="business">
+        {% with articles=business_articles|default([]) %}
+            {% include 'secondpage/business.html' %}
+        {% endwith %}
     </section>
 
 
-    <!-- Real Estate Section -->
-    <section id="realestate" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/realestate.html' %}
+    <!-- ========================= -->
+    <!-- Real Estate Section       -->
+    <!-- ========================= -->
+
+    <section id="realestate">
+        {% with articles=realestate_articles|default([]) %}
+            {% include 'secondpage/realestate.html' %}
+        {% endwith %}
     </section>
 
 
-    <!-- Commodities Section -->
-    <section id="commodities" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/commodities.html' %}
+    <!-- ========================= -->
+    <!-- Commodities Section       -->
+    <!-- ========================= -->
+
+    <section id="commodities">
+        {% with articles=commodities_articles|default([]) %}
+            {% include 'secondpage/commodities.html' %}
+        {% endwith %}
     </section>
 
 
-    <!-- Tech Section -->
-    <section id="tech" style="scroll-margin-top: 100px;">
-        {% include 'secondpage/tech.html' %}
+    <!-- ========================= -->
+    <!-- Technology Section        -->
+    <!-- ========================= -->
+
+    <section id="tech">
+        {% with articles=tech_articles|default([]) %}
+            {% include 'secondpage/tech.html' %}
+        {% endwith %}
     </section>
 
 
+    <!-- Pagination -->
     {% include 'page123.html' %}
 
+    <!-- Footer -->
     {% include 'footer.html' %}
-
 
     <script src="/static/nav.js"></script>
 
