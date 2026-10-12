@@ -81,7 +81,13 @@ def dashboard_page():
         search_query=search,
     )
 
-
+#about
+# -----------------------------
+# 📄 About Page
+# -----------------------------
+@app.route("/about")
+def about_page():
+    return render_template("secondpage/about.html")
 # -----------------------------
 # 📄 Additional Pages
 # -----------------------------
