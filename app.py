@@ -24,9 +24,7 @@ supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 
 PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
-app.register_blueprint(second)
-
-
+app.register_blueprint(second, url_prefix="/secondpage")
 
 
 # -----------------------------
@@ -87,32 +85,32 @@ def dashboard_page():
 # -----------------------------
 # 📄 Additional Pages
 # -----------------------------
-@app.route("/secondpage")
-def second_page():
-    tag = request.args.get("tag")
-    search = request.args.get("search", "").strip()
-     # Tag filter
-    if tag and tag.lower() != "all":
-        query = query.ilike("tags", f"%{tag}%")
+# @app.route("/secondpage")
+# def second_page():
+#     tag = request.args.get("tag")
+#     search = request.args.get("search", "").strip()
+#      # Tag filter
+#     if tag and tag.lower() != "all":
+#         query = query.ilike("tags", f"%{tag}%")
 
-    # Search filter
-    if search:
-        try:
-            query = query.or_(f"title.ilike.%{search}%,summary.ilike.%{search}%")
-        except Exception as e:
-            print(f"⚠️ Search filter error: {e}")
+#     # Search filter
+#     if search:
+#         try:
+#             query = query.or_(f"title.ilike.%{search}%,summary.ilike.%{search}%")
+#         except Exception as e:
+#             print(f"⚠️ Search filter error: {e}")
 
-    # Execute query
-    try:
-        result = query.execute()
-        articles = result.data or []
-    except Exception as e:
-        print(f"⚠️ Error fetching articles: {e}")
-        articles = []
-    return render_template("secondpage/secondpage.html",
-        articles=articles,
-        current_tag=tag or "All",
-        search_query=search,)
+#     # Execute query
+#     try:
+#         result = query.execute()
+#         articles = result.data or []
+#     except Exception as e:
+#         print(f"⚠️ Error fetching articles: {e}")
+#         articles = []
+#     return render_template("secondpage/secondpage.html",
+#         articles=articles,
+#         current_tag=tag or "All",
+#         search_query=search,)
 
 
 @app.route("/thirdpage")

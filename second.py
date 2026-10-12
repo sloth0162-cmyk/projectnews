@@ -1,11 +1,10 @@
 from flask import Blueprint, render_template
-from supabase import create_client
-from config import Config
+from services.supabase_client import supabase
+
 second = Blueprint("second", __name__)
 
-supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
+
 def get_articles_by_tag(tag, limit=12):
-    """Fetch articles matching a specific tag."""
     try:
         result = (
             supabase.table("articles")
@@ -15,10 +14,18 @@ def get_articles_by_tag(tag, limit=12):
             .limit(limit)
             .execute()
         )
-        return result.data or []
+
+        articles = result.data or []
+
+        print(
+            f"[secondpage] Tag: {tag!r} | "
+            f"Articles found: {len(articles)}"
+        )
+
+        return articles
 
     except Exception as e:
-        print(f"Error fetching articles for tag '{tag}': {e}")
+        print(f"[secondpage] ERROR for tag {tag!r}: {e}")
         return []
 
 
