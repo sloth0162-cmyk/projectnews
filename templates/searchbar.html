@@ -1,19 +1,82 @@
-<div class="flex items-center justify-end mb-6 mr-6">
-  <form method="get" class="flex gap-3 items-center mt-3">
-    <!-- 🔎 Search -->
+<style>
+  .searchbar-row {
+    max-width: 72rem;            /* matches max-w-6xl of <main> */
+    margin: 1rem auto 0;
+    padding: 0 1rem;
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .search-pill {
+    display: flex;
+    align-items: center;
+    gap: .4rem;
+    width: 100%;
+    max-width: 26rem;
+    background: #fff;
+    border: 2px solid #0e2f26;
+    border-radius: 999px;
+    padding: .3rem .3rem .3rem 1rem;
+    box-shadow: 4px 4px 0 #0e2f26;
+    transition: box-shadow .15s ease, transform .15s ease;
+  }
+
+  .search-pill:focus-within {
+    transform: translate(-2px, -2px);
+    box-shadow: 6px 6px 0 #ff3d81;
+  }
+
+  .search-pill i { color: #12b76a; font-size: .95rem; }
+
+  .search-pill input {
+    flex: 1;
+    min-width: 0;                /* lets the input shrink on small screens */
+    border: 0;
+    outline: none;
+    background: transparent;
+    font: inherit;
+    color: #0e2f26;
+    padding: .45rem .25rem;
+  }
+
+  .search-pill input::placeholder { color: #6b8a80; }
+
+  .search-pill button {
+    flex-shrink: 0;
+    border: 0;
+    border-radius: 999px;
+    padding: .55rem 1.2rem;
+    font-weight: 600;
+    color: #fff;
+    cursor: pointer;
+    background: linear-gradient(90deg, #ff6b35, #ff3d81);
+    transition: filter .15s ease;
+  }
+
+  .search-pill button:hover { filter: brightness(1.08); }
+  .search-pill button:focus-visible { outline: 3px solid #ffc93c; outline-offset: 2px; }
+
+  @media (max-width: 640px) {
+    .searchbar-row { justify-content: stretch; }
+    .search-pill { max-width: none; box-shadow: 3px 3px 0 #0e2f26; }
+    .search-pill button { padding: .55rem 1rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .search-pill, .search-pill button { transition: none; }
+  }
+</style>
+
+<div class="searchbar-row">
+  <form method="get" role="search" class="search-pill">
+    <i class="fa-solid fa-magnifying-glass" aria-hidden="true"></i>
     <input
       type="text"
       name="search"
       placeholder="Search articles..."
       value="{{ search_query }}"
-      class="border border-gray-300 rounded-md p-2 focus:ring-2 focus:ring-blue-400 outline-none w-64"
+      aria-label="Search articles"
     />
-    
-    <button
-      type="submit"
-      class="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700 transition-all"
-    >
-      Search
-    </button>
+    <button type="submit">Search</button>
   </form>
 </div>

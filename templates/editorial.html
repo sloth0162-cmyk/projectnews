@@ -6,43 +6,458 @@
   <title>Editorial Insights | GeoAI Platform</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style/nav.css">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --canopy: #0e2f26;
+      --leaf: #12b76a;
+      --papaya: #ff6b35;
+      --guava: #ff3d81;
+      --sun: #ffc93c;
+      --mist: #f3faf1;
+    }
+
+    html { scroll-behavior: auto; }
+    @media (prefers-reduced-motion: no-preference) { html { scroll-behavior: smooth; } }
+    html, body { max-width: 100%; overflow-x: clip; }
+
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
+        radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
+        radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
+        var(--mist);
+      color: var(--canopy);
+    }
+
+    .font-display {
+      font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* ---------- Page heading ---------- */
+    .page-title {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1;
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .sloth-hang {
+      display: inline-block;
+      transform-origin: 50% 0;
+      animation: hang 4.5s ease-in-out infinite;
+    }
+
+    @keyframes hang {
+      0%, 100% { transform: rotate(-7deg); }
+      50%      { transform: rotate(7deg); }
+    }
+
+    .page-intro { margin-top: 1rem; max-width: 60ch; color: #3f6357; font-size: 1.05rem; line-height: 1.7; }
+
+    /* ---------- Jump links ---------- */
+    .jump { display: flex; flex-wrap: wrap; gap: .75rem; margin: 1.75rem 0 2.5rem; }
+
+    .jump a {
+      --accent: var(--papaya);
+      background: #fff;
+      border: 2px solid var(--canopy);
+      border-radius: 999px;
+      padding: .5rem 1.1rem;
+      font-weight: 600;
+      font-size: .92rem;
+      color: var(--canopy);
+      text-decoration: none;
+      box-shadow: 3px 3px 0 var(--accent);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .jump a:nth-child(2) { --accent: var(--guava); }
+    .jump a:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--accent); }
+    .jump a:focus-visible { outline: 3px solid var(--canopy); outline-offset: 3px; }
+
+    /* ---------- Article card ---------- */
+    .article-card {
+      --accent: var(--papaya);
+      position: relative;
+      background: #fff;
+      border: 2px solid var(--canopy);
+      border-radius: 1.75rem;
+      overflow: hidden;
+      padding: 2.25rem 2rem 2rem;
+      box-shadow: 8px 8px 0 var(--accent);
+      scroll-margin-top: 100px;
+    }
+
+    .article-card.alt { --accent: var(--guava); }
+
+    .article-card::before {
+      content: "";
+      position: absolute;
+      inset: 0 0 auto 0;
+      height: 10px;
+      background: linear-gradient(90deg, var(--papaya), var(--guava), var(--sun), var(--leaf));
+    }
+
+    .tags { display: flex; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+
+    .tag {
+      border: 1.5px solid var(--canopy);
+      background: color-mix(in srgb, var(--accent) 22%, #fff);
+      border-radius: 999px;
+      padding: .15rem .8rem;
+      font-size: .78rem;
+      font-weight: 600;
+    }
+
+    .article-title {
+      font-size: clamp(1.7rem, 4vw, 2.6rem);
+      font-weight: 800;
+      line-height: 1.12;
+      overflow-wrap: anywhere;
+    }
+
+    .byline { display: flex; align-items: center; gap: .75rem; margin: 1.1rem 0 1.5rem; }
+
+    .avatar {
+      display: grid;
+      place-items: center;
+      width: 2.5rem;
+      height: 2.5rem;
+      border-radius: 999px;
+      border: 2px solid var(--canopy);
+      background: linear-gradient(135deg, var(--papaya), var(--guava));
+      color: #fff;
+      font-weight: 800;
+      font-size: .85rem;
+    }
+
+    .byline-name { font-weight: 600; line-height: 1.2; }
+    .byline-date { font-size: .85rem; color: #4d6f64; }
+
+    .lead { font-size: 1.2rem; line-height: 1.7; font-weight: 500; max-width: 62ch; }
+
+    /* ---------- Stats ---------- */
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+      gap: .9rem;
+      margin: 1.75rem 0;
+    }
+
+    .stat {
+      border: 2px solid var(--canopy);
+      border-radius: 1.1rem;
+      padding: .8rem 1rem;
+      background: color-mix(in srgb, var(--accent) 14%, #fff);
+    }
+
+    .stat b {
+      display: block;
+      font-family: "Bricolage Grotesque", sans-serif;
+      font-size: 1.7rem;
+      font-weight: 800;
+      line-height: 1.1;
+    }
+
+    .stat span { font-size: .82rem; color: #3f6357; }
+
+    /* ---------- Prose ---------- */
+    .article-card h3 {
+      font-family: "Bricolage Grotesque", sans-serif;
+      letter-spacing: -0.01em;
+      font-size: 1.4rem;
+      font-weight: 800;
+      margin: 2rem 0 .6rem;
+    }
+
+    .article-card p.body-text {
+      font-size: 1.04rem;
+      line-height: 1.8;
+      color: #264a3f;
+      max-width: 68ch;
+      margin-bottom: .9rem;
+      overflow-wrap: anywhere;
+    }
+
+    /* ---------- Timeline ---------- */
+    .timeline { list-style: none; margin: 1.25rem 0 .5rem; padding: 0 0 0 1.6rem; border-left: 3px solid var(--canopy); }
+
+    .timeline li {
+      --dot: var(--papaya);
+      position: relative;
+      padding: 0 0 1.25rem 1rem;
+    }
+
+    .timeline li:nth-child(4n+2) { --dot: var(--guava); }
+    .timeline li:nth-child(4n+3) { --dot: var(--leaf); }
+    .timeline li:nth-child(4n+4) { --dot: var(--sun); }
+
+    .timeline li::before {
+      content: "";
+      position: absolute;
+      left: -2.45rem;
+      top: .3rem;
+      width: 1.1rem;
+      height: 1.1rem;
+      border-radius: 999px;
+      background: var(--dot);
+      border: 2px solid var(--canopy);
+    }
+
+    .tl-date { font-family: "Bricolage Grotesque", sans-serif; font-weight: 800; font-size: 1.05rem; }
+    .timeline p { font-size: 1rem; line-height: 1.65; color: #264a3f; max-width: 62ch; overflow-wrap: anywhere; }
+
+    /* ---------- Callout ---------- */
+    .callout {
+      margin: 1.75rem 0 .5rem;
+      padding: 1.1rem 1.25rem;
+      border: 2px solid var(--canopy);
+      border-radius: 1.25rem;
+      background: color-mix(in srgb, var(--leaf) 20%, #fff);
+      box-shadow: 4px 4px 0 var(--canopy);
+    }
+
+    .callout .callout-label { font-weight: 700; margin-bottom: .25rem; }
+    .callout p { font-size: 1.1rem; line-height: 1.6; font-weight: 500; }
+
+    /* ---------- Sources ---------- */
+    .sources {
+      margin-top: 2rem;
+      padding-top: 1.1rem;
+      border-top: 2px dashed var(--canopy);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: .5rem;
+      font-size: .88rem;
+    }
+
+    .sources .chip {
+      border: 1.5px solid var(--canopy);
+      border-radius: 999px;
+      padding: .15rem .75rem;
+      background: #fff;
+      font-weight: 600;
+    }
+
+    @media (max-width: 640px) {
+      .article-card { padding: 1.9rem 1.15rem 1.4rem; border-radius: 1.25rem; box-shadow: 5px 5px 0 var(--accent); }
+      .lead { font-size: 1.08rem; }
+      .timeline { padding-left: 1.4rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sloth-hang { animation: none; }
+      .jump a { transition: none; }
+    }
+  </style>
 </head>
 
-<body class="bg-gray-100 min-h-screen">
+<body class="min-h-screen">
   <header></header>
 
-  <main class="max-w-5xl mx-auto mt-12 px-4">
-    <h1 class="text-3xl font-bold mb-6 text-gray-900">Editorial Insights</h1>
-    <p class="text-gray-600 mb-8">
+  <main class="max-w-5xl mx-auto mt-12 px-4 pb-12">
+    <h1 class="page-title font-display">
+      <span class="sloth-hang" aria-hidden="true">🦥</span>
+      Editorial Insights
+    </h1>
+    <p class="page-intro">
       Expert analysis and deep perspectives on finance, geopolitics, and macroeconomics.
     </p>
 
-    <!-- Example editorial card -->
-    <div class="space-y-8">
-      <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">The Shifting Power Balance in Asia</h2>
-        <p class="text-gray-500 text-sm mb-4">By <strong>You</strong> · October 2025</p>
-        <p class="text-gray-700 leading-relaxed">
-          The Indo-Pacific region continues to redefine global trade and security alignments. 
-          From India’s growing assertiveness to China’s strategic partnerships, 
-          the world’s economic and military focus is pivoting East. 
-          Here’s how investors and policymakers should read the signals.
+    <nav class="jump" aria-label="Articles on this page">
+      <a href="#china-russia">China&rsquo;s role in Russia</a>
+      <a href="#us-indian-ocean">The US in the Indian Ocean</a>
+    </nav>
+
+    <div class="space-y-12">
+
+      <!-- ===================== Article 1 ===================== -->
+      <article id="china-russia" class="article-card">
+        <div class="tags">
+          <span class="tag">Geopolitics</span>
+          <span class="tag">Conflict</span>
+          <span class="tag">Global</span>
+        </div>
+
+        <h2 class="article-title font-display">China&rsquo;s Role in Russia: A Partnership That Calls Itself More Than an Alliance</h2>
+
+        <div class="byline">
+          <div class="avatar" aria-hidden="true">AP</div>
+          <div>
+            <div class="byline-name">By Alex Paul</div>
+            <div class="byline-date">October 2025</div>
+          </div>
+        </div>
+
+        <p class="lead">
+          China and Russia share one of the most important relationships in the world. Both countries have common interests in energy cooperation, military ties, global stability and a geopolitical alignment that challenges the West.
         </p>
+
+        <div class="stats">
+          <div class="stat"><b>$244B</b><span>China&ndash;Russia trade in 2024</span></div>
+          <div class="stat"><b>63%</b><span>Rise in Russian imports after the war</span></div>
+          <div class="stat"><b>50 bcm</b><span>Proposed Yamal gas pipeline via Mongolia</span></div>
+        </div>
+
+        <h3>How the relationship grew</h3>
+        <p class="body-text">
+          The two countries established diplomatic relations with the dissolution of the Soviet Union in 1991. Both now describe their ties as more than an alliance, and those ties have deepened since the war in Ukraine.
+        </p>
+
+        <ol class="timeline">
+          <li>
+            <div class="tl-date">1991</div>
+            <p>The Soviet Union dissolves and China and Russia establish diplomatic relations. The US&ndash;China alliance, which had grown up against the Soviets, comes to an end.</p>
+          </li>
+          <li>
+            <div class="tl-date">2001</div>
+            <p>The close relationship is formalized with the Treaty of Good-Neighborliness and Friendly Cooperation.</p>
+          </li>
+          <li>
+            <div class="tl-date">2008</div>
+            <p>China tries to put pressure on Russia after its war with Georgia.</p>
+          </li>
+          <li>
+            <div class="tl-date">After Crimea</div>
+            <p>Russia faces sanctions for annexing Crimea, and Chinese banks become wary of working with Russian institutions. Once China itself is hit with US sanctions, Beijing and Moscow draw closer.</p>
+          </li>
+          <li>
+            <div class="tl-date">2019</div>
+            <p>The US notices that trade between Russia and China has risen sharply.</p>
+          </li>
+          <li>
+            <div class="tl-date">February 2022</div>
+            <p>The two countries sign a &ldquo;no limits&rdquo; economic, military and diplomatic partnership to counter Western influence. Closeness deepens through diplomacy and trade.</p>
+          </li>
+          <li>
+            <div class="tl-date">June 2024</div>
+            <p>The Bank of China halts payments to sanctioned Russian banks, unwilling to risk secondary sanctions.</p>
+          </li>
+          <li>
+            <div class="tl-date">2024</div>
+            <p>China becomes Russia&rsquo;s most important economic partner, with bilateral trade soaring to $244 billion.</p>
+          </li>
+          <li>
+            <div class="tl-date">2025</div>
+            <p>Xi Jinping visits Moscow for the Victory Day parade marking the 80th anniversary of the Soviet victory over Nazi Germany, deepening mutual trust further.</p>
+          </li>
+        </ol>
+
+        <h3>A lifeline under sanctions</h3>
+        <p class="body-text">
+          As Western sanctions choke Russia&rsquo;s economy over the war in Ukraine, Moscow increasingly counts on Beijing as a lifeline for energy and raw material exports. After the war began, Russia&rsquo;s imports rose 63%, and Chinese imports helped bolster Moscow&rsquo;s wartime economy, binding the two nations closer than ever. Western think tanks believe that without China&rsquo;s help Russia&rsquo;s economy would be in deep trouble, and the world sees Russia becoming more dependent on China for trade.
+        </p>
+
+        <h3>Help, but with limits</h3>
+        <p class="body-text">
+          It may look as if China is helping Russia fully, but it is not. Many Chinese banks work with Russia carefully, and many exports to Russia are not going through at all. Even so, the help is substantial. Without the restrictions that US sanctions place on China, it could have made Russia even closer and more dependent.
+        </p>
+        <p class="body-text">
+          Russia and China have proposed a pipeline to carry 50 billion cubic meters of Russian gas from Yamal in northwest Siberia to China via Mongolia, but China does not seem very interested in the project. A few skirmishes also suggest that China does not fully trust Russia, or does not want it to grow too strong, or did not want US sanctions to land on it.
+        </p>
+
+        <h3>United by a shared rival</h3>
+        <p class="body-text">
+          Anti-US sentiment, and a desire to challenge the West, is what pulls China and Russia together in the modern world. Chinese state media were reportedly advised not to publish anything unfavorable to Russia or sympathetic to the West.
+        </p>
+
+        <h3>China and the war in Ukraine</h3>
+        <p class="body-text">
+          China does not support Ukraine at the UN, yet it says its position on the conflict is objective, impartial, rational and pragmatic. It has also said it will keep pressure on North Korea and try to stop it sending troops, though this reads more like talk than action. Ukraine, for its part, accuses China of supplying gunpowder and artillery.
+        </p>
+
+        <h3>The loop: the US, China and now India</h3>
+        <p class="body-text">
+          History offers a parallel. The US and the Soviet Union fought Nazi Germany as allies, then became enemies. The US then aligned with China against the Soviets, but after the Soviet fall that relationship crumbled, and China is now the biggest rival of the US.
+        </p>
+        <p class="body-text">
+          So where does India fit? Either the loop breaks because China wins, or it continues with India taking China&rsquo;s place.
+        </p>
+
+        <h3>Conclusion</h3>
+        <p class="body-text">
+          As of 2025, relations between Russia and China are at an all-time high.
+        </p>
+
+        <div class="sources">
+          <strong>Sources</strong>
+          <span class="chip">Wikipedia</span>
+          <span class="chip">The Times of India</span>
+          <span class="chip">USCC</span>
+        </div>
       </article>
 
-      <article class="bg-white p-6 rounded-lg shadow hover:shadow-lg transition-shadow">
-        <h2 class="text-2xl font-semibold text-gray-800 mb-2">Global Energy Realignment</h2>
-        <p class="text-gray-500 text-sm mb-4">By <strong>You</strong> · October 2025</p>
-        <p class="text-gray-700 leading-relaxed">
-          With oil markets adapting to sanctions, renewable energy geopolitics 
-          is becoming the next strategic frontier. 
-          Countries are now competing not just for barrels—but for battery materials and influence.
+
+      <!-- ===================== Article 2 ===================== -->
+      <article id="us-indian-ocean" class="article-card alt">
+        <div class="tags">
+          <span class="tag">Geopolitics</span>
+          <span class="tag">Policy</span>
+          <span class="tag">India</span>
+        </div>
+
+        <h2 class="article-title font-display">The US in the Indian Ocean: From Acting Alone to Acting Together</h2>
+
+        <div class="byline">
+          <div class="avatar" aria-hidden="true">AP</div>
+          <div>
+            <div class="byline-name">By Alex Paul</div>
+            <div class="byline-date">October 2025</div>
+          </div>
+        </div>
+
+        <p class="lead">
+          The US used to act unilaterally in its Indian Ocean missions. Now it has shifted to a collaborative approach with India, Australia and Japan through the Quad.
         </p>
+
+        <div class="stats">
+          <div class="stat"><b>370+</b><span>Chinese battle force platforms</span></div>
+          <div class="stat"><b>435</b><span>Expected Chinese ships by 2030</span></div>
+          <div class="stat"><b>$113.5M</b><span>Indo-Pacific investment fund, 2018</span></div>
+        </div>
+
+        <h3>From power projection to regional stability</h3>
+        <p class="body-text">
+          The shift suggests the US is moving away from power projection and toward regional stability. Rather than interfering directly in the Indian Ocean, it now acts more like a regional security partner.
+        </p>
+
+        <h3>Why India matters</h3>
+        <p class="body-text">
+          India is seen as the natural partner to counter China&rsquo;s influence. The two countries&rsquo; ideals for Indian Ocean security do not fully match, but the US needs India to counterbalance China.
+        </p>
+
+        <h3>The numbers behind the shift</h3>
+        <p class="body-text">
+          China has surpassed the US in the number of battle force ships, with over 370 platforms, and its fleet is expected to grow to 435 ships by 2030.
+        </p>
+        <p class="body-text">
+          During the first Trump administration, the US Pacific Command was renamed the US Indo-Pacific Command. A funding corpus of US$113.5 million to encourage private investment in the region was announced at the July 2018 Indo-Pacific Forum.
+        </p>
+
+        <div class="callout">
+          <div class="callout-label">Editor&rsquo;s take</div>
+          <p>India should collaborate militarily with Thailand, Vietnam and Indonesia.</p>
+        </div>
+
+        <div class="sources">
+          <strong>Source</strong>
+          <span class="chip">Rishi Kumar Mishra, ORF Online (a non-governmental Indian think tank)</span>
+        </div>
       </article>
+
     </div>
   </main>
-  <p class=""></p>
+
 {% include 'footer.html' %}
-  <script src="/static/nav.js" ></script>
+  <script src="/static/nav.js"></script>
 </body>
 </html>

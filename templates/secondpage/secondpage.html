@@ -14,8 +14,57 @@
         rel="stylesheet"
         href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
     >
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 
     <title>Sloth Newz</title>
+
+    <style>
+        :root {
+            --canopy: #0e2f26;
+            --leaf: #12b76a;
+            --papaya: #ff6b35;
+            --guava: #ff3d81;
+            --sun: #ffc93c;
+            --mist: #f3faf1;
+        }
+
+        html { scroll-behavior: auto; }
+
+        @media (prefers-reduced-motion: no-preference) {
+            html { scroll-behavior: smooth; }   /* smooth jump from Discover cards to #sections */
+        }
+
+        body {
+            font-family: "DM Sans", system-ui, sans-serif;
+            background:
+                radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
+                radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
+                radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
+                var(--mist);
+            color: var(--canopy);
+        }
+
+        h1, h2, h3 {
+            font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
+            letter-spacing: -0.02em;
+        }
+
+        /* safety net so no included section can push the page sideways */
+        html, body { max-width: 100%; overflow-x: clip; }
+
+        /* keep the target section visible below the sticky nav + highlight it briefly when jumped to */
+        section[id] { scroll-margin-top: 100px; }
+
+        @media (prefers-reduced-motion: no-preference) {
+            section[id]:target { animation: flash 1.4s ease-out; }
+            @keyframes flash {
+                0%   { box-shadow: inset 0 0 0 4px rgba(255, 61, 129, .55); }
+                100% { box-shadow: inset 0 0 0 4px rgba(255, 61, 129, 0); }
+            }
+        }
+    </style>
 </head>
 
 <body>

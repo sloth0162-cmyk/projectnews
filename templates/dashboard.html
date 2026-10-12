@@ -131,8 +131,8 @@
     /* ---------- Headline cards ---------- */
     .news-card {
       --accent: var(--c0);
-      min-width: 300px;
-      max-width: 300px;
+      flex: 0 0 auto;
+      width: min(300px, 82vw);
       background: #fff;
       border: 2px solid var(--canopy);
       border-radius: 1.5rem;
@@ -162,10 +162,11 @@
       inset: 0;
       background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--accent) 45%, transparent));
       pointer-events: none;
+      z-index: 20;
     }
 
-    .news-card img { transition: transform .5s ease; }
-    .news-card:hover img { transform: scale(1.06); }
+    .news-card .thumb-main { transition: transform .5s ease; }
+    .news-card:hover .thumb-main { transform: scale(1.04); }
 
     .news-card h3 { font-family: "Bricolage Grotesque", sans-serif; letter-spacing: -0.01em; }
     .news-card:hover h3 { color: var(--accent); }
@@ -216,9 +217,22 @@
       font-weight: 500;
     }
 
+    /* ---------- Responsive ---------- */
+    html, body { max-width: 100%; overflow-x: clip; }
+    .filter-wrap select { max-width: 100%; min-width: 0; }
+
+    @media (max-width: 640px) {
+      .page-title { font-size: 2rem; }
+      .filter-wrap { width: 100%; box-shadow: 3px 3px 0 var(--canopy); padding-left: .9rem; }
+      .filter-wrap label { font-size: .8rem; white-space: nowrap; }
+      .filter-wrap select { flex: 1; }
+      .section-title { font-size: 1.4rem; }
+      .news-card { box-shadow: 4px 4px 0 var(--accent); }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .sloth-hang { animation: none; }
-      .news-card, .news-card img, .news-card .read-more i { transition: none; }
+      .news-card, .news-card .thumb-main, .news-card .read-more i { transition: none; }
     }
   </style>
 </head>
@@ -261,24 +275,20 @@
         {% for article in articles %}
         <div class="news-card" style="--accent: var(--c{{ loop.index0 % 4 }});">
           <a href="{{ url_for('article.article', article_id=article.id) }}">
-            <div class="thumb">
-              
-<div class="thumb relative overflow-hidden h-40 bg-gray-100">
-  <!-- Blurred background fills the entire box -->
-  <img
-    src="{{ article.image_url }}"
-    alt=""
-    aria-hidden="true"
-    class="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50"
-  >
-
-  <!-- Original image: fully visible and centered -->
-  <img
-    src="{{ article.image_url }}"
-    alt="News image"
-    class="relative z-10 w-full h-full object-contain object-center"
-  >
-</div>
+            <div class="thumb h-40 bg-gray-100">
+              <!-- Blurred background fills the entire box -->
+              <img
+                src="{{ article.image_url }}"
+                alt=""
+                aria-hidden="true"
+                class="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50"
+              >
+              <!-- Original image: fully visible and centered -->
+              <img
+                src="{{ article.image_url }}"
+                alt="News image"
+                class="thumb-main relative z-10 w-full h-full object-contain object-center"
+              >
             </div>
 
             <div class="p-4 h-[200px]">

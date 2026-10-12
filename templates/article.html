@@ -136,6 +136,16 @@
     }
     .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--guava), var(--papaya)); }
 
+    /* ---------- Responsive ---------- */
+    html, body { max-width: 100%; overflow-x: clip; }
+    .article-title, .article-summary { overflow-wrap: anywhere; }
+
+    @media (max-width: 640px) {
+      .article-card { padding: 1.25rem; box-shadow: 5px 5px 0 var(--papaya); border-radius: 1.25rem; }
+      .article-image { box-shadow: 3px 3px 0 var(--guava); height: auto; }
+      .article-summary { font-size: 1rem; line-height: 1.7; }
+    }
+
     @media (prefers-reduced-motion: reduce) {
       .sloth-hang { animation: none; }
       .back-link { transition: none; }
@@ -147,7 +157,7 @@
 
 <header></header>
 
-<div class="max-w-6xl mx-auto mt-10 p-4 mb-20">
+<div class="max-w-6xl mx-auto mt-10 p-4">
 
     <a href="javascript:history.back()" class="back-link mb-6">
         <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
