@@ -1,72 +1,62 @@
 <section class="cardbox">
-  
-    <div class="flex items-center justify-between mb-4">
-    <h2 class="">Stock Market</h2>
-    <a href="/finance" class="text-blue-600 hover:text-blue-800 font-medium transition-all">
-      View all →
-    </a>
-  </div>
-  <div class="card-container scrollbar-custom">
+
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-semibold text-gray-900">
+      Stock Market
+    </h2>
+
     
-  
+  </div>
 
-    <!-- Card 2 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <span class="card-badge">📈 Popular</span>
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=400&q=80" alt="Stock market">
-      </div>
-      <div class="card-content">
-        <h3>Market Update</h3>
-        <p>Global markets show positive momentum with technology stocks leading the charge in today's trading session.</p>
-      </div>
-    </div>
+  <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
 
-    <!-- Card 3 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <span class="card-badge">🇮🇳 Local</span>
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=400&q=80" alt="India finance">
-      </div>
-      <div class="card-content">
-        <h3>India GDP Growth</h3>
-        <p>Indian economy shows robust growth with strong performance in manufacturing and services sectors this quarter.</p>
-      </div>
-    </div>
+    {% if articles %}
 
-    <!-- Card 4 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <span class="card-badge">💎 Premium</span>
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" alt="Financial data">
-      </div>
-      <div class="card-content">
-        <h3>Investment Strategies</h3>
-        <p>Expert analysis on portfolio diversification and risk management for the upcoming fiscal year.</p>
-      </div>
-    </div>
+      {% for article in articles %}
 
-    <!-- Card 5 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" alt="Real estate">
+      <a
+        href="{{ url_for('article.article', article_id=article.id) }}"
+        class="min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 block"
+      >
+
+        <!-- Database Image -->
+        <div class="h-48 overflow-hidden">
+
+          <img
+            src="{{ article.image_url }}"
+            alt="{{ article.title }}"
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          />
+
+        </div>
+
+        <!-- Database Content -->
+        <div class="p-5">
+
+          <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+            {{ article.title }}
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-6 line-clamp-3">
+            {{ article.summary }}
+          </p>
+
+        </div>
+
+      </a>
+
+      {% endfor %}
+
+    {% else %}
+
+      <div class="bg-white rounded-xl shadow-sm p-8 text-center w-full">
+        <p class="text-gray-500">
+          No stock market articles found.
+        </p>
       </div>
-      <div class="card-content">
-        <h3>Real Estate Trends</h3>
-        <p>Housing market analysis reveals shifting patterns in urban development and investment opportunities.</p>
-      </div>
-    </div>
+
+    {% endif %}
 
   </div>
-</section>
 
-<script>
-  // Add click handlers to cards
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', function() {
-      const title = this.querySelector('h3').textContent;
-      console.log(`Card clicked: ${title}`);
-      // Add your navigation logic here
-    });
-  });
-</script>
+</section>

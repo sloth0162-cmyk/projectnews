@@ -1,26 +1,79 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style/nav.css" />
-  <link rel="stylesheet" href="/static/style/style.css" />
-  <title>News Dashboard</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
-  
-    <title>Document</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <link rel="stylesheet" href="/static/style/nav.css">
+    <link rel="stylesheet" href="/static/style/style.css">
+
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    >
+
+    <title>Sloth Newz</title>
 </head>
+
 <body>
+
     <header></header>
-    {%include 'searchbar.html' %}
-  {% include 'secondpage/crypto.html' %}
-  {% include 'secondpage/stockmarket.html' %}
-  {% include 'page123.html' %}
-  {% include 'footer.html' %}
-<script src="/static/nav.js"></script>
+
+    {% include 'searchbar.html' %}
+
+
+    <!-- Crypto Section -->
+    <section id="crypto" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/crypto.html' %}
+    </section>
+
+
+    <!-- Stock Market Section -->
+    <section id="stockmarket" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/stockmarket.html' %}
+    </section>
+
+
+    <!-- Indian Market Section -->
+    <section id="indianmarket" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/indianmarket.html' %}
+    </section>
+
+
+    <!-- Business Section -->
+    <section id="business" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/business.html' %}
+    </section>
+
+
+    <!-- Real Estate Section -->
+    <section id="realestate" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/realestate.html' %}
+    </section>
+
+
+    <!-- Commodities Section -->
+    <section id="commodities" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/commodities.html' %}
+    </section>
+
+
+    <!-- Tech Section -->
+    <section id="tech" style="scroll-margin-top: 100px;">
+        {% include 'secondpage/tech.html' %}
+    </section>
+
+
+    {% include 'page123.html' %}
+
+    {% include 'footer.html' %}
+
+
+    <script src="/static/nav.js"></script>
+
 </body>
+
 </html>

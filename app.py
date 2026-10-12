@@ -533,7 +533,7 @@ def editorial_page():
 # -----------------------------
 @app.route("/finance")
 def finance_page():
-    """Finance dashboard route."""
+    """Sloth Newz Finance."""
     try:
         result = (
             supabase.table("finance_articles")

@@ -9,42 +9,164 @@
   <link rel="stylesheet" href="/static/style/style.css" />
   <title>{{ article.title }}</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
-    .scrollbar-custom::-webkit-scrollbar {
-      height: 8px;
+    :root {
+      --canopy: #0e2f26;
+      --leaf: #12b76a;
+      --papaya: #ff6b35;
+      --guava: #ff3d81;
+      --sun: #ffc93c;
+      --mist: #f3faf1;
     }
 
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
+        radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
+        radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
+        var(--mist);
+      color: var(--canopy);
+    }
+
+    .font-display {
+      font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* ---------- Back link ---------- */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: .5rem;
+      background: #fff;
+      border: 2px solid var(--canopy);
+      border-radius: 999px;
+      padding: .4rem 1.1rem .4rem .5rem;
+      font-weight: 600;
+      font-size: .9rem;
+      color: var(--canopy);
+      text-decoration: none;
+      box-shadow: 3px 3px 0 var(--canopy);
+      transition: transform .15s ease, box-shadow .15s ease;
+    }
+
+    .back-link i {
+      display: grid;
+      place-items: center;
+      width: 1.6rem;
+      height: 1.6rem;
+      border-radius: 999px;
+      background: var(--papaya);
+      color: #fff;
+      font-size: .7rem;
+    }
+
+    .back-link:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0 var(--canopy);
+    }
+
+    .back-link:focus-visible { outline: 3px solid var(--guava); outline-offset: 3px; }
+
+    /* ---------- Article card ---------- */
+    .article-card {
+      background: #fff;
+      border: 2px solid var(--canopy);
+      border-radius: 1.75rem;
+      overflow: hidden;
+      padding: 2rem;
+      box-shadow: 8px 8px 0 var(--papaya);
+      position: relative;
+    }
+
+    .article-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 10px;
+      background: linear-gradient(90deg, var(--papaya), var(--guava), var(--sun), var(--leaf));
+    }
+
+    .article-title {
+      font-size: clamp(1.75rem, 4vw, 2.75rem);
+      font-weight: 800;
+      line-height: 1.1;
+      color: var(--canopy);
+    }
+
+    .article-image {
+      border: 2px solid var(--canopy);
+      border-radius: 1.25rem !important;
+      box-shadow: 5px 5px 0 var(--guava);
+      align-self: flex-start;
+    }
+
+    .article-summary {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      color: #264a3f;
+      max-width: 68ch;
+    }
+
+    /* ---------- Sloth sign-off ---------- */
+    .sloth-hang {
+      display: inline-block;
+      transform-origin: 50% 0;
+      animation: hang 4.5s ease-in-out infinite;
+    }
+
+    @keyframes hang {
+      0%, 100% { transform: rotate(-7deg); }
+      50%      { transform: rotate(7deg); }
+    }
+
+    /* ---------- Scrollbar ---------- */
+    .scrollbar-custom::-webkit-scrollbar { height: 10px; }
+    .scrollbar-custom::-webkit-scrollbar-track { background: rgba(14, 47, 38, .08); border-radius: 10px; }
     .scrollbar-custom::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
+      background: linear-gradient(90deg, var(--papaya), var(--guava));
       border-radius: 10px;
     }
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--guava), var(--papaya)); }
 
-    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-      background-color: #94a3b8;
+    @media (prefers-reduced-motion: reduce) {
+      .sloth-hang { animation: none; }
+      .back-link { transition: none; }
     }
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body>
 
 <header></header>
 
-<div class="max-w-6xl mx-auto mt-10 p-4">
+<div class="max-w-6xl mx-auto mt-10 p-4 mb-20">
 
-    <div class="bg-white shadow-md rounded-lg overflow-hidden p-6">
+    <a href="javascript:history.back()" class="back-link mb-6">
+        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
+        Back to news
+    </a>
 
-        <h1 class="text-3xl font-bold mb-4">{{ article.title }}</h1>
+    <div class="article-card mt-6">
 
-        <div class="md:flex md:gap-6">
+        <h1 class="article-title font-display mb-6 mt-2">{{ article.title }}</h1>
+
+        <div class="md:flex md:gap-8">
 
             <img
             src="{{ article.image_url }}"
             alt="{{ article.title }}"
-            class="w-full md:w-1/3 rounded-lg object-cover mb-4 md:mb-0"
+            class="article-image w-full md:w-1/3 object-cover mb-4 md:mb-0"
             >
 
-            <p class="text-gray-700 md:w-2/3">
+            <p class="article-summary md:w-2/3">
                 {{ article.summary }}
             </p>
 

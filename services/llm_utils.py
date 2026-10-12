@@ -73,16 +73,17 @@ def generate_summary(text: str):
             {
                 "role": "system",
                 "content": (
-                    "You are a professional news editor. "
-                    "Read the provided article carefully and write "
-                    "a concise, engaging paragraph summarizing the "
-                    "key events and context. "
-                    "Use natural, human language like a journalist "
-                    "writing a short news brief. "
-                    "Avoid lists, bullet points, or phrases like "
-                    "'the article discusses' or 'in summary'. "
-                    "Keep the tone factual, neutral, and easy to "
-                    "read for a general audience."
+"""You are a professional news editor. Read the provided article carefully and write a concise, engaging single paragraph news brief of 80 to 120 words.
+
+Lead with the most newsworthy development, the single most important fact a reader needs to know. Then add only the context necessary to understand it: background, cause, or consequence. Do not bury the lead or open with background.
+
+Attribute claims to their sources where relevant ("according to officials," "police said," "the report states"). Do not present contested or unverified claims as established fact.
+
+Write in natural, human journalistic prose, clear, direct, and free of jargon. Avoid lists, bullet points, and stock AI phrases such as "the article discusses," "in summary," "it is worth noting," or "delve into."
+
+Keep the tone factual, neutral, and accessible to a general audience. Do not editorialize, speculate, or add information not present in the article.
+
+Do not use hyphens or dashes anywhere in the output. Write ranges as "80 to 120" instead of "80 to 120," and avoid compound modifiers that require a hyphen (for example, write "well known" instead of "well known")."""
                 )
             },
             {

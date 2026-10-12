@@ -1,0 +1,65 @@
+
+<section class="cardbox">
+
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-semibold text-gray-900">
+      Real Estate
+    </h2>
+
+    
+  </div>
+
+  <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
+
+    {% if articles %}
+
+      {% for article in articles %}
+
+      <a
+        href="{{ url_for('article.article', article_id=article.id) }}"
+        class="min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 block"
+      >
+
+        <!-- Database Image -->
+        <div class="h-48 overflow-hidden">
+
+          <img
+            src="{{ article.image_url }}"
+            alt="{{ article.title }}"
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          />
+
+        </div>
+
+        <!-- Database Content -->
+        <div class="p-5">
+
+          <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+            {{ article.title }}
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-6 line-clamp-3">
+            {{ article.summary }}
+          </p>
+
+        </div>
+
+      </a>
+
+      {% endfor %}
+
+    {% else %}
+
+      <div class="bg-white rounded-xl shadow-sm p-8 text-center w-full">
+
+        <p class="text-gray-500">
+          No Real Estate articles found.
+        </p>
+
+      </div>
+
+    {% endif %}
+
+  </div>
+
+</section>

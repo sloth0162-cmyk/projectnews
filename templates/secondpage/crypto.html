@@ -1,347 +1,56 @@
-<!DOCTYPE html>
-<html lang="en">
+<section class="cardbox">
 
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <div class="flex items-center justify-between mb-4">
+    <h2 class="text-2xl font-semibold text-gray-900">
+      Crypto
+    </h2>
 
-  <!-- Tailwind -->
-  <script src="https://cdn.tailwindcss.com"></script>
-
-  <!-- Your styles -->
-  <link rel="stylesheet" href="/static/style/nav.css" />
-  <link rel="stylesheet" href="/static/style/style.css" />
-
-  <!-- Font Awesome -->
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
-
-  <title>Crypto News</title>
-
-  <style>
-    /* Modern horizontal scrollbar */
-    .scrollbar-custom::-webkit-scrollbar {
-      height: 8px;
-    }
-
-    .scrollbar-custom::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
-      border-radius: 10px;
-    }
-
-    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-      background-color: #94a3b8;
-    }
-
-    /* Card hover animation */
-    .crypto-card {
-      transition: all 0.3s ease;
-    }
-
-    .crypto-card:hover {
-      transform: translateY(-4px);
-    }
-
-    .crypto-image {
-      height: 180px;
-      overflow: hidden;
-    }
-
-    .crypto-image img {
-      width: 100%;
-      height: 100%;
-      object-fit: cover;
-      transition: transform 0.4s ease;
-    }
-
-    .crypto-card:hover .crypto-image img {
-      transform: scale(1.05);
-    }
-  </style>
-</head>
-
-<body class="bg-gray-100">
-
-  <!-- Navbar -->
-  <header></header>
-
-  <!-- Search bar -->
-  {% include 'searchbar.html' %}
+  </div>
 
 
-  <main class="max-w-6xl mx-auto mt-10 px-4 pb-10">
+  <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
 
-    <!-- Page Header -->
-    <div class="flex items-center justify-between mb-8">
-      <div>
-        <h1 class="text-3xl font-bold text-gray-900">
-          Crypto
-        </h1>
+    {% if articles %}
 
-        <p class="text-gray-600 mt-1">
-          Latest cryptocurrency news, market updates and analysis
-        </p>
-      </div>
+      {% for article in articles %}
 
       <a
-        href="/"
-        class="text-blue-600 hover:text-blue-800 font-medium transition-all"
+        href="{{ url_for('article.article', article_id=article.id) }}"
+        class="min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 block"
       >
-        ← Back to Dashboard
+
+        <!-- Database Image -->
+        <div class="h-48 overflow-hidden">
+
+          <img
+            src="{{ article.image_url }}"
+            alt="{{ article.title }}"
+            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+          />
+
+        </div>
+
+
+        <!-- Database Content -->
+        <div class="p-5">
+
+          <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
+            {{ article.title }}
+          </h3>
+
+          <p class="text-gray-600 text-sm leading-6 line-clamp-3">
+            {{ article.summary }}
+          </p>
+
+        </div>
+
       </a>
-    </div>
 
+      {% endfor %}
 
-    <!-- Crypto Headlines -->
-    <section class="mb-10">
+    {% else %}
 
-      <div class="flex items-center justify-between mb-5">
-        <h2 class="text-2xl font-semibold text-gray-900">
-          Crypto Headlines
-        </h2>
-
-        <span class="text-sm text-gray-500">
-          Latest updates
-        </span>
-      </div>
-
-
-      <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
-
-        <!-- Card 1 -->
-        <article
-          class="crypto-card min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden cursor-pointer"
-        >
-
-          <div class="relative crypto-image">
-
-            <span
-              class="absolute top-3 left-3 z-10 bg-blue-600 text-white text-xs font-semibold px-3 py-1 rounded-full"
-            >
-              ₿ Trending
-            </span>
-
-            <img
-              src="https://images.unsplash.com/photo-1621416894569-0f39ed31d247?auto=format&fit=crop&w=600&q=80"
-              alt="Bitcoin"
-            />
-
-          </div>
-
-          <div class="p-5">
-
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-              Bitcoin Market Update
-            </h3>
-
-            <p class="text-gray-600 text-sm leading-6">
-              Bitcoin continues to attract investor attention as crypto
-              markets react to changing global economic conditions.
-            </p>
-
-          </div>
-        </article>
-
-
-        <!-- Card 2 -->
-        <article
-          class="crypto-card min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden cursor-pointer"
-        >
-
-          <div class="relative crypto-image">
-
-            <span
-              class="absolute top-3 left-3 z-10 bg-green-600 text-white text-xs font-semibold px-3 py-1 rounded-full"
-            >
-              📈 Market
-            </span>
-
-            <img
-              src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=600&q=80"
-              alt="Crypto market"
-            />
-
-          </div>
-
-          <div class="p-5">
-
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-              Crypto Market Momentum
-            </h3>
-
-            <p class="text-gray-600 text-sm leading-6">
-              Digital asset markets show renewed momentum as traders
-              watch Bitcoin, Ethereum and major altcoins.
-            </p>
-
-          </div>
-        </article>
-
-
-        <!-- Card 3 -->
-        <article
-          class="crypto-card min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden cursor-pointer"
-        >
-
-          <div class="relative crypto-image">
-
-            <span
-              class="absolute top-3 left-3 z-10 bg-purple-600 text-white text-xs font-semibold px-3 py-1 rounded-full"
-            >
-              ◆ Ethereum
-            </span>
-
-            <img
-              src="https://images.unsplash.com/photo-1622630998477-20aa696ecb05?auto=format&fit=crop&w=600&q=80"
-              alt="Ethereum"
-            />
-
-          </div>
-
-          <div class="p-5">
-
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-              Ethereum Developments
-            </h3>
-
-            <p class="text-gray-600 text-sm leading-6">
-              Ethereum remains one of the most watched blockchain
-              ecosystems as developers continue building new applications.
-            </p>
-
-          </div>
-        </article>
-
-
-        <!-- Card 4 -->
-        <article
-          class="crypto-card min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden cursor-pointer"
-        >
-
-          <div class="relative crypto-image">
-
-            <span
-              class="absolute top-3 left-3 z-10 bg-yellow-500 text-white text-xs font-semibold px-3 py-1 rounded-full"
-            >
-              💎 Investment
-            </span>
-
-            <img
-              src="https://images.unsplash.com/photo-1644143379190-29574b17de5b?auto=format&fit=crop&w=600&q=80"
-              alt="Crypto investment"
-            />
-
-          </div>
-
-          <div class="p-5">
-
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-              Crypto Investment Trends
-            </h3>
-
-            <p class="text-gray-600 text-sm leading-6">
-              Investors continue exploring digital assets while weighing
-              volatility, regulation and long-term opportunities.
-            </p>
-
-          </div>
-        </article>
-
-
-        <!-- Card 5 -->
-        <article
-          class="crypto-card min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden cursor-pointer"
-        >
-
-          <div class="relative crypto-image">
-
-            <span
-              class="absolute top-3 left-3 z-10 bg-red-500 text-white text-xs font-semibold px-3 py-1 rounded-full"
-            >
-              🌍 Global
-            </span>
-
-            <img
-              src="https://images.unsplash.com/photo-1518546305927-5a555bb7020d?auto=format&fit=crop&w=600&q=80"
-              alt="Cryptocurrency"
-            />
-
-          </div>
-
-          <div class="p-5">
-
-            <h3 class="text-lg font-semibold text-gray-900 mb-2">
-              Global Crypto Regulation
-            </h3>
-
-            <p class="text-gray-600 text-sm leading-6">
-              Governments around the world continue developing new rules
-              that could shape the future of cryptocurrency markets.
-            </p>
-
-          </div>
-        </article>
-
-      </div>
-    </section>
-
-
-    <!-- Latest Crypto News -->
-    <section>
-
-      <div class="flex items-center justify-between mb-5">
-
-        <h2 class="text-2xl font-semibold text-gray-900">
-          Latest Crypto News
-        </h2>
-
-      </div>
-
-
-      {% if articles %}
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-
-        {% for article in articles %}
-
-        <a
-          href="{{ url_for('article.article', article_id=article.id) }}"
-          class="bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 block"
-        >
-
-          <div class="h-48 overflow-hidden">
-
-            <img
-              src="{{ article.image_url }}"
-              alt="News image"
-              class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
-            />
-
-          </div>
-
-          <div class="p-5">
-
-            <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-              {{ article.title }}
-            </h3>
-
-            <p class="text-gray-600 text-sm leading-6 line-clamp-3">
-              {{ article.summary }}
-            </p>
-
-          </div>
-
-        </a>
-
-        {% endfor %}
-
-      </div>
-
-      {% else %}
-
-      <div class="bg-white rounded-xl shadow-sm p-8 text-center">
+      <div class="bg-white rounded-xl shadow-sm p-8 text-center w-full">
 
         <p class="text-gray-500">
           No crypto articles found.
@@ -349,20 +58,8 @@
 
       </div>
 
-      {% endif %}
+    {% endif %}
 
-    </section>
+  </div>
 
-  </main>
-
-
-  <!-- Footer -->
-  {% include 'footer.html' %}
-
-
-  <!-- Navbar JS -->
-  <script src="/static/nav.js"></script>
-
-</body>
-</html>
-```
+</section>

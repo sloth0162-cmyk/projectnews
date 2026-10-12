@@ -15,8 +15,8 @@ navLinks.className = 'nav-links';
 const links = [
   { text: 'Home', href: '/' },
   { text: 'Finance', href: '/finance' },
-  { text: 'Crypto', href: '/crypto' },
-  { text: 'Business', href: '/business' },
+  { text: 'Crypto', href: '/secondpage#crypto' },
+  { text: 'Business', href: '/secondpage#business' },
   { text: 'Editorial', href: '/editorial' },
   { text: 'About', href: '/about' }
 ];

@@ -7,39 +7,237 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <link rel="stylesheet" href="/static/style/nav.css" />
   <link rel="stylesheet" href="/static/style/style.css" />
-  <title>News Dashboard</title>
+  <title>Sloth Newz</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
 
   <style>
-    /* Modern horizontal scrollbar */
-    .scrollbar-custom::-webkit-scrollbar {
-      height: 8px;
+    :root {
+      --canopy: #0e2f26;
+      --leaf: #12b76a;
+      --papaya: #ff6b35;
+      --guava: #ff3d81;
+      --sun: #ffc93c;
+      --mist: #f3faf1;
+
+      /* card accent cycle */
+      --c0: var(--papaya);
+      --c1: var(--guava);
+      --c2: var(--leaf);
+      --c3: var(--sun);
     }
 
+    body {
+      font-family: "DM Sans", system-ui, sans-serif;
+      background:
+        radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
+        radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
+        radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
+        var(--mist);
+      color: var(--canopy);
+    }
+
+    .font-display {
+      font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
+      letter-spacing: -0.02em;
+    }
+
+    /* ---------- Page title ---------- */
+    .page-title {
+      font-size: clamp(2.25rem, 5vw, 3.5rem);
+      font-weight: 800;
+      line-height: 1;
+      color: var(--canopy);
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+    }
+
+    .sloth-hang {
+      display: inline-block;
+      transform-origin: 50% 0;
+      animation: hang 4.5s ease-in-out infinite;
+    }
+
+    @keyframes hang {
+      0%, 100% { transform: rotate(-7deg); }
+      50%      { transform: rotate(7deg); }
+    }
+
+    /* ---------- Filter pill ---------- */
+    .filter-wrap {
+      display: flex;
+      align-items: center;
+      gap: .6rem;
+      background: #fff;
+      border: 2px solid var(--canopy);
+      border-radius: 999px;
+      padding: .35rem .4rem .35rem 1.1rem;
+      box-shadow: 4px 4px 0 var(--canopy);
+    }
+
+    .filter-wrap label {
+      font-weight: 600;
+      font-size: .9rem;
+      color: var(--canopy);
+      margin: 0;
+    }
+
+    .filter-wrap select {
+      appearance: none;
+      -webkit-appearance: none;
+      background: var(--papaya)
+        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
+        no-repeat right .9rem center;
+      color: #fff;
+      font-weight: 600;
+      border: 0;
+      border-radius: 999px;
+      padding: .5rem 2.4rem .5rem 1.1rem;
+      cursor: pointer;
+    }
+
+    .filter-wrap select option {
+      color: var(--canopy);
+      background: #fff;
+    }
+
+    .filter-wrap select:hover { background-color: var(--guava); }
+
+    /* ---------- Section heading ---------- */
+    .section-title {
+      font-size: 1.75rem;
+      font-weight: 800;
+      display: inline-block;
+      position: relative;
+      padding-bottom: .35rem;
+    }
+
+    .section-title::after {
+      content: "";
+      position: absolute;
+      left: 0;
+      bottom: 0;
+      width: 100%;
+      height: 10px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, var(--papaya), var(--guava), var(--sun), var(--leaf));
+      opacity: .9;
+      z-index: -1;
+    }
+
+    /* ---------- Headline cards ---------- */
+    .news-card {
+      --accent: var(--c0);
+      min-width: 300px;
+      max-width: 300px;
+      background: #fff;
+      border: 2px solid var(--canopy);
+      border-radius: 1.5rem;
+      overflow: hidden;
+      box-shadow: 6px 6px 0 var(--accent);
+      transition: transform .2s ease, box-shadow .2s ease;
+    }
+
+    .news-card:hover,
+    .news-card:focus-within {
+      transform: translate(-3px, -3px);
+      box-shadow: 9px 9px 0 var(--accent);
+    }
+
+    .news-card a { display: block; color: inherit; text-decoration: none; }
+    .news-card a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
+
+    .news-card .thumb {
+      position: relative;
+      overflow: hidden;
+      border-bottom: 2px solid var(--canopy);
+    }
+
+    .news-card .thumb::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--accent) 45%, transparent));
+      pointer-events: none;
+    }
+
+    .news-card img { transition: transform .5s ease; }
+    .news-card:hover img { transform: scale(1.06); }
+
+    .news-card h3 { font-family: "Bricolage Grotesque", sans-serif; letter-spacing: -0.01em; }
+    .news-card:hover h3 { color: var(--accent); }
+
+    .news-card .read-more {
+      display: inline-flex;
+      align-items: center;
+      gap: .4rem;
+      margin-top: .6rem;
+      font-size: .8rem;
+      font-weight: 600;
+      color: var(--canopy);
+    }
+
+    .news-card .read-more i {
+      display: grid;
+      place-items: center;
+      width: 1.5rem;
+      height: 1.5rem;
+      border-radius: 999px;
+      background: var(--accent);
+      color: #fff;
+      font-size: .65rem;
+      transition: transform .2s ease;
+    }
+
+    .news-card:hover .read-more i { transform: translateX(4px); }
+
+    /* ---------- Scrollbar ---------- */
+    .scrollbar-custom { scroll-snap-type: x proximity; padding: .5rem .5rem 1.5rem .25rem; }
+    .scrollbar-custom > * { scroll-snap-align: start; }
+
+    .scrollbar-custom::-webkit-scrollbar { height: 10px; }
+    .scrollbar-custom::-webkit-scrollbar-track { background: rgba(14, 47, 38, .08); border-radius: 10px; }
     .scrollbar-custom::-webkit-scrollbar-thumb {
-      background-color: #cbd5e1;
+      background: linear-gradient(90deg, var(--papaya), var(--guava));
       border-radius: 10px;
     }
+    .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--guava), var(--papaya)); }
 
-    .scrollbar-custom::-webkit-scrollbar-thumb:hover {
-      background-color: #94a3b8;
+    /* ---------- Empty state ---------- */
+    .empty-state {
+      background: #fff;
+      border: 2px dashed var(--canopy);
+      border-radius: 1.5rem;
+      padding: 2rem;
+      text-align: center;
+      font-weight: 500;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .sloth-hang { animation: none; }
+      .news-card, .news-card img, .news-card .read-more i { transition: none; }
     }
   </style>
 </head>
 
-<body class="bg-gray-100">
+<body>
   <header></header>
   {%include 'searchbar.html' %}
 
   <main class="max-w-6xl mx-auto mt-10 p-4">
-    <div class="flex items-center justify-between mb-6">
-      <h1 class="text-3xl font-bold">Top News</h1>
+    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
+      <h1 class="page-title font-display">
+        <span class="sloth-hang" aria-hidden="true">🦥</span>
+        Top News
+      </h1>
 
       <!-- Tag Filter -->
-      <form method="get" class="ml-7">
-        <label for="tag" class="text-gray-700 mr-2 font-medium">Filter by Tag:</label>
-        <select name="tag" id="tag" onchange="this.form.submit()" class="border border-gray-300 rounded-md p-2">
+      <form method="get" class="filter-wrap">
+        <label for="tag">Filter by Tag:</label>
+        <select name="tag" id="tag" onchange="this.form.submit()">
           <option value="All" {% if current_tag=="All" %}selected{% endif %}>All</option>
           <option value="India" {% if current_tag=="India" %}selected{% endif %}>India</option>
           <option value="Finance" {% if current_tag=="Finance" %}selected{% endif %}>Finance</option>
@@ -58,34 +256,47 @@
     <!-- 📰 Top News Scroll Section -->
     {% if articles %}
     <section>
-      <h2 class="text-2xl font-semibold mb-4">Top Headlines</h2>
-      <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
+      <h2 class="section-title font-display mb-5">Top Headlines</h2>
+      <div class="flex overflow-x-auto space-x-6 scrollbar-custom">
         {% for article in articles %}
-        <div class="min-w-[300px] bg-white shadow-md rounded-lg overflow-hidden">
-          <a href="{{ url_for('article.article', article_id=article.id) }}"
-   class="min-w-[300px] bg-white shadow-md rounded-lg overflow-hidden block">
-          <img src="{{ article.image_url }}" alt="News image" class="w-full h-40 object-cover">
+        <div class="news-card" style="--accent: var(--c{{ loop.index0 % 4 }});">
+          <a href="{{ url_for('article.article', article_id=article.id) }}">
+            <div class="thumb">
+              
+<div class="thumb relative overflow-hidden h-40 bg-gray-100">
+  <!-- Blurred background fills the entire box -->
+  <img
+    src="{{ article.image_url }}"
+    alt=""
+    aria-hidden="true"
+    class="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50"
+  >
 
+  <!-- Original image: fully visible and centered -->
+  <img
+    src="{{ article.image_url }}"
+    alt="News image"
+    class="relative z-10 w-full h-full object-contain object-center"
+  >
+</div>
+            </div>
 
-        <div class="p-4 h-[200px]">
-
-            <h3 class="text-lg font-semibold mb-2 line-clamp-3 leading-7">
+            <div class="p-4 h-[200px]">
+              <h3 class="text-lg font-bold mb-2 line-clamp-3 leading-7">
                 {{ article.title }}
-            </h3>
+              </h3>
 
-            <p class="text-gray-700 text-sm line-clamp-3 leading-5">
+              <p class="text-gray-700 text-sm line-clamp-3 leading-5">
                 {{ article.summary }}
-            </p>
-
+              </p>
+            </div>
+          </a>
         </div>
-        </a>
-        </div>
-
         {% endfor %}
       </div>
     </section>
     {% else %}
-    <p class="text-gray-600 mt-4">No articles found.</p>
+    <p class="empty-state mt-4">No articles found. Try a different tag.</p>
     {% endif %}
   </main>
   <section id="">
