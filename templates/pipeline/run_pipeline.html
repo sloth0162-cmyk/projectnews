@@ -3,7 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Run News Pipeline</title>
+    <style>
+        #pipeline-status { margin-top: 1rem; padding: .6rem .8rem; border-radius: 6px; display: none; }
+        #pipeline-status.running { display: block; background: #eef4ff; color: #1d3b8b; }
+        #pipeline-status.ok      { display: block; background: #e8f7ec; color: #14532d; }
+        #pipeline-status.warn    { display: block; background: #fff7e0; color: #7a5200; }
+        #pipeline-status.error   { display: block; background: #fdeaea; color: #8b1a1a; }
+    </style>
 </head>
 <body>
     <h1>Welcome to the Pipeline</h1>
@@ -18,10 +25,191 @@
     <p>{{ error }}</p>
 {% endif %}
 
-<form method="post">
+<!-- Without JavaScript this still posts normally to /run_pipeline. -->
+<form method="post" action="{{ url_for('run_pipeline') }}" id="pipeline-form">
     <label for="password">Password:</label>
-    <input type="password" id="password" name="password">
-    <button type="submit">Run Pipeline</button>
+    <input type="password" id="password" name="password" autocomplete="off">
+    <button type="submit" id="pipeline-submit">Run Pipeline</button>
 </form>
+
+<p id="pipeline-status" role="status" aria-live="polite"></p>
+<p><small>Open DevTools (F12 &rarr; Console) to see detailed step-by-step logs after the run finishes.</small></p>
+
+<script>
+(function () {
+    "use strict";
+
+    var form = document.getElementById("pipeline-form");
+    var button = document.getElementById("pipeline-submit");
+    var passwordInput = document.getElementById("password");
+    var statusEl = document.getElementById("pipeline-status");
+
+    // Client-side wait limit. Vercel may stop the function earlier than this.
+    var TIMEOUT_MS = 300000;
+    var EXCERPT_LIMIT = 300;
+    var TAG = "[Pipeline]";
+
+    function setStatus(kind, message) {
+        statusEl.className = kind;
+        statusEl.textContent = message;
+    }
+
+    function levelFor(status) {
+        var s = String(status || "").toLowerCase();
+        if (s === "failed" || s === "error") return "error";
+        if (s === "warning" || s === "skipped") return "warn";
+        return "log";
+    }
+
+    function printEntry(entry) {
+        var status = String(entry.status || "?");
+        var line = TAG + " " + status.toUpperCase() +
+            " | " + (entry.step || "?") +
+            " | +" + (entry.elapsed_s !== undefined ? entry.elapsed_s : "?") + "s" +
+            (entry.detail ? " | " + entry.detail : "");
+        console[levelFor(status)](line);
+    }
+
+    // Short, tag-stripped, length-limited excerpt of a non-JSON body.
+    function safeExcerpt(text) {
+        var plain = String(text || "")
+            .replace(/<script[\s\S]*?<\/script>/gi, " ")
+            .replace(/<style[\s\S]*?<\/style>/gi, " ")
+            .replace(/<[^>]+>/g, " ")
+            .replace(/\s+/g, " ")
+            .trim();
+        return plain.length > EXCERPT_LIMIT ? plain.slice(0, EXCERPT_LIMIT) + "…" : plain;
+    }
+
+    function handleJson(res, data, clientElapsed) {
+        var log = Array.isArray(data.log) ? data.log : [];
+        var stats = data.stats || {};
+        var lastEntry = log.length ? log[log.length - 1] : null;
+        var total = stats.total_elapsed_s !== undefined
+            ? stats.total_elapsed_s
+            : (lastEntry ? lastEntry.elapsed_s : "unknown");
+        var finished = log.some(function (e) {
+            return e.step === "pipeline" && e.status === "finished";
+        });
+
+        console.groupCollapsed(TAG + " Step log (" + log.length + " entries)");
+        log.forEach(printEntry);
+        console.groupEnd();
+
+        console.group(TAG + " Summary");
+        console.log("HTTP status:", res.status, res.statusText || "");
+        console.log("Server-side elapsed (s):", total, "| browser-measured (s):", clientElapsed);
+        console.log("Articles fetched:", stats.articles_fetched !== undefined ? stats.articles_fetched : "n/a");
+        console.log("Articles saved:", stats.articles_saved !== undefined ? stats.articles_saved : "n/a");
+        console.log("Skipped:", stats.skipped !== undefined ? stats.skipped : "n/a",
+                    "| Failed:", stats.failed !== undefined ? stats.failed : "n/a",
+                    "| Warnings:", stats.warnings !== undefined ? stats.warnings : "n/a");
+        console.groupEnd();
+
+        if (res.status === 401) {
+            console.error(TAG + " Rejected: incorrect password. The pipeline did NOT run.");
+            setStatus("error", "Incorrect password. The pipeline did not run.");
+            return;
+        }
+        if (!res.ok || data.error) {
+            console.error(TAG + " Pipeline FAILED (HTTP " + res.status + "): " + (data.error || "unknown error"));
+            setStatus("error", "Pipeline failed: " + (data.error || "HTTP " + res.status) + " (see Console).");
+            return;
+        }
+        if (!finished) {
+            console.warn(TAG + " Response was OK but the log has no 'pipeline: finished' entry. Execution may be incomplete.");
+            setStatus("warn", "Response received, but the log is incomplete (see Console).");
+            return;
+        }
+
+        var failed = Number(stats.failed || 0);
+        var saved = stats.articles_saved !== undefined ? stats.articles_saved : "?";
+        if (failed > 0) {
+            console.warn(TAG + " Finished with " + failed + " failed step(s). Check ERROR lines above.");
+            setStatus("warn", "Finished: " + saved + " saved, " + failed + " failed (see Console).");
+        } else {
+            console.log(TAG + " Finished: " + saved + " article(s) saved.");
+            setStatus("ok", "Finished: " + saved + " article(s) saved (see Console for details).");
+        }
+    }
+
+    function handleNonJson(res, text, clientElapsed) {
+        console.error(TAG + " Response was not valid JSON.");
+        console.error(TAG + " HTTP " + res.status + " " + (res.statusText || "") +
+            " | content-type: " + (res.headers.get("content-type") || "unknown") +
+            " | browser-measured elapsed: " + clientElapsed + "s");
+        console.error(TAG + " Excerpt (max " + EXCERPT_LIMIT + " chars): " + safeExcerpt(text));
+        if (res.status === 502 || res.status === 504 || res.status === 500) {
+            console.warn(TAG + " Possible execution interruption (e.g. Vercel function timeout or crash) " +
+                "before Flask returned its debug log. The failing stage cannot be determined from this response; " +
+                "check Vercel's function logs for this request.");
+        }
+        setStatus("error", "Unexpected non-JSON response (HTTP " + res.status + "). See Console.");
+    }
+
+    form.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        var url = new URL(form.action, window.location.href);
+        url.searchParams.set("debug", "1");
+
+        var controller = new AbortController();
+        var timer = setTimeout(function () { controller.abort(); }, TIMEOUT_MS);
+        var started = performance.now();
+
+        button.disabled = true;
+        setStatus("running", "Running pipeline… this can take a while. Results will appear in the Console.");
+        console.log(TAG + " POST " + url.pathname + url.search + " started at " + new Date().toISOString());
+
+        var res;
+        try {
+            // Password is sent only as the form field; it is never logged.
+            res = await fetch(url.toString(), {
+                method: "POST",
+                body: new FormData(form),
+                headers: { "Accept": "application/json" },
+                signal: controller.signal,
+                credentials: "same-origin"
+            });
+        } catch (err) {
+            var waited = ((performance.now() - started) / 1000).toFixed(1);
+            if (err && err.name === "AbortError") {
+                console.error(TAG + " Request timed out in the browser after " + waited + "s. " +
+                    "The server may still be running or may have been interrupted.");
+                setStatus("error", "Request timed out after " + waited + "s. See Console.");
+            } else {
+                console.error(TAG + " Network error after " + waited + "s: " +
+                    (err && err.message ? err.message : "unknown") +
+                    ". The connection may have been dropped (possible server/Vercel interruption).");
+                setStatus("error", "Network error. See Console.");
+            }
+            clearTimeout(timer);
+            button.disabled = false;
+            passwordInput.value = "";
+            return;
+        }
+
+        try {
+            var text = await res.text();
+            var elapsed = ((performance.now() - started) / 1000).toFixed(1);
+            var data = null;
+            try { data = JSON.parse(text); } catch (e) { data = null; }
+
+            if (data && typeof data === "object") {
+                handleJson(res, data, elapsed);
+            } else {
+                handleNonJson(res, text, elapsed);
+            }
+        } catch (err) {
+            console.error(TAG + " Failed while reading the response: " + (err && err.message ? err.message : "unknown"));
+            setStatus("error", "Could not read the response. See Console.");
+        } finally {
+            clearTimeout(timer);
+            button.disabled = false;
+            passwordInput.value = "";
+        }
+    });
+})();
+</script>
 </body>
 </html>

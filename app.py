@@ -274,18 +274,55 @@ def profile_page():
     )
 # -----------------------------
 # ⚙️ Run News Pipeline (General)
+# Drop-in replacement for the existing _pipeline_respond + run_pipeline block.
+# Requires `import os` at the top of app.py (add it if not already present).
 # -----------------------------
 
-def _pipeline_respond(debug_log, error=None):
+_SENSITIVE_ENV_HINTS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "PASS", "SUPABASE", "DATABASE")
+
+
+def _redact(value, limit=500):
+    """Make text safe for the JSON response: mask secret values, cap length."""
+    text = str(value)
+
+    secrets = [PIPELINE_PASSWORD]
+    for name, env_value in os.environ.items():
+        if any(hint in name.upper() for hint in _SENSITIVE_ENV_HINTS):
+            secrets.append(env_value)
+
+    for secret in secrets:
+        if secret and len(secret) >= 4:
+            text = text.replace(secret, "[REDACTED]")
+
+    return text if len(text) <= limit else text[:limit] + "…"
+
+
+def _pipeline_stats(debug_log, fetched, saved, start_time):
+    article_entries = [e for e in debug_log if e["step"].startswith("article[")]
+    return {
+        "articles_fetched": fetched,
+        "articles_saved": saved,
+        "skipped": sum(1 for e in article_entries if e["status"] == "skipped"),
+        "failed": sum(1 for e in article_entries if e["status"] == "failed"),
+        "warnings": sum(1 for e in debug_log if e["status"] == "warning"),
+        "total_elapsed_s": round(time.monotonic() - start_time, 2),
+    }
+
+
+def _pipeline_respond(debug_log, error=None, status_code=None, stats=None):
     """?debug=1 returns raw JSON for easier debugging."""
 
-    status_code = 500 if error else 200
+    if status_code is None:
+        status_code = 500 if error else 200
 
     if request.args.get("debug") == "1":
-        return jsonify({
+        payload = {
             "error": error,
             "log": debug_log
-        }), status_code
+        }
+        if stats is not None:
+            payload["stats"] = stats
+        return jsonify(payload), status_code
 
     return render_template(
         "pipeline/run_pipeline.html",
@@ -306,26 +343,28 @@ def run_pipeline():
         )
 
     # -----------------------------
-    # Check password
+    # Check password (unchanged check; response now 401 + JSON in debug mode)
     # -----------------------------
     password = request.form.get("password")
 
     if password != PIPELINE_PASSWORD:
         print("❌ Pipeline rejected: Incorrect password")
 
-        return render_template(
-            "pipeline/run_pipeline.html",
-            error="Incorrect password"
+        return _pipeline_respond(
+            [],
+            error="Incorrect password",
+            status_code=401
         )
 
     start_time = time.monotonic()
     debug_log = []
+    fetched = 0
 
     def log_step(step, status, detail=""):
         debug_log.append({
             "step": step,
             "status": status,
-            "detail": detail,
+            "detail": _redact(detail),
             "elapsed_s": round(
                 time.monotonic() - start_time,
                 2
@@ -354,13 +393,18 @@ def run_pipeline():
             log_step(
                 "scrape",
                 "warning",
-                f"{len(scraper_errors)} feed error(s): {scraper_errors}"
+                f"{len(scraper_errors)} feed error(s)"
             )
+            # One entry per failing feed (capped) so each can be identified.
+            for feed_error in list(scraper_errors)[:10]:
+                log_step("scrape.feed", "warning", feed_error)
+
+        fetched = len(articles) if articles else 0
 
         log_step(
             "scrape",
             "ok",
-            f"{len(articles)} article(s) fetched"
+            f"{fetched} article(s) fetched"
         )
 
     except Exception as e:
@@ -372,7 +416,8 @@ def run_pipeline():
 
         return _pipeline_respond(
             debug_log,
-            error=f"Scraper failed: {e}"
+            error=_redact(f"Scraper failed: {e}"),
+            stats=_pipeline_stats(debug_log, fetched, 0, start_time)
         )
 
     if not articles:
@@ -384,7 +429,8 @@ def run_pipeline():
 
         return _pipeline_respond(
             debug_log,
-            error="No articles were returned by the scraper."
+            error="No articles were returned by the scraper.",
+            stats=_pipeline_stats(debug_log, fetched, 0, start_time)
         )
 
     # -----------------------------
@@ -396,200 +442,205 @@ def run_pipeline():
         articles,
         start=1
     ):
-
-        title = article.get(
-            "title",
-            ""
-        ).strip()
-
-        content = article.get(
-            "content",
-            ""
-        ).strip()
-
-        source = article.get(
-            "source",
-            "Unknown"
-        )
-
-        url = article.get(
-            "url",
-            "Unknown"
-        )
-
-        if not title:
-            log_step(
-                f"article[{index}]",
-                "skipped",
-                "no title"
-            )
-            continue
-
-        if not content:
-            log_step(
-                f"article[{index}]",
-                "skipped",
-                "no content"
-            )
-            continue
-
-        log_step(
-            f"article[{index}]",
-            "start",
-            f"{source}: {title}"
-        )
-
-        # -----------------------------
-        # 3. CHECK SUPABASE
-        # -----------------------------
+        # Any unexpected exception is recorded and the loop moves on,
+        # so the debug log can still be returned to the browser.
         try:
-            exists = (
-                supabase
-                .table("articles")
-                .select("id")
-                .eq("title", title)
-                .execute()
-            )
 
-            matches = exists.data or []
+            # `or ""` guards against None values (previously an AttributeError).
+            title = (article.get("title") or "").strip()
+            content = (article.get("content") or "").strip()
+            source = article.get("source") or "Unknown"
+            url = article.get("url") or "Unknown"
 
-        except Exception as e:
-            log_step(
-                f"article[{index}]",
-                "failed",
-                f"dup-check error: "
-                f"{type(e).__name__}: {e}"
-            )
-            continue
-
-        if matches:
-            log_step(
-                f"article[{index}]",
-                "skipped",
-                f"duplicate: {title}"
-            )
-            continue
-
-        # -----------------------------
-        # 4. SUMMARIZE
-        # -----------------------------
-        try:
-            summary = summarize_text(content)
-
-            if not summary:
+            if not title:
                 log_step(
                     f"article[{index}]",
-                    "failed",
-                    "summarizer returned empty result"
+                    "skipped",
+                    "no title"
                 )
                 continue
 
-        except Exception as e:
-            log_step(
-                f"article[{index}]",
-                "failed",
-                f"summarizer error: "
-                f"{type(e).__name__}: {e}"
-            )
-            continue
-
-        # -----------------------------
-        # 5. GENERATE IMAGE
-        # -----------------------------
-        try:
-            image_path = create_news_image(
-                title,
-                summary
-            )
-
-            if not image_path:
+            if not content:
                 log_step(
                     f"article[{index}]",
-                    "failed",
-                    "image generation returned empty result"
+                    "skipped",
+                    "no content"
                 )
                 continue
 
-        except Exception as e:
             log_step(
                 f"article[{index}]",
-                "failed",
-                f"image-gen error: "
-                f"{type(e).__name__}: {e}"
-            )
-            continue
-
-        # -----------------------------
-        # 6. UPLOAD IMAGE
-        # -----------------------------
-        try:
-            image_url = upload_image(
-                image_path
+                "start",
+                f"{source}: {title}"
             )
 
-            if not image_url:
+            # -----------------------------
+            # 3. CHECK SUPABASE
+            # -----------------------------
+            try:
+                exists = (
+                    supabase
+                    .table("articles")
+                    .select("id")
+                    .eq("title", title)
+                    .execute()
+                )
+
+                matches = exists.data or []
+
+            except Exception as e:
                 log_step(
                     f"article[{index}]",
                     "failed",
-                    "image upload returned empty result"
+                    f"dup-check error: "
+                    f"{type(e).__name__}: {e}"
                 )
                 continue
 
+            if matches:
+                log_step(
+                    f"article[{index}]",
+                    "skipped",
+                    f"duplicate: {title}"
+                )
+                continue
+
+            # -----------------------------
+            # 4. SUMMARIZE
+            # -----------------------------
+            try:
+                summary = summarize_text(content)
+
+                if not summary:
+                    log_step(
+                        f"article[{index}]",
+                        "failed",
+                        "summarizer returned empty result"
+                    )
+                    continue
+
+            except Exception as e:
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    f"summarizer error: "
+                    f"{type(e).__name__}: {e}"
+                )
+                continue
+
+            # -----------------------------
+            # 5. GENERATE IMAGE
+            # -----------------------------
+            try:
+                image_path = create_news_image(
+                    title,
+                    summary
+                )
+
+                if not image_path:
+                    log_step(
+                        f"article[{index}]",
+                        "failed",
+                        "image generation returned empty result"
+                    )
+                    continue
+
+            except Exception as e:
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    f"image-gen error: "
+                    f"{type(e).__name__}: {e}"
+                )
+                continue
+
+            # -----------------------------
+            # 6. UPLOAD IMAGE
+            # -----------------------------
+            try:
+                image_url = upload_image(
+                    image_path
+                )
+
+                if not image_url:
+                    log_step(
+                        f"article[{index}]",
+                        "failed",
+                        "image upload returned empty result"
+                    )
+                    continue
+
+            except Exception as e:
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    f"image-upload error: "
+                    f"{type(e).__name__}: {e}"
+                )
+                continue
+
+            # -----------------------------
+            # 7. SAVE ARTICLE
+            # -----------------------------
+            try:
+                save_summary_to_db(
+                    title,
+                    summary,
+                    image_url
+                )
+
+                processed += 1
+
+                log_step(
+                    f"article[{index}]",
+                    "ok",
+                    f"saved: {title}"
+                )
+
+            except Exception as e:
+                log_step(
+                    f"article[{index}]",
+                    "failed",
+                    f"db-save error: "
+                    f"{type(e).__name__}: {e}"
+                )
+                continue
+
+            # -----------------------------
+            # 8. CLASSIFY ARTICLE
+            # -----------------------------
+            try:
+                tags = classify_article(title, summary)
+
+                save_tags_to_article(title, tags)
+
+                if tags:
+                    log_step(
+                        f"article[{index}]",
+                        "ok",
+                        f"tags saved: {tags}"
+                    )
+                else:
+                    log_step(
+                        f"article[{index}]",
+                        "warning",
+                        "classifier returned no tags (save was still attempted)"
+                    )
+
+            except Exception as e:
+                log_step(
+                    f"article[{index}]",
+                    "warning",
+                    f"tagging error: {type(e).__name__}: {e}"
+                )
+
         except Exception as e:
             log_step(
                 f"article[{index}]",
                 "failed",
-                f"image-upload error: "
-                f"{type(e).__name__}: {e}"
+                f"unexpected error: {type(e).__name__}: {e}"
             )
             continue
-
-        # -----------------------------
-        # 7. SAVE ARTICLE
-        # -----------------------------
-        try:
-            save_summary_to_db(
-                title,
-                summary,
-                image_url
-            )
-
-            processed += 1
-
-            log_step(
-                f"article[{index}]",
-                "ok",
-                f"saved: {title}"
-            )
-
-        except Exception as e:
-            log_step(
-                f"article[{index}]",
-                "failed",
-                f"db-save error: "
-                f"{type(e).__name__}: {e}"
-            )
-            continue
-                # -----------------------------
-        # 8. CLASSIFY ARTICLE
-        # -----------------------------
-        try:
-            tags = classify_article(title, summary)
-
-            save_tags_to_article(title, tags)
-
-            log_step(
-                f"article[{index}]",
-                "ok",
-                f"tags saved: {tags}"
-            )
-
-        except Exception as e:
-            log_step(
-                f"article[{index}]",
-                "warning",
-                f"tagging error: {type(e).__name__}: {e}"
-            )
 
     # -----------------------------
     # PIPELINE COMPLETE
@@ -607,9 +658,9 @@ def run_pipeline():
     )
 
     return _pipeline_respond(
-        debug_log
+        debug_log,
+        stats=_pipeline_stats(debug_log, fetched, processed, start_time)
     )
-
 # -----------------------------
 # 🧠 Editorial (Manual Posts)
 # -----------------------------
