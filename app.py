@@ -13,6 +13,7 @@ from image_generation.upload_image_to_supabase import upload_image
 from routes.route import article_bp
 from second import second
 import time
+import os
 
 # -----------------------------
 # 🔧 Flask App Setup
