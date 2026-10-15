@@ -13,4 +13,7 @@ jobs:
     steps:
       - name: Trigger Project Newz
         run: |
-          curl https://projectnews-mocha.vercel.app/run_pipeline
+          curl --fail-with-body --show-error --silent \
+            --request POST \
+            --data-urlencode "password=${{ secrets.PIPELINE_PASSWORD }}" \
+            "https://projectnews-mocha.vercel.app/run_pipeline?debug=1"

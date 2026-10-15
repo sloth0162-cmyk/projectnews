@@ -88,35 +88,7 @@ def dashboard_page():
 @app.route("/about")
 def about_page():
     return render_template("secondpage/about.html")
-# -----------------------------
-# 📄 Additional Pages
-# -----------------------------
-# @app.route("/secondpage")
-# def second_page():
-#     tag = request.args.get("tag")
-#     search = request.args.get("search", "").strip()
-#      # Tag filter
-#     if tag and tag.lower() != "all":
-#         query = query.ilike("tags", f"%{tag}%")
 
-#     # Search filter
-#     if search:
-#         try:
-#             query = query.or_(f"title.ilike.%{search}%,summary.ilike.%{search}%")
-#         except Exception as e:
-#             print(f"⚠️ Search filter error: {e}")
-
-#     # Execute query
-#     try:
-#         result = query.execute()
-#         articles = result.data or []
-#     except Exception as e:
-#         print(f"⚠️ Error fetching articles: {e}")
-#         articles = []
-#     return render_template("secondpage/secondpage.html",
-#         articles=articles,
-#         current_tag=tag or "All",
-#         search_query=search,)
 
 
 @app.route("/thirdpage")

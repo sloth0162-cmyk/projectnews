@@ -69,7 +69,7 @@ def fetch_feed(feed):
         response = requests.get(
             url,
             headers=HEADERS,
-            timeout=10,
+            timeout=33,
         )
 
         response.raise_for_status()
