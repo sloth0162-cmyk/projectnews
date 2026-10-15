@@ -22,7 +22,7 @@ RSS_FEEDS = [
     },
 ]
 
-MAX_ARTICLES = 1
+MAX_ARTICLES = 3
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0",
