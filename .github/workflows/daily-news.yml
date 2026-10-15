@@ -3,7 +3,6 @@ name: Daily News Pipeline
 on:
   schedule:
     - cron: '30 2 * * *'
-
   workflow_dispatch:
 
 jobs:
@@ -12,5 +11,10 @@ jobs:
 
     steps:
       - name: Trigger Project Newz
+        env:
+          PIPELINE_PASSWORD: ${{ secrets.PIPELINE_PASSWORD }}
         run: |
-          curl https://projectnews-mocha.vercel.app/run_pipeline
+          curl --fail-with-body --show-error --silent \
+            -X POST \
+            -F "password=${PIPELINE_PASSWORD}" \
+            "https://projectnews-mocha.vercel.app/run_pipeline"
