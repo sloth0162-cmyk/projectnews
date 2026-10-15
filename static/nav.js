@@ -1,202 +1,233 @@
-// Create navbar structure
-const header = document.querySelector('header');
-const nav = document.createElement('nav');
-nav.className = 'navbar';
+document.addEventListener("DOMContentLoaded", () => {
+  const header = document.querySelector("header");
+  if (!header) return;
 
-// Logo
-const logo = document.createElement('div');
-logo.className = 'logo-text';
-logo.textContent = 'Sloth Newz';
+  // User details provided by Flask
+  const user = window.NAV_USER || {};
+  const isLoggedIn = user.loggedIn === true;
+  const userName = user.name || "User";
+  const avatar =
+    user.avatar || "https://cdn-icons-png.flaticon.com/512/847/847969.png";
 
-// Navigation links
-const navLinks = document.createElement('ul');
-navLinks.className = 'nav-links';
+  const escapeHTML = (value) =>
+    String(value).replace(/[&<>"']/g, (char) => ({
+      "&": "&amp;",
+      "<": "&lt;",
+      ">": "&gt;",
+      '"': "&quot;",
+      "'": "&#39;",
+    })[char]);
 
-const links = [
-  { text: 'Home', href: '/' },
-  { text: 'Finance', href: '/finance' },
-  { text: 'Crypto', href: '/secondpage#crypto' },
-  { text: 'Business', href: '/secondpage#business' },
-  { text: 'Editorial', href: '/editorial' },
-  { text: 'About', href: '/about' }
-];
+  // Navigation links
+  const links = [
+    ["Home", "/"],
+    ["Finance", "/finance"],
+    ["Crypto", "/secondpage#crypto"],
+    ["Business", "/secondpage#business"],
+    ["Editorial", "/editorial"],
+    ["About", "/about"],
+  ];
 
-links.forEach(({ text, href }) => {
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.textContent = text;
-  a.href = href;
-  li.appendChild(a);
-  navLinks.appendChild(li);
-});
+  function createLinks(container) {
+    links.forEach(([name, url]) => {
+      const li = document.createElement("li");
+      const a = document.createElement("a");
 
-// Right section container
-const navRight = document.createElement('div');
-navRight.className = 'nav-right';
+      a.textContent = name;
+      a.href = url;
 
-// Notification bell
-const notifContainer = document.createElement('div');
-notifContainer.className = 'notif-container';
-notifContainer.innerHTML = `
-  <i class="fa-solid fa-bell notif-icon"></i>
-  <div class="notif-dropdown hidden">
-    <p class="notif-title">Notifications</p>
-    <div class="notif-item">No new notifications</div>
-  </div>
-`;
-
-// Profile section
-const profileContainer = document.createElement('div');
-profileContainer.className = 'profile-container';
-profileContainer.innerHTML = `
-  <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile" class="profile-icon">
-  <div class="dropdown-menu hidden">
-    <div class="dropdown-item"><i class="fas fa-cog"></i> Settings</div>
-    <hr class="dropdown-divider">
-    <div class="dropdown-item google-signin">Sign in with Google</div>
-  </div>
-`;
-
-// Hamburger menu
-const hamburger = document.createElement('div');
-hamburger.className = 'hamburger';
-hamburger.innerHTML = '<span></span><span></span><span></span>';
-
-// Assemble navbar
-navRight.append(notifContainer, profileContainer, hamburger);
-nav.append(logo, navLinks, navRight);
-header.appendChild(nav);
-
-// Mobile menu
-const mobileMenu = document.createElement('div');
-mobileMenu.className = 'mobile-menu';
-const mobileNav = document.createElement('ul');
-mobileNav.className = 'mobile-nav-links';
-links.forEach(({ text, href }) => {
-  const li = document.createElement('li');
-  const a = document.createElement('a');
-  a.textContent = text;
-  a.href = href;
-  li.appendChild(a);
-  mobileNav.appendChild(li);
-});
-
-const mobileProfile = document.createElement('div');
-mobileProfile.className = 'mobile-profile-section';
-mobileProfile.innerHTML = `
-  <div class="mobile-profile-info">
-    <img src="https://cdn-icons-png.flaticon.com/512/847/847969.png" alt="Profile" class="profile-icon">
-    <div class="mobile-profile-name">User Profile</div>
-  </div>
-  <div class="dropdown-item"><i class="fas fa-cog"></i> Settings</div>
-  <hr class="dropdown-divider">
-  <div class="dropdown-item google-signin">Sign in with Google</div>
-`;
-
-mobileMenu.append(mobileNav, mobileProfile);
-document.body.appendChild(mobileMenu);
-
-// Overlay
-const overlay = document.createElement('div');
-overlay.className = 'menu-overlay';
-document.body.appendChild(overlay);
-
-// Elements
-const bellIcon = notifContainer.querySelector('.notif-icon');
-const notifDropdown = notifContainer.querySelector('.notif-dropdown');
-const profileIcon = profileContainer.querySelector('.profile-icon');
-const dropdown = profileContainer.querySelector('.dropdown-menu');
-
-// Functions
-function toggleMobileMenu() {
-  const isActive = mobileMenu.classList.contains('active');
-
-  if (isActive) {
-    closeMobileMenu();
-  } else {
-    hamburger.classList.add('active');
-    mobileMenu.classList.add('active');
-    overlay.classList.add('active');
-    document.body.style.overflow = 'hidden';
+      li.appendChild(a);
+      container.appendChild(li);
+    });
   }
-}
 
-function closeMobileMenu() {
-  hamburger.classList.remove('active');
-  mobileMenu.classList.remove('active');
-  overlay.classList.remove('active');
-  document.body.style.overflow = '';
-}
+  // Navbar
+  const nav = document.createElement("nav");
+  nav.className = "navbar";
 
-function closeDropdowns() {
-  notifDropdown.classList.add('hidden');
-  dropdown.classList.add('hidden');
-}
+  nav.innerHTML = `
+    <a class="logo-text" href="/">Sloth Newz</a>
+    <ul class="nav-links"></ul>
+    <div class="nav-right">
+      <div class="notif-container">
+        <button type="button" class="notif-icon" aria-label="Notifications"
+          aria-expanded="false">
+          <i class="fa-solid fa-bell"></i>
+        </button>
+        <div class="notif-dropdown hidden">
+          <p class="notif-title">Notifications</p>
+          <div class="notif-item">No new notifications</div>
+        </div>
+      </div>
 
-// Events
-hamburger.addEventListener('click', (e) => {
-  e.stopPropagation();
-  toggleMobileMenu();
-});
+      <div class="profile-container">
+        <button type="button" class="profile-trigger"
+          aria-label="Open profile menu" aria-expanded="false">
+          <img src="${escapeHTML(avatar)}" alt="Profile" class="profile-icon">
+        </button>
 
-overlay.addEventListener('click', (e) => {
-  e.stopPropagation();
-  closeMobileMenu();
-});
+        <div class="dropdown-menu hidden">
+          ${
+            isLoggedIn
+              ? `
+                <div class="dropdown-item profile-name">
+                  ${escapeHTML(userName)}
+                </div>
+                <hr class="dropdown-divider">
+                <a class="dropdown-item" href="/profile">
+                  <i class="fas fa-user"></i> My Profile
+                </a>
+                <a class="dropdown-item" href="/profile">
+                  <i class="fas fa-cog"></i> Settings
+                </a>
+                <hr class="dropdown-divider">
+                <button type="button" class="dropdown-item logout-button">
+                  <i class="fas fa-sign-out-alt"></i> Sign out
+                </button>
+              `
+              : `
+                <a class="dropdown-item" href="/profile">
+                  <i class="fas fa-user"></i> Profile
+                </a>
+                <button type="button" class="dropdown-item google-signin">
+                  <i class="fab fa-google"></i> Sign in with Google
+                </button>
+              `
+          }
+        </div>
+      </div>
 
-mobileNav.querySelectorAll('a').forEach(link => {
-  link.addEventListener('click', () => {
-    closeMobileMenu();
-  });
-});
+      <button type="button" class="hamburger"
+        aria-label="Toggle navigation" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  `;
 
-profileIcon.addEventListener('click', (e) => {
-  e.stopPropagation();
-  dropdown.classList.toggle('hidden');
-  notifDropdown.classList.add('hidden');
-});
+  createLinks(nav.querySelector(".nav-links"));
+  header.replaceChildren(nav);
 
-bellIcon.addEventListener('click', (e) => {
-  e.stopPropagation();
-  notifDropdown.classList.toggle('hidden');
-  dropdown.classList.add('hidden');
-});
+  // Mobile menu
+  const mobileMenu = document.createElement("div");
+  mobileMenu.className = "mobile-menu";
 
-document.addEventListener('click', (e) => {
-  if (!notifContainer.contains(e.target) && !profileContainer.contains(e.target)) {
+  const mobileLinks = document.createElement("ul");
+  mobileLinks.className = "mobile-nav-links";
+  createLinks(mobileLinks);
+
+  const mobileProfile = document.createElement("div");
+  mobileProfile.className = "mobile-profile-section";
+
+  mobileProfile.innerHTML = isLoggedIn
+    ? `
+      <div class="mobile-profile-info">
+        <img src="${escapeHTML(avatar)}" alt="Profile" class="profile-icon">
+        <div class="mobile-profile-name">${escapeHTML(userName)}</div>
+      </div>
+      <a class="dropdown-item" href="/profile">My Profile</a>
+      <button type="button" class="dropdown-item logout-button">
+        Sign out
+      </button>
+    `
+    : `
+      <div class="mobile-profile-info">
+        <img src="${escapeHTML(avatar)}" alt="Profile" class="profile-icon">
+        <div class="mobile-profile-name">Guest</div>
+      </div>
+      <button type="button" class="dropdown-item google-signin">
+        <i class="fab fa-google"></i> Sign in with Google
+      </button>
+    `;
+
+  mobileMenu.append(mobileLinks, mobileProfile);
+  document.body.appendChild(mobileMenu);
+
+  const overlay = document.createElement("div");
+  overlay.className = "menu-overlay";
+  document.body.appendChild(overlay);
+
+  // Dropdowns
+  const bellButton = nav.querySelector(".notif-icon");
+  const notifDropdown = nav.querySelector(".notif-dropdown");
+  const profileButton = nav.querySelector(".profile-trigger");
+  const profileDropdown = nav.querySelector(".dropdown-menu");
+
+  function toggleDropdown(button, dropdown) {
+    const open = dropdown.classList.contains("hidden");
+
     closeDropdowns();
+    dropdown.classList.toggle("hidden", !open);
+    button.setAttribute("aria-expanded", String(open));
   }
-});
 
-// Prevent dropdown clicks from closing
-notifDropdown.addEventListener('click', (e) => e.stopPropagation());
-dropdown.addEventListener('click', (e) => e.stopPropagation());
+  function closeDropdowns() {
+    notifDropdown.classList.add("hidden");
+    profileDropdown.classList.add("hidden");
+    bellButton.setAttribute("aria-expanded", "false");
+    profileButton.setAttribute("aria-expanded", "false");
+  }
 
-// Google Sign-In
-document.querySelectorAll('.google-signin').forEach(btn => {
-  btn.addEventListener('click', () => {
-    window.location.href = '/auth/login';
+  bellButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleDropdown(bellButton, notifDropdown);
   });
-});
 
-// Scroll effect
-let lastScrollY = window.scrollY;
-window.addEventListener('scroll', () => {
-  if (window.scrollY > 50) {
-    nav.classList.add('scrolled');
-  } else {
-    nav.classList.remove('scrolled');
+  profileButton.addEventListener("click", (event) => {
+    event.stopPropagation();
+    toggleDropdown(profileButton, profileDropdown);
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!nav.contains(event.target)) closeDropdowns();
+  });
+
+  // Authentication: Flask handles the actual login and logout
+  document.querySelectorAll(".google-signin").forEach((button) => {
+    button.addEventListener("click", () => {
+      window.location.href = "/auth/login";
+    });
+  });
+
+  document.querySelectorAll(".logout-button").forEach((button) => {
+    button.addEventListener("click", () => {
+      window.location.href = "/auth/logout";
+    });
+  });
+
+  // Mobile menu
+  const hamburger = nav.querySelector(".hamburger");
+
+  function closeMobileMenu() {
+    mobileMenu.classList.remove("active");
+    overlay.classList.remove("active");
+    hamburger.classList.remove("active");
+    hamburger.setAttribute("aria-expanded", "false");
+    document.body.style.overflow = "";
   }
-  lastScrollY = window.scrollY;
-});
 
-// Resize handler - close mobile menu when resizing to desktop
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(() => {
-    if (window.innerWidth > 768) {
-      closeMobileMenu();
-    }
-  }, 250);
+  hamburger.addEventListener("click", () => {
+    const open = !mobileMenu.classList.contains("active");
+
+    mobileMenu.classList.toggle("active", open);
+    overlay.classList.toggle("active", open);
+    hamburger.classList.toggle("active", open);
+    hamburger.setAttribute("aria-expanded", String(open));
+    document.body.style.overflow = open ? "hidden" : "";
+  });
+
+  overlay.addEventListener("click", closeMobileMenu);
+
+  mobileLinks.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", closeMobileMenu);
+  });
+
+  // Navbar scroll effect
+  window.addEventListener("scroll", () => {
+    nav.classList.toggle("scrolled", window.scrollY > 50);
+  }, { passive: true });
+
+  // Close mobile menu when returning to desktop
+  window.addEventListener("resize", () => {
+    if (window.innerWidth > 768) closeMobileMenu();
+  });
 });

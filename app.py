@@ -152,40 +152,154 @@ def third_page():
         search_query=search,
         current_tag=tag or "All"
     )
-
-
 # -----------------------------
-# 🔐 Google Auth (via Supabase)
+# Google Auth (Supabase)
 # -----------------------------
 @app.route("/auth/login")
 def login_google():
-    """Redirect user to Supabase Google OAuth."""
-    redirect_url = f"{Config.SUPABASE_URL}/auth/v1/authorize?provider=google&redirect_to=http://127.0.0.1:5000/auth/callback"
-    return redirect(redirect_url)
+    callback_url = url_for("auth_callback", _external=True)
+
+    return redirect(
+        f"{Config.SUPABASE_URL}/auth/v1/authorize"
+        f"?provider=google&redirect_to={callback_url}"
+    )
 
 
-@app.route("/auth/callback")
+@app.route("/auth/callback", methods=["GET", "POST"])
 def auth_callback():
-    """Handle redirect from Supabase Google login."""
-    access_token = request.args.get("access_token")
+    access_token = (
+        request.form.get("access_token")
+        or request.args.get("access_token")
+    )
 
+    # Read the access token from the URL fragment.
     if not access_token:
-        # Simulate login (for now)
-        session["logged_in"] = True
-        return redirect(url_for("dashboard_page"))
+        return """
+        <p>Signing you in...</p>
+        <script>
+            const token = new URLSearchParams(
+                window.location.hash.slice(1)
+            ).get("access_token");
 
-    headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get(f"{Config.SUPABASE_URL}/auth/v1/user", headers=headers)
+            if (token) {
+                const form = document.createElement("form");
+                form.method = "POST";
+                form.action = "/auth/callback";
 
-    if response.status_code == 200:
-        user = response.json()
-        session["user"] = user
-        print("✅ Logged in user:", user.get("email"))
-    else:
-        print("❌ Failed to verify user token:", response.text)
+                const input = document.createElement("input");
+                input.type = "hidden";
+                input.name = "access_token";
+                input.value = token;
+
+                form.appendChild(input);
+                document.body.appendChild(form);
+                form.submit();
+            } else {
+                window.location.replace("/");
+            }
+        </script>
+        """
+
+    # Verify the user with Supabase.
+    response = requests.get(
+        f"{Config.SUPABASE_URL}/auth/v1/user",
+        headers={
+            "apikey": Config.SUPABASE_KEY,
+            "Authorization": f"Bearer {access_token}",
+        },
+        timeout=10,
+    )
+
+    if not response.ok:
+        print("Login failed:", response.text)
+        return redirect("/")
+
+    user = response.json()
+
+    session["user"] = {
+        "id": user.get("id"),
+        "email": user.get("email"),
+        "user_metadata": user.get("user_metadata") or {},
+    }
 
     return redirect(url_for("dashboard_page"))
 
+
+# -----------------------------
+# Profile
+# -----------------------------
+@app.route("/profile", methods=["GET", "POST"])
+def profile_page():
+    user = session.get("user")
+
+    if not user:
+        return redirect(url_for("login_google"))
+
+    metadata = user.get("user_metadata") or {}
+    notice = session.pop("profile_notice", None)
+
+    # Update the user's display name.
+    if request.method == "POST" and request.form.get("action") == "update_name":
+        first_name = request.form.get("first_name", "").strip()
+        last_name = request.form.get("last_name", "").strip()
+
+        if not first_name:
+            notice = "Please enter your first name."
+        elif len(first_name) > 60 or len(last_name) > 60:
+            notice = "Names must be 60 characters or fewer."
+        else:
+            display_name = " ".join(filter(None, [first_name, last_name]))
+
+            metadata.update({
+                "given_name": first_name,
+                "family_name": last_name,
+                "full_name": display_name,
+                "name": display_name,
+            })
+
+            user["user_metadata"] = metadata
+            session["user"] = user
+            session["profile_notice"] = "Your name was updated for this session."
+
+            return redirect(url_for("profile_page"))
+
+    # Get the user's name.
+    full_name = (
+        metadata.get("full_name")
+        or metadata.get("name")
+        or user.get("name")
+        or ""
+    ).strip()
+
+    first_name = (metadata.get("given_name") or "").strip()
+    last_name = (metadata.get("family_name") or "").strip()
+
+    if not first_name and full_name:
+        parts = full_name.split(maxsplit=1)
+        first_name = parts[0]
+        last_name = last_name or (parts[1] if len(parts) > 1 else "")
+
+    first_name = first_name or "New"
+    last_name = last_name or ("Sloth" if not full_name else "")
+
+    display_name = " ".join(filter(None, [first_name, last_name]))
+
+    # Get the user's profile picture.
+    avatar_url = (
+        metadata.get("avatar_url")
+        or metadata.get("picture")
+        or "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+    )
+
+    return render_template(
+        "profile.html",
+        first_name=first_name,
+        last_name=last_name,
+        display_name=display_name,
+        avatar_url=avatar_url,
+        saved_articles=[],
+        notice=notice,
+    )
 # -----------------------------
 # ⚙️ Run News Pipeline (General)
 # -----------------------------
