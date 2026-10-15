@@ -1,5 +1,4 @@
 import os
-from pathlib import Path
 
 import requests
 from dotenv import load_dotenv
@@ -22,11 +21,7 @@ HEADERS = {
 def generate_image(
     prompt,
     model="@cf/lykon/dreamshaper-8-lcm",
-    output_file="generated_images/test.png",
 ):
-    output_path = Path(output_file)
-    output_path.parent.mkdir(parents=True, exist_ok=True)
-
     payload = {
         "prompt": prompt
     }
@@ -40,10 +35,6 @@ def generate_image(
 
     response.raise_for_status()
 
-    with open(output_path, "wb") as image:
-        image.write(response.content)
+    print("✅ Image generated successfully!")
 
-    print(f"✅ Image generated successfully!")
-    print(f"📁 Saved as: {output_path}")
-
-    return str(output_path)
+    return response.content  # image bytes, nothing written to disk

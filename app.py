@@ -272,11 +272,10 @@ def profile_page():
         avatar_url=avatar_url,
         saved_articles=[],
         notice=notice,
-    )
-# -----------------------------
+    )# -----------------------------
 # ⚙️ Run News Pipeline (General)
-# Drop-in replacement for the existing _pipeline_respond + run_pipeline block.
-# Requires `import os` at the top of app.py (add it if not already present).
+# Replace the existing _pipeline_respond + run_pipeline block with this.
+# app.py must have `import os` and `import time` at the top.
 # -----------------------------
 
 _SENSITIVE_ENV_HINTS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "PASS", "SUPABASE", "DATABASE")
@@ -530,19 +529,28 @@ def run_pipeline():
                 continue
 
             # -----------------------------
-            # 5. GENERATE IMAGE
+            # 5. GENERATE IMAGE (returns image bytes, nothing saved locally)
             # -----------------------------
             try:
-                image_path = create_news_image(
+                image_bytes = create_news_image(
                     title,
                     summary
                 )
 
-                if not image_path:
+                if not image_bytes:
                     log_step(
                         f"article[{index}]",
                         "failed",
                         "image generation returned empty result"
+                    )
+                    continue
+
+                if not isinstance(image_bytes, (bytes, bytearray)):
+                    log_step(
+                        f"article[{index}]",
+                        "failed",
+                        f"image generation returned "
+                        f"{type(image_bytes).__name__}, expected bytes"
                     )
                     continue
 
@@ -556,11 +564,11 @@ def run_pipeline():
                 continue
 
             # -----------------------------
-            # 6. UPLOAD IMAGE
+            # 6. UPLOAD IMAGE (bytes → Supabase Storage)
             # -----------------------------
             try:
                 image_url = upload_image(
-                    image_path
+                    image_bytes
                 )
 
                 if not image_url:
