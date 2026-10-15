@@ -22,7 +22,7 @@ RSS_FEEDS = [
     },
 ]
 
-MAX_ARTICLES = 4
+MAX_ARTICLES = 1
 
 HEADERS = {
     "User-Agent": "Mozilla/5.0",
@@ -69,7 +69,7 @@ def fetch_feed(feed):
         response = requests.get(
             url,
             headers=HEADERS,
-            timeout=33,
+            timeout=280,
         )
 
         response.raise_for_status()
