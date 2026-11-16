@@ -1,27 +1,53 @@
-# Project Newz
+# Project Newz | SLOTH NEWS
 
-**Project Newz** is an AI-powered news generation platform built with **Flask**.
+**Project Newz** is an AI-powered news generation and aggregation platform built with **Python and Flask**.
 
-It automatically collects news, generates summaries and classifications using LLMs, creates AI-generated images, and stores the resulting articles in Supabase.
+It automatically collects news, generates AI-powered summaries and classifications, creates AI-generated article images, and stores the resulting articles in Supabase.
+
+The platform features a newsroom-style interface under the **SLOTH NEWS** identity, providing news discovery, topic-based sections, market information, weather updates, and individual article pages.
 
 ## Features
 
-* 📰 Automated news scraping
-* 🤖 AI-generated article summaries
-* 🏷️ Article classification
-* 🖼️ AI-generated article images
-* 📄 Individual article pages
-* 🗄️ Supabase database and storage
-* 🔐 Password-protected pipeline
-* 🌐 Flask web application
+### News Automation & AI
+- 📰 Automated news scraping and aggregation.
+- 🤖 AI-generated article summaries.
+- 🏷️ Automated article classification.
+- 🖼️ AI-generated article images.
+- 🔄 Daily automated news generation.
+- 📄 Individual article pages.
+
+### News Discovery
+- 🔎 Article search functionality.
+- 🏷️ Tag-based filtering.
+- 🌍 Dedicated news sections and topic-based discovery.
+- 📈 Financial Intelligence Desk.
+- 🔥 Trending Topic Desks.
+
+### Newsroom Interface
+- 📰 Redesigned SLOTH NEWS newsroom interface.
+- 🚨 Breaking news ticker.
+- 📊 Market index displays.
+- 🌤️ Weather information.
+- 🏢 Dedicated Bureau (About Us) section.
+- 📖 Newsroom Charter and Mission.
+- 🏛️ Institutional Governance information.
+
+### Backend & Infrastructure
+- 🗄️ Supabase database and storage.
+- 🔐 Password-protected pipeline.
+- 🌐 Flask web application.
+- ⚙️ Automated news pipeline.
 
 ## Tech Stack
 
-* **Backend:** Python, Flask
-* **Database & Storage:** Supabase
-* **Text AI:** OpenRouter — Llama 3.1 8B
-* **Image AI:** Cloudflare AI — `@cf/lykon/dreamshaper-8-lcm`
-* **Frontend:** HTML, CSS, JavaScript
+| Component | Technology |
+|---|---|
+| Backend | Python, Flask |
+| Database & Storage | Supabase |
+| Text AI | OpenRouter, Llama 3.1 8B |
+| Image AI | Cloudflare AI, `@cf/lykon/dreamshaper-8-lcm` |
+| Frontend | HTML, CSS, JavaScript |
+| Automation | GitHub Actions |
 
 ## Project Structure
 
@@ -54,27 +80,41 @@ Project-Newz/
 └── static/
 ```
 
-## Pipeline
+## News Pipeline
 
 ```text
-News
- ↓
+News Sources
+     ↓
 Scraper Agent
- ↓
+     ↓
 Summarizer Agent
- ↓
+     ↓
 Classifier Agent
- ↓
-Supabase
- ↓
-Image Generation
- ↓
+     ↓
+Supabase Database
+     ↓
+AI Image Generation
+     ↓
 Supabase Storage
- ↓
-Website
+     ↓
+SLOTH NEWS Website
 ```
 
-The pipeline currently generates **3 articles at a time**.
+The news pipeline automatically runs daily and generates **4 articles per run**.
+
+## Bureau & Mission
+
+SLOTH NEWS operates under the institutional identity of **Sloth News Network (SNN)**.
+
+Its newsroom charter is built around three journalistic pillars:
+
+1. **Accuracy First:** Cross-verification of information.
+2. **Signal Over Noise:** Concise executive briefs.
+3. **Zero Conflicts:** Editorial independence.
+
+Sloth News operates as the public media and intelligence division of **Triarc and Thinker**.
+
+The Bureau section provides further information about the platform's mission, journalistic principles, technology and institutional governance.
 
 ## Setup
 
@@ -91,13 +131,13 @@ cd Project-Newz
 python -m venv venv
 ```
 
-Windows:
+**Windows:**
 
 ```bash
 venv\Scripts\activate
 ```
 
-Linux/macOS:
+**Linux/macOS:**
 
 ```bash
 source venv/bin/activate
@@ -139,9 +179,9 @@ The application will normally be available at:
 http://127.0.0.1:5000
 ```
 
-## Pipeline
+## Running the Pipeline
 
-Running the pipeline requires the configured pipeline password.
+Running the pipeline manually requires the configured pipeline password.
 
 The pipeline:
 
@@ -152,13 +192,13 @@ The pipeline:
 5. Generates article images using Cloudflare AI.
 6. Uploads images to Supabase Storage.
 
-## Current Limitation
-
-Tag-based filtering was available in **v1**, but the tag schema was lost and has not yet been recreated. Therefore, tag filtering is currently unavailable.
+The automated pipeline runs daily and generates four articles per run.
 
 ## Changelog
 
-See [CHANGELOG.md](CHANGELOG.md) for project changes.
+The project has evolved through multiple versions, introducing AI image generation, automated news processing, search and filtering functionality, and a redesigned newsroom interface.
+
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history.
 
 ## License
 

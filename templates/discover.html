@@ -1,307 +1,232 @@
-<!-- Discover section (include fragment: no <html>/<head>/<body>) -->
-<style>
-  .dz {
-    --dz-canopy: #0e2f26;
-    --dz-leaf: #12b76a;
-    --dz-papaya: #ff6b35;
-    --dz-guava: #ff3d81;
-    --dz-sun: #ffc93c;
-    font-family: "DM Sans", system-ui, sans-serif;
-    color: var(--dz-canopy);
-  }
+<!-- Sloth News Channel: Trending Topic Desks & Sector Portals -->
+<section class="mt-14 mb-10" aria-labelledby="discover-heading">
 
-  /* ---------- Heading ---------- */
-  .dz-head { text-align: center; margin-bottom: 1.5rem; }
-
-  .dz-title {
-    font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
-    letter-spacing: -0.02em;
-    font-size: clamp(2rem, 5vw, 2.75rem);
-    font-weight: 800;
-    line-height: 1.1;
-    position: relative;
-    display: inline-block;
-    isolation: isolate;
-    padding-bottom: .35rem;
-  }
-
-  .dz-title::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    bottom: 0;
-    width: 100%;
-    height: 10px;
-    border-radius: 999px;
-    background: linear-gradient(90deg, var(--dz-papaya), var(--dz-guava), var(--dz-sun), var(--dz-leaf));
-    z-index: -1;
-  }
-
-  .dz-sub { margin-top: .9rem; color: #3f6357; font-size: .95rem; }
-
-  /* ---------- Scroller ---------- */
-  .dz-wrap { position: relative; }
-
-  .dz-scroll {
-    display: flex;
-    gap: 1.5rem;
-    overflow-x: auto;
-    padding: .75rem 1rem 1.75rem;      /* room for the offset shadows */
-    scroll-snap-type: x proximity;
-  }
-
-  .dz-scroll > * { scroll-snap-align: start; }
-  @media (prefers-reduced-motion: no-preference) { .dz-scroll { scroll-behavior: smooth; } }
-
-  .dz-scroll::-webkit-scrollbar { height: 10px; }
-  .dz-scroll::-webkit-scrollbar-track { background: rgba(14, 47, 38, .08); border-radius: 10px; }
-  .dz-scroll::-webkit-scrollbar-thumb { background: linear-gradient(90deg, var(--dz-papaya), var(--dz-guava)); border-radius: 10px; }
-
-  /* ---------- Cards ---------- */
-  .dz-card {
-    --accent: var(--dz-papaya);
-    position: relative;
-    flex: 0 0 auto;
-    width: min(280px, 78vw);
-    display: block;
-    background: #fff;
-    border: 2px solid var(--dz-canopy);
-    border-radius: 1.5rem;
-    overflow: hidden;
-    color: inherit;
-    text-decoration: none;
-    box-shadow: 6px 6px 0 var(--accent);
-    transition: transform .2s ease, box-shadow .2s ease;
-  }
-
-  .dz-card:hover,
-  .dz-card:focus-visible {
-    transform: translate(-3px, -3px);
-    box-shadow: 9px 9px 0 var(--accent);
-  }
-
-  .dz-card:focus-visible { outline: 3px solid var(--dz-canopy); outline-offset: 3px; }
-
-  .dz-media { position: relative; overflow: hidden; border-bottom: 2px solid var(--dz-canopy); }
-  .dz-media img { display: block; width: 100%; height: 12rem; object-fit: cover; transition: transform .5s ease; }
-  .dz-card:hover .dz-media img { transform: scale(1.06); }
-
-  .dz-media::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(180deg, transparent 50%, color-mix(in srgb, var(--accent) 55%, transparent));
-    opacity: 0;
-    transition: opacity .3s ease;
-    pointer-events: none;
-  }
-
-  .dz-card:hover .dz-media::after { opacity: 1; }
-
-  .dz-badge {
-    position: absolute;
-    top: .75rem;
-    right: .75rem;
-    z-index: 5;
-    background: #fff;
-    color: var(--dz-canopy);
-    border: 2px solid var(--dz-canopy);
-    border-radius: 999px;
-    padding: .25rem .7rem;
-    font-size: .75rem;
-    font-weight: 600;
-    opacity: 0;
-    transform: translateY(-6px);
-    transition: opacity .25s ease, transform .25s ease;
-  }
-
-  .dz-card:hover .dz-badge,
-  .dz-card:focus-visible .dz-badge { opacity: 1; transform: none; }
-
-  /* touch screens have no hover, so keep the badge visible */
-  @media (hover: none) { .dz-badge { opacity: 1; transform: none; } }
-
-  .dz-badge.is-new { animation: dz-pulse 2.4s infinite; }
-
-  @keyframes dz-pulse {
-    0%, 100% { box-shadow: 0 0 0 0 rgba(255, 61, 129, .55); }
-    50%      { box-shadow: 0 0 0 8px rgba(255, 61, 129, 0); }
-  }
-
-  .dz-body { padding: 1rem 1rem 1.15rem; text-align: center; }
-
-  .dz-name {
-    font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
-    font-weight: 800;
-    font-size: 1.2rem;
-    letter-spacing: -0.01em;
-    margin-bottom: .2rem;
-    transition: color .2s ease;
-  }
-
-  .dz-card:hover .dz-name { color: var(--accent); }
-  .dz-desc { color: #4d6f64; font-size: .88rem; }
-
-  .dz-tags { display: flex; flex-wrap: wrap; justify-content: center; gap: .5rem; margin-top: .8rem; }
-
-  .dz-tag {
-    padding: .2rem .8rem;
-    border-radius: 999px;
-    border: 1.5px solid var(--dz-canopy);
-    background: color-mix(in srgb, var(--accent) 22%, #fff);
-    font-size: .75rem;
-    font-weight: 600;
-  }
-
-  .dz-tag.alt { background: #fff; }
-
-  /* ---------- Scroll buttons ---------- */
-  .dz-btn {
-    position: absolute;
-    top: 45%;
-    transform: translateY(-50%);
-    z-index: 10;
-    width: 46px;
-    height: 46px;
-    display: grid;
-    place-items: center;
-    border-radius: 999px;
-    border: 2px solid var(--dz-canopy);
-    background: #fff;
-    color: var(--dz-canopy);
-    cursor: pointer;
-    box-shadow: 3px 3px 0 var(--dz-canopy);
-    transition: background .15s ease, color .15s ease;
-  }
-
-  .dz-btn:hover { background: var(--dz-papaya); color: #fff; }
-  .dz-btn:focus-visible { outline: 3px solid var(--dz-guava); outline-offset: 3px; }
-  .dz-btn.left  { left: -6px; }
-  .dz-btn.right { right: -6px; }
-
-  @media (max-width: 640px) {
-    .dz-btn { display: none; }
-    .dz-card { box-shadow: 4px 4px 0 var(--accent); }
-  }
-
-  @media (prefers-reduced-motion: reduce) {
-    .dz-card, .dz-media img, .dz-badge, .dz-name { transition: none; }
-    .dz-badge.is-new { animation: none; }
-  }
-</style>
-
-<section class="dz px-4 mt-16 max-w-7xl mx-auto" aria-labelledby="dz-heading">
-
-  <!-- Section Heading -->
-  <div class="dz-head">
-    <h2 id="dz-heading" class="dz-title">Discover</h2>
-    <p class="dz-sub">Explore trending topics and financial insights</p>
+  <div class="news-desk-header">
+    <h2 id="discover-heading" class="news-desk-title">
+      <i class="fa-solid fa-compass"></i> Trending Topic Desks
+    </h2>
+    <div class="flex items-center gap-2">
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
+        Sector Focus
+      </span>
+      <div class="flex items-center gap-1.5 ml-2">
+        <button
+          type="button"
+          id="discoverScrollLeft"
+          class="w-8 h-8 rounded-full border border-slate-300 hover:border-slate-900 bg-white hover:bg-slate-900 hover:text-white flex items-center justify-center text-xs text-slate-700 transition"
+          aria-label="Scroll left"
+        >
+          <i class="fa-solid fa-chevron-left"></i>
+        </button>
+        <button
+          type="button"
+          id="discoverScrollRight"
+          class="w-8 h-8 rounded-full border border-slate-300 hover:border-slate-900 bg-white hover:bg-slate-900 hover:text-white flex items-center justify-center text-xs text-slate-700 transition"
+          aria-label="Scroll right"
+        >
+          <i class="fa-solid fa-chevron-right"></i>
+        </button>
+      </div>
+    </div>
   </div>
 
-  <div class="dz-wrap">
+  <div class="relative">
+    <div class="news-scroller" id="discoverScroller">
 
-    <button type="button" class="dz-btn left" id="dzLeft" aria-label="Scroll left">
-      <i class="fas fa-chevron-left" aria-hidden="true"></i>
-    </button>
-
-    <button type="button" class="dz-btn right" id="dzRight" aria-label="Scroll right">
-      <i class="fas fa-chevron-right" aria-hidden="true"></i>
-    </button>
-
-    <div class="dz-scroll" id="dzScroll">
-
-      <!-- Card 1: Crypto -->
-      <a href="/secondpage#crypto" class="dz-card" style="--accent: var(--dz-papaya);">
-        <div class="dz-badge is-new">🔥 Trending</div>
-        <div class="dz-media">
-          <img src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?auto=format&fit=crop&w=400&q=80" alt="Crypto">
+      <!-- 1. Crypto Desk -->
+      <a href="/secondpage#crypto" class="group w-[280px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+        <div class="h-40 relative overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1621504450181-5d356f61d307?auto=format&fit=crop&w=500&q=80"
+            alt="Cryptocurrency Desk"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+          <span class="absolute top-2.5 left-2.5 bg-red-600 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            #01 • TRENDING
+          </span>
+          <span class="absolute bottom-2.5 left-3 text-white text-xs font-bold flex items-center gap-1">
+            <i class="fa-brands fa-bitcoin text-amber-400"></i> Crypto 24/7 Desk
+          </span>
         </div>
-        <div class="dz-body">
-          <div class="dz-name">Cryptocurrency</div>
-          <p class="dz-desc">Digital assets &amp; blockchain</p>
-          <div class="dz-tags">
-            <span class="dz-tag">Bitcoin</span>
-            <span class="dz-tag alt">Ethereum</span>
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 group-hover:text-red-600 transition mb-1">
+              Cryptocurrency & Web3
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Institutional Bitcoin inflows, Ethereum ETF developments & blockchain regulation.
+            </p>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+            <span class="text-emerald-600">BTC +2.1%</span>
+            <span class="text-red-600 group-hover:translate-x-1 transition-transform">Enter Desk →</span>
           </div>
         </div>
       </a>
 
-      <!-- Card 2: Stock Market -->
-      <a href="/secondpage#stockmarket" class="dz-card" style="--accent: var(--dz-leaf);">
-        <div class="dz-badge">📈 Popular</div>
-        <div class="dz-media">
-          <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=400&q=80" alt="Stock Market">
+      <!-- 2. Stock Market Desk -->
+      <a href="/secondpage#stockmarket" class="group w-[280px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+        <div class="h-40 relative overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=500&q=80"
+            alt="Global Stock Market"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+          <span class="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            #02 • EQUITIES
+          </span>
+          <span class="absolute bottom-2.5 left-3 text-white text-xs font-bold flex items-center gap-1">
+            <i class="fa-solid fa-chart-line text-blue-400"></i> Wall Street & Europe
+          </span>
         </div>
-        <div class="dz-body">
-          <div class="dz-name">Stock Market</div>
-          <p class="dz-desc">Equities &amp; trading insights</p>
-          <div class="dz-tags">
-            <span class="dz-tag">NYSE</span>
-            <span class="dz-tag alt">NASDAQ</span>
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 group-hover:text-red-600 transition mb-1">
+              Global Stock Markets
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              S&P 500, NASDAQ, FTSE rallies, rate cut bets, and corporate earnings.
+            </p>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+            <span>NYSE & NASDAQ</span>
+            <span class="text-red-600 group-hover:translate-x-1 transition-transform">Enter Desk →</span>
           </div>
         </div>
       </a>
 
-      <!-- Card 3: India Market -->
-      <a href="/secondpage#indianmarket" class="dz-card" style="--accent: var(--dz-guava);">
-        <div class="dz-badge">🇮🇳 Local</div>
-        <div class="dz-media">
-          <img src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=400&q=80" alt="India Finance">
+      <!-- 3. India Market Desk -->
+      <a href="/secondpage#indianmarket" class="group w-[280px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+        <div class="h-40 relative overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=500&q=80"
+            alt="India Market Desk"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+          <span class="absolute top-2.5 left-2.5 bg-amber-600 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            #03 • DALAL STREET
+          </span>
+          <span class="absolute bottom-2.5 left-3 text-white text-xs font-bold flex items-center gap-1">
+            <i class="fa-solid fa-landmark text-amber-300"></i> NSE & BSE Wire
+          </span>
         </div>
-        <div class="dz-body">
-          <div class="dz-name">India Market</div>
-          <p class="dz-desc">NSE, BSE &amp; Indian economy</p>
-          <div class="dz-tags">
-            <span class="dz-tag">NSE</span>
-            <span class="dz-tag alt">BSE</span>
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 group-hover:text-red-600 transition mb-1">
+              Indian Markets & Economy
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Sensex record highs, Nifty sector breakdown, RBI policy stance & GDP outlook.
+            </p>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+            <span class="text-emerald-600">Sensex 81.4k</span>
+            <span class="text-red-600 group-hover:translate-x-1 transition-transform">Enter Desk →</span>
           </div>
         </div>
       </a>
 
-      <!-- Card 4: Real Estate -->
-      <a href="/secondpage#realestate" class="dz-card" style="--accent: var(--dz-sun);">
-        <div class="dz-badge">🏠 New</div>
-        <div class="dz-media">
-          <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" alt="Real Estate">
+      <!-- 4. Tech & AI Desk -->
+      <a href="/secondpage#tech" class="group w-[280px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+        <div class="h-40 relative overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=500&q=80"
+            alt="Technology Desk"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+          <span class="absolute top-2.5 left-2.5 bg-blue-600 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            #04 • AI & TECH
+          </span>
+          <span class="absolute bottom-2.5 left-3 text-white text-xs font-bold flex items-center gap-1">
+            <i class="fa-solid fa-microchip text-blue-300"></i> Silicon Valley
+          </span>
         </div>
-        <div class="dz-body">
-          <div class="dz-name">Real Estate</div>
-          <p class="dz-desc">Property &amp; investment</p>
-          <div class="dz-tags">
-            <span class="dz-tag">REITs</span>
-            <span class="dz-tag alt">Commercial</span>
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 group-hover:text-red-600 transition mb-1">
+              Tech Innovation & AI
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Generative AI platforms, semiconductor wars, cybersecurity & mega-cap earnings.
+            </p>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+            <span>AI Disruption</span>
+            <span class="text-red-600 group-hover:translate-x-1 transition-transform">Enter Desk →</span>
           </div>
         </div>
       </a>
 
-      <!-- Card 5: Commodities -->
-      <a href="/secondpage#commodities" class="dz-card" style="--accent: var(--dz-papaya);">
-        <div class="dz-badge">⚡ Active</div>
-        <div class="dz-media">
-          <img src="https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=400&q=80" alt="Commodities">
+      <!-- 5. Energy & Commodities -->
+      <a href="/secondpage#commodities" class="group w-[280px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+        <div class="h-40 relative overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1610375461246-83df859d849d?auto=format&fit=crop&w=500&q=80"
+            alt="Commodities Desk"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+          <span class="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            #05 • COMMODITIES
+          </span>
+          <span class="absolute bottom-2.5 left-3 text-white text-xs font-bold flex items-center gap-1">
+            <i class="fa-solid fa-oil-well text-amber-400"></i> Gold & Crude
+          </span>
         </div>
-        <div class="dz-body">
-          <div class="dz-name">Commodities</div>
-          <p class="dz-desc">Gold, oil &amp; raw materials</p>
-          <div class="dz-tags">
-            <span class="dz-tag">Gold</span>
-            <span class="dz-tag alt">Silver</span>
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 group-hover:text-red-600 transition mb-1">
+              Energy & Commodities
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              Brent crude price dynamics, gold all-time records, clean energy transitions.
+            </p>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+            <span>Gold $2,684</span>
+            <span class="text-red-600 group-hover:translate-x-1 transition-transform">Enter Desk →</span>
           </div>
         </div>
       </a>
 
-      <!-- Card 6: Tech Stocks -->
-      <a href="/secondpage#tech" class="dz-card" style="--accent: var(--dz-leaf);">
-        <div class="dz-badge">💎 Premium</div>
-        <div class="dz-media">
-          <img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?auto=format&fit=crop&w=400&q=80" alt="Tech Stocks">
+      <!-- 6. Real Estate Desk -->
+      <a href="/secondpage#realestate" class="group w-[280px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col">
+        <div class="h-40 relative overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=500&q=80"
+            alt="Real Estate Desk"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent"></div>
+          <span class="absolute top-2.5 left-2.5 bg-emerald-700 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            #06 • PROPERTY
+          </span>
+          <span class="absolute bottom-2.5 left-3 text-white text-xs font-bold flex items-center gap-1">
+            <i class="fa-solid fa-building text-slate-300"></i> Real Estate
+          </span>
         </div>
-        <div class="dz-body">
-          <div class="dz-name">Tech Stocks</div>
-          <p class="dz-desc">Innovation &amp; growth</p>
-          <div class="dz-tags">
-            <span class="dz-tag">AI</span>
-            <span class="dz-tag alt">Cloud</span>
+        <div class="p-4 flex-1 flex flex-col justify-between">
+          <div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 group-hover:text-red-600 transition mb-1">
+              Commercial & Residential
+            </h3>
+            <p class="text-xs text-slate-500 leading-relaxed">
+              REIT performance, mortgage rate trends, urban property development cycles.
+            </p>
+          </div>
+          <div class="mt-3 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[11px] font-semibold text-slate-600">
+            <span>REIT Yields</span>
+            <span class="text-red-600 group-hover:translate-x-1 transition-transform">Enter Desk →</span>
           </div>
         </div>
       </a>
@@ -312,17 +237,16 @@
 
 <script>
   (function () {
-    var scroller = document.getElementById('dzScroll');
-    var left = document.getElementById('dzLeft');
-    var right = document.getElementById('dzRight');
-    if (!scroller || !left || !right) return;
+    const scroller = document.getElementById('discoverScroller');
+    const leftBtn = document.getElementById('discoverScrollLeft');
+    const rightBtn = document.getElementById('discoverScrollRight');
+    if (!scroller || !leftBtn || !rightBtn) return;
 
-    function step() {
-      var card = scroller.querySelector('.dz-card');
-      return card ? card.getBoundingClientRect().width + 24 : 320;
-    }
-
-    left.addEventListener('click', function () { scroller.scrollBy({ left: -step() }); });
-    right.addEventListener('click', function () { scroller.scrollBy({ left: step() }); });
+    leftBtn.addEventListener('click', () => {
+      scroller.scrollBy({ left: -300, behavior: 'smooth' });
+    });
+    rightBtn.addEventListener('click', () => {
+      scroller.scrollBy({ left: 300, behavior: 'smooth' });
+    });
   })();
 </script>

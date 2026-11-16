@@ -1,205 +1,176 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sector Desks & Financial Channels | Sloth News Channel</title>
 
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Explore Sloth News Channel sector-specific desks: Cryptocurrency, Stock Markets, Indian Economy, Corporate Business, Real Estate, Commodities, and Artificial Intelligence." />
+  <meta name="keywords" content="crypto news, stock market updates, India finance, business intelligence, tech AI news, commodities, real estate" />
+  <meta name="author" content="Sloth News Network" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{{ request.base_url }}" />
 
-    <link rel="stylesheet" href="/static/style/nav.css">
-    <link rel="stylesheet" href="/static/style/style.css">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sloth News Channel" />
+  <meta property="og:title" content="Sector Desks & Financial Channels | Sloth News Channel" />
+  <meta property="og:description" content="Explore 24/7 sector-specific dispatches across Crypto, Equities, India, Real Estate, and AI." />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}" />
 
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@SlothNews" />
+  <meta name="twitter:title" content="Sector Desks | Sloth News Channel" />
+  <meta name="twitter:description" content="Explore 24/7 sector-specific dispatches across Crypto, Equities, India, Real Estate, and AI." />
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-
-    <link
-        href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap"
-        rel="stylesheet"
-    >
-
-    <title>Sloth Newz</title>
-
-    <style>
-        :root {
-            --canopy: #0e2f26;
-            --leaf: #12b76a;
-            --papaya: #ff6b35;
-            --guava: #ff3d81;
-            --sun: #ffc93c;
-            --mist: #f3faf1;
-        }
-
-        html {
-            scroll-behavior: auto;
-        }
-
-        @media (prefers-reduced-motion: no-preference) {
-            html {
-                scroll-behavior: smooth;
-            }
-        }
-
-        body {
-            font-family: "DM Sans", system-ui, sans-serif;
-
-            background:
-                radial-gradient(
-                    900px 400px at 8% -5%,
-                    rgba(255, 201, 60, .35),
-                    transparent 60%
-                ),
-                radial-gradient(
-                    700px 380px at 95% 0%,
-                    rgba(255, 61, 129, .18),
-                    transparent 60%
-                ),
-                radial-gradient(
-                    800px 500px at 50% 110%,
-                    rgba(18, 183, 106, .20),
-                    transparent 60%
-                ),
-                var(--mist);
-
-            color: var(--canopy);
-        }
-
-        h1,
-        h2,
-        h3 {
-            font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
-            letter-spacing: -0.02em;
-        }
-
-        /* Prevent horizontal overflow from included sections */
-        html,
-        body {
-            max-width: 100%;
-            overflow-x: clip;
-        }
-
-        /* Keep anchor targets visible below the navigation */
-        section[id] {
-            scroll-margin-top: 100px;
-        }
-
-        @media (prefers-reduced-motion: no-preference) {
-            section[id]:target {
-                animation: flash 1.4s ease-out;
-            }
-
-            @keyframes flash {
-                0% {
-                    box-shadow: inset 0 0 0 4px rgba(255, 61, 129, .55);
-                }
-
-                100% {
-                    box-shadow: inset 0 0 0 4px rgba(255, 61, 129, 0);
-                }
-            }
-        }
-    </style>
+  <!-- Tailwind CSS & Stylesheets -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-    <header></header>
+  <!-- Master News Channel Header -->
+  <header></header>
 
-    <!-- Search bar -->
+  <!-- Market Strip -->
+  <div class="market-strip">
+    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
+      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
+    </div>
+    {% if market_ticker %}
+      {% for m in market_ticker %}
+      <div class="market-item">
+        <span class="market-sym">{{ m.symbol }}</span>
+        <span class="market-val">{{ m.value }}</span>
+        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
+          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
+        </span>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Search & Trending Keywords -->
   {% include 'searchbar.html' %}
 
+  <!-- Main Content Hub -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
 
-    <!-- ========================= -->
-    <!-- Cryptocurrency Section    -->
-    <!-- ========================= -->
+    <!-- Sector Masthead Banner -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 mb-8 shadow-sm flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-600 mb-1">
+          <i class="fa-solid fa-layer-group"></i> Sector Portals & Verticals
+        </div>
+        <h1 class="font-editorial text-3xl sm:text-4xl font-extrabold text-slate-900">
+          Newsroom Sector Desks
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-2 max-w-2xl leading-relaxed">
+          Specialized reporting bureaus monitoring decentralized digital assets, Dalal Street, global equity markets, enterprise corporate strategy, energy flows, and breakthrough technologies.
+        </p>
+      </div>
 
-    <section id="crypto">
-        {% with articles=crypto_articles|default([]) %}
-            {% include 'secondpage/crypto.html' %}
-        {% endwith %}
+      <!-- Quick Desk Navigation Pills -->
+      <div class="flex flex-wrap gap-2 text-xs">
+        <a href="#crypto" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#Crypto</a>
+        <a href="#stockmarket" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#Equities</a>
+        <a href="#indianmarket" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#DalalStreet</a>
+        <a href="#business" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#Corporate</a>
+        <a href="#realestate" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#Property</a>
+        <a href="#commodities" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#Commodities</a>
+        <a href="#tech" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-900 hover:text-white font-bold transition">#TechAI</a>
+      </div>
+    </div>
+
+    <!-- 1. Crypto Desk -->
+    <section id="crypto" class="mb-14 scroll-mt-24">
+      {% with articles=crypto_articles|default([]) %}
+        {% include 'secondpage/crypto.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- ========================= -->
-    <!-- Stock Market Section      -->
-    <!-- ========================= -->
-
-    <section id="stockmarket">
-        {% with articles=stockmarket_articles|default([]) %}
-            {% include 'secondpage/stockmarket.html' %}
-        {% endwith %}
+    <!-- 2. Stock Market Desk -->
+    <section id="stockmarket" class="mb-14 scroll-mt-24">
+      {% with articles=stockmarket_articles|default([]) %}
+        {% include 'secondpage/stockmarket.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- ========================= -->
-    <!-- Indian Market Section     -->
-    <!-- ========================= -->
-
-    <section id="indianmarket">
-        {% with articles=indianmarket_articles|default([]) %}
-            {% include 'secondpage/indianmarket.html' %}
-        {% endwith %}
+    <!-- 3. Indian Market Desk -->
+    <section id="indianmarket" class="mb-14 scroll-mt-24">
+      {% with articles=indianmarket_articles|default([]) %}
+        {% include 'secondpage/indianmarket.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- ========================= -->
-    <!-- Business Section          -->
-    <!-- ========================= -->
-
-    <section id="business">
-        {% with articles=business_articles|default([]) %}
-            {% include 'secondpage/business.html' %}
-        {% endwith %}
+    <!-- 4. Business Desk -->
+    <section id="business" class="mb-14 scroll-mt-24">
+      {% with articles=business_articles|default([]) %}
+        {% include 'secondpage/business.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- ========================= -->
-    <!-- Real Estate Section       -->
-    <!-- ========================= -->
-
-    <section id="realestate">
-        {% with articles=realestate_articles|default([]) %}
-            {% include 'secondpage/realestate.html' %}
-        {% endwith %}
+    <!-- 5. Real Estate Desk -->
+    <section id="realestate" class="mb-14 scroll-mt-24">
+      {% with articles=realestate_articles|default([]) %}
+        {% include 'secondpage/realestate.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- ========================= -->
-    <!-- Commodities Section       -->
-    <!-- ========================= -->
-
-    <section id="commodities">
-        {% with articles=commodities_articles|default([]) %}
-            {% include 'secondpage/commodities.html' %}
-        {% endwith %}
+    <!-- 6. Commodities Desk -->
+    <section id="commodities" class="mb-14 scroll-mt-24">
+      {% with articles=commodities_articles|default([]) %}
+        {% include 'secondpage/commodities.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- ========================= -->
-    <!-- Technology Section        -->
-    <!-- ========================= -->
-
-    <section id="tech">
-        {% with articles=tech_articles|default([]) %}
-            {% include 'secondpage/tech.html' %}
-        {% endwith %}
+    <!-- 7. Tech Desk -->
+    <section id="tech" class="mb-14 scroll-mt-24">
+      {% with articles=tech_articles|default([]) %}
+        {% include 'secondpage/tech.html' %}
+      {% endwith %}
     </section>
 
-
-    <!-- Pagination -->
+    <!-- Newsroom Edition Switcher -->
     {% include 'page123.html' %}
 
-    <!-- Footer -->
-    {% include 'footer.html' %}
+  </main>
 
-    <script src="/static/nav.js"></script>
+  <!-- Global Footer -->
+  {% include 'footer.html' %}
 
+  <!-- Back to Top Button -->
+  <button type="button" class="back-to-top-btn" id="backToTopBtn" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
+  <script>
+    const bttBtn = document.getElementById('backToTopBtn');
+    if (bttBtn) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 350) {
+          bttBtn.classList.add('visible');
+        } else {
+          bttBtn.classList.remove('visible');
+        }
+      });
+      bttBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  </script>
 </body>
 
 </html>

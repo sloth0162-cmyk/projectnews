@@ -2,232 +2,200 @@
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>About the Newsroom & Editorial Code of Ethics | Sloth News Channel</title>
 
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Discover Sloth News Channel: Our mission, editorial code of ethics, automated cross-verification methodology, and intelligence newsroom team." />
+  <meta name="keywords" content="About Sloth News, journalism ethics, newsroom standards, fact checking policy, Triarc and Thinker, editorial independence" />
+  <meta name="author" content="Sloth News Network" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{{ request.base_url }}" />
 
-    <!-- Existing styles -->
-    <link rel="stylesheet" href="/static/style/nav.css">
-    <link rel="stylesheet" href="/static/style/style.css">
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sloth News Channel" />
+  <meta property="og:title" content="About the Newsroom & Editorial Standards | Sloth News" />
+  <meta property="og:description" content="Our journalistic charter, verification standards, and intelligence technology." />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}" />
 
-    <!-- Font Awesome -->
-    <link
-        rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-    >
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@SlothNews" />
+  <meta name="twitter:title" content="About Sloth Newsroom" />
 
-    <title>About - Sloth Newz</title>
+  <!-- Tailwind CSS & Stylesheets -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 
-<body class="bg-gray-100 text-gray-900">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-    <!-- Navbar -->
-    <header></header>
+  <!-- Master News Channel Header -->
+  <header></header>
 
+  <!-- Market Strip -->
+  <div class="market-strip">
+    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
+      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
+    </div>
+    {% if market_ticker %}
+      {% for m in market_ticker %}
+      <div class="market-item">
+        <span class="market-sym">{{ m.symbol }}</span>
+        <span class="market-val">{{ m.value }}</span>
+        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
+          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
+        </span>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
 
-    <!-- Main Content -->
-    <main class="max-w-6xl mx-auto px-4 py-12">
+  <!-- Search & Trending Keywords -->
+  {% include 'searchbar.html' %}
 
-        <!-- Hero -->
-        <section class="bg-white rounded-2xl shadow-md p-8 md:p-12 mb-8">
+  <!-- Main Editorial Standards Content -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 w-full flex-1">
 
-            <div class="max-w-3xl">
+    <!-- Newsroom Mission Banner -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-12 mb-10 shadow-sm animate-fade-in">
+      <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-red-600 mb-3">
+        <i class="fa-solid fa-landmark"></i> The Newsroom Charter & Mission
+      </div>
+      <h1 class="font-editorial text-3xl sm:text-5xl font-extrabold text-slate-900 leading-tight mb-4">
+        Unbiased Intelligence, Distilled for Speed and Clarity.
+      </h1>
+      <p class="text-sm sm:text-base text-slate-600 leading-relaxed max-w-3xl">
+        Sloth News Network (SNN) was founded on a singular conviction: in an era of information overload and algorithmic sensationalism, leaders, analysts, and informed citizens need rigorous, fact-checked reporting delivered without editorial bloat.
+      </p>
+    </section>
 
-                <p class="text-blue-600 font-semibold mb-3">
-                    About Sloth Newz
-                </p>
+    <!-- Core Pillars of Our Journalism -->
+    <section class="mb-12">
+      <div class="news-desk-header">
+        <h2 class="news-desk-title">
+          <i class="fa-solid fa-shield-halved"></i> Our Journalistic Pillars
+        </h2>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Code of Integrity
+        </span>
+      </div>
 
-                <h1 class="text-4xl md:text-5xl font-bold mb-5">
-                    News, without the unnecessary reading.
-                </h1>
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-6">
 
-                <p class="text-gray-600 text-lg leading-8">
-                    Sloth Newz is a news platform built to make staying informed
-                    simpler. We aggregate news from various trusted sources and
-                    turn lengthy articles into concise, readable summaries.
-                </p>
-
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-xl mb-4">
+              <i class="fa-solid fa-scale-balanced"></i>
             </div>
-
-        </section>
-
-
-        <!-- What is Sloth Newz -->
-        <section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-
-            <div class="bg-white rounded-xl shadow-md p-7">
-
-                <div class="w-12 h-12 bg-blue-100 text-blue-600 rounded-lg
-                            flex items-center justify-center mb-5">
-                    <i class="fa-solid fa-newspaper text-xl"></i>
-                </div>
-
-                <h2 class="text-2xl font-bold mb-3">
-                    What is Sloth Newz?
-                </h2>
-
-                <p class="text-gray-600 leading-7">
-                    Sloth Newz brings together news from multiple sources into
-                    one place. Instead of having to go through several websites
-                    and lengthy articles, users can find concise summaries and
-                    quickly understand what is happening.
-                </p>
-
-            </div>
-
-
-            <div class="bg-white rounded-xl shadow-md p-7">
-
-                <div class="w-12 h-12 bg-green-100 text-green-600 rounded-lg
-                            flex items-center justify-center mb-5">
-                    <i class="fa-solid fa-clock text-xl"></i>
-                </div>
-
-                <h2 class="text-2xl font-bold mb-3">
-                    Save Time
-                </h2>
-
-                <p class="text-gray-600 leading-7">
-                    News articles can often be long and time-consuming to read.
-                    Sloth Newz focuses on providing the important information
-                    in a shorter and more accessible format.
-                </p>
-
-            </div>
-
-        </section>
-
-
-        <!-- Our Approach -->
-        <section class="bg-white rounded-xl shadow-md p-7 md:p-10 mb-8">
-
-            <h2 class="text-3xl font-bold mb-6">
-                Our Approach
-            </h2>
-
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-
-                <!-- Trusted Sources -->
-                <div class="border border-gray-200 rounded-xl p-6">
-
-                    <div class="text-blue-600 text-2xl mb-4">
-                        <i class="fa-solid fa-shield-halved"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold mb-2">
-                        Trusted Sources
-                    </h3>
-
-                    <p class="text-gray-600 leading-6">
-                        We focus on aggregating news from reliable and trusted
-                        sources.
-                    </p>
-
-                </div>
-
-
-                <!-- Concise Summaries -->
-                <div class="border border-gray-200 rounded-xl p-6">
-
-                    <div class="text-purple-600 text-2xl mb-4">
-                        <i class="fa-solid fa-compress"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold mb-2">
-                        Concise Summaries
-                    </h3>
-
-                    <p class="text-gray-600 leading-6">
-                        Long-form news is condensed into short, adequate and
-                        readable summaries.
-                    </p>
-
-                </div>
-
-
-                <!-- Easy Reading -->
-                <div class="border border-gray-200 rounded-xl p-6">
-
-                    <div class="text-orange-500 text-2xl mb-4">
-                        <i class="fa-solid fa-book-open"></i>
-                    </div>
-
-                    <h3 class="text-xl font-semibold mb-2">
-                        Easy to Read
-                    </h3>
-
-                    <p class="text-gray-600 leading-6">
-                        Our goal is to make it easier for users to understand
-                        the important parts of a story quickly.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Still Improving -->
-        <section class="bg-white rounded-xl shadow-md p-7 md:p-10 mb-8">
-
-            <div class="flex items-start gap-5">
-
-                <div class="w-12 h-12 shrink-0 bg-yellow-100 text-yellow-600
-                            rounded-lg flex items-center justify-center">
-                    <i class="fa-solid fa-code text-xl"></i>
-                </div>
-
-                <div>
-
-                    <h2 class="text-2xl font-bold mb-3">
-                        We Are Still Building
-                    </h2>
-
-                    <p class="text-gray-600 leading-7">
-                        Sloth Newz is currently under development. We are
-                        continuously working on improving the platform,
-                        summaries, news coverage and overall experience.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Triarc & Thinker -->
-        <section class="bg-gray-900 text-white rounded-2xl shadow-md p-8 md:p-10">
-
-            <p class="text-gray-400 text-sm font-medium mb-2">
-                A project under
+            <h3 class="font-editorial text-lg font-bold text-slate-900 mb-2">
+              Cross-Verification
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              Every dispatch undergoes multi-source corroboration across international wire services, official regulatory filings, and vetted primary sources.
             </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-400">
+            Rule 01 • Accuracy First
+          </div>
+        </div>
 
-            <h2 class="text-3xl font-bold mb-4">
-                Triarc and Thinker
-            </h2>
-
-            <p class="text-gray-300 leading-7 max-w-3xl">
-                Sloth Newz currently operates under the broader umbrella of
-                Triarc and Thinker as we continue developing and improving
-                the platform.
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-xl mb-4">
+              <i class="fa-solid fa-compress"></i>
+            </div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 mb-2">
+              Concise Executive Briefs
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              We extract high-density factual signals from 3,000-word treatises into 60-second read times, respecting our readers' focus and time.
             </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-400">
+            Rule 02 • Signal Over Noise
+          </div>
+        </div>
 
-        </section>
+        <div class="bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-xl mb-4">
+              <i class="fa-solid fa-handshake-simple"></i>
+            </div>
+            <h3 class="font-editorial text-lg font-bold text-slate-900 mb-2">
+              Editorial Independence
+            </h3>
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
+              We maintain absolute commercial and political independence. Our reporting decisions are insulated from advertisers or external influence.
+            </p>
+          </div>
+          <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-400">
+            Rule 03 • Zero Conflicts
+          </div>
+        </div>
 
-    </main>
+      </div>
+    </section>
 
+    <!-- The Intelligence Engine & Technology -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 mb-10 shadow-sm">
+      <div class="flex items-start gap-4">
+        <div class="w-12 h-12 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-xl shrink-0">
+          <i class="fa-solid fa-microchip"></i>
+        </div>
+        <div>
+          <h2 class="font-editorial text-2xl font-bold text-slate-900 mb-2">
+            The Sloth Intelligence Engine
+          </h2>
+          <p class="text-xs sm:text-sm text-slate-600 leading-relaxed mb-4">
+            Sloth News combines professional newsroom oversight with state-of-the-art automated ingestion pipelines. Our agents scrape real-time feeds, cluster related storylines, remove duplicate syndications, classify topics across 11 key verticals, and produce neutral, fact-based abstracts.
+          </p>
+          <div class="flex flex-wrap gap-2 text-xs font-semibold text-slate-700">
+            <span class="px-3 py-1 bg-slate-100 rounded-full">Scraper Agent</span>
+            <span class="px-3 py-1 bg-slate-100 rounded-full">Summarizer Agent</span>
+            <span class="px-3 py-1 bg-slate-100 rounded-full">Classification Classifier</span>
+            <span class="px-3 py-1 bg-slate-100 rounded-full">Supabase Storage</span>
+          </div>
+        </div>
+      </div>
+    </section>
 
-    <!-- Footer -->
-    {% include 'footer.html' %}
+    <!-- Institutional Parent: Triarc & Thinker -->
+    <section class="bg-slate-900 text-white rounded-2xl p-6 sm:p-10 shadow-md">
+      <div class="text-xs font-bold uppercase tracking-widest text-red-500 mb-2">
+        Institutional Governance
+      </div>
+      <h2 class="font-editorial text-2xl sm:text-3xl font-extrabold text-white mb-3">
+        A Triarc and Thinker Initiative
+      </h2>
+      <p class="text-xs sm:text-sm text-slate-300 leading-relaxed max-w-2xl mb-6">
+        Sloth News operates as the public media and intelligence division of <strong>Triarc and Thinker</strong>, dedicated to advancing open access to reliable market and geopolitical intelligence through computational systems.
+      </p>
+      <div class="flex flex-wrap gap-3">
+        <a href="mailto:contact@triarcandthinker.com" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition inline-flex items-center gap-2">
+          <i class="fa-solid fa-envelope"></i> Contact Newsroom
+        </a>
+        <a href="/" class="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold uppercase tracking-wider rounded-lg transition">
+          Front Page
+        </a>
+      </div>
+    </section>
 
+  </main>
 
-    <!-- Navbar JS -->
-    <script src="/static/nav.js"></script>
+  <!-- Global Footer -->
+  {% include 'footer.html' %}
 
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
 </body>
+
 </html>
-```

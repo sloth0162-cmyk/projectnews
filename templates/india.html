@@ -1,72 +1,145 @@
-<section class="cardbox">
-  
-    <div class="flex items-center justify-between mb-4">
-    <h2 class="">Ground news</h2>
-    <a href="/finance" class="text-blue-600 hover:text-blue-800 font-medium transition-all">
-      View all →
+<!-- Sloth News Channel: National & In-Depth Ground Reporting Desk -->
+<section class="mt-14 mb-10" aria-labelledby="ground-news-heading">
+
+  <div class="news-desk-header">
+    <h2 id="ground-news-heading" class="news-desk-title">
+      <i class="fa-solid fa-location-dot"></i> National & Ground Reporting
+    </h2>
+    <a href="/?tag=India" class="news-desk-link">
+      <span>India Desk Coverage</span>
+      <i class="fa-solid fa-arrow-right"></i>
     </a>
   </div>
-  <div class="card-container scrollbar-custom">
-    
-  
 
-    <!-- Card 2 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <span class="card-badge">📈 Popular</span>
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=400&q=80" alt="Stock market">
-      </div>
-      <div class="card-content">
-        <h3>Market Update</h3>
-        <p>Global markets show positive momentum with technology stocks leading the charge in today's trading session.</p>
-      </div>
-    </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
 
-    <!-- Card 3 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <span class="card-badge">🇮🇳 Local</span>
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=400&q=80" alt="India finance">
+    <!-- Card 1: India GDP & Growth -->
+    <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
+      <div>
+        <div class="relative h-44 overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1624628639856-100bf817fd35?auto=format&fit=crop&w=500&q=80"
+            alt="India GDP Growth"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <span class="absolute top-2.5 left-2.5 bg-red-600 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            🇮🇳 National Desk
+          </span>
+        </div>
+        <div class="p-4">
+          <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">
+            Macroeconomics
+          </div>
+          <h3 class="font-editorial text-base font-bold text-slate-900 leading-snug group-hover:text-red-600 transition mb-2">
+            <a href="/?tag=India">India GDP Trajectory & Manufacturing Expansion</a>
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed line-clamp-3">
+            Domestic production indices signal robust quarterly growth across capital expenditure and high-tech manufacturing corridors.
+          </p>
+        </div>
       </div>
-      <div class="card-content">
-        <h3>India GDP Growth</h3>
-        <p>Indian economy shows robust growth with strong performance in manufacturing and services sectors this quarter.</p>
+      <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+        <span class="text-slate-400 font-semibold">Field Bureau</span>
+        <a href="/?tag=India" class="font-bold text-slate-900 hover:text-red-600">Explore →</a>
       </div>
-    </div>
+    </article>
 
-    <!-- Card 4 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <span class="card-badge">💎 Premium</span>
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&w=400&q=80" alt="Financial data">
+    <!-- Card 2: Market Capitalization -->
+    <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
+      <div>
+        <div class="relative h-44 overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?auto=format&fit=crop&w=500&q=80"
+            alt="Indian Stock Market"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <span class="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            Dalal Street
+          </span>
+        </div>
+        <div class="p-4">
+          <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">
+            Equities & Capital
+          </div>
+          <h3 class="font-editorial text-base font-bold text-slate-900 leading-snug group-hover:text-red-600 transition mb-2">
+            <a href="/secondpage#indianmarket">Domestic Retail Participation Powers Market Highs</a>
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed line-clamp-3">
+            Systematic investment plans (SIPs) top historic volume records as institutional equity inflows strengthen market resilience.
+          </p>
+        </div>
       </div>
-      <div class="card-content">
-        <h3>Investment Strategies</h3>
-        <p>Expert analysis on portfolio diversification and risk management for the upcoming fiscal year.</p>
+      <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+        <span class="text-slate-400 font-semibold">Markets Desk</span>
+        <a href="/secondpage#indianmarket" class="font-bold text-slate-900 hover:text-red-600">Explore →</a>
       </div>
-    </div>
+    </article>
 
-    <!-- Card 5 -->
-    <div class="min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-      <div class="card-image">
-        <img src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=400&q=80" alt="Real estate">
+    <!-- Card 3: Urban Development & Infrastructure -->
+    <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
+      <div>
+        <div class="relative h-44 overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1560518883-ce09059eeffa?auto=format&fit=crop&w=500&q=80"
+            alt="Real Estate & Infrastructure"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <span class="absolute top-2.5 left-2.5 bg-slate-900/90 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            Infrastructure
+          </span>
+        </div>
+        <div class="p-4">
+          <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">
+            Urban Growth
+          </div>
+          <h3 class="font-editorial text-base font-bold text-slate-900 leading-snug group-hover:text-red-600 transition mb-2">
+            <a href="/secondpage#realestate">Expressway Networks & Tier-2 Urban Logistics Hubs</a>
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed line-clamp-3">
+            Massive transit corridors accelerate real estate developments and modern freight logistics hubs across key interstate transit routes.
+          </p>
+        </div>
       </div>
-      <div class="card-content">
-        <h3>Real Estate Trends</h3>
-        <p>Housing market analysis reveals shifting patterns in urban development and investment opportunities.</p>
+      <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+        <span class="text-slate-400 font-semibold">Urban Bureau</span>
+        <a href="/secondpage#realestate" class="font-bold text-slate-900 hover:text-red-600">Explore →</a>
       </div>
-    </div>
+    </article>
+
+    <!-- Card 4: Energy & Solar Revolution -->
+    <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col justify-between">
+      <div>
+        <div class="relative h-44 overflow-hidden bg-slate-900">
+          <img
+            src="https://images.unsplash.com/photo-1509391365360-2e959784a276?auto=format&fit=crop&w=500&q=80"
+            alt="Clean Energy & Solar"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
+          />
+          <span class="absolute top-2.5 left-2.5 bg-emerald-600 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            Clean Energy
+          </span>
+        </div>
+        <div class="p-4">
+          <div class="text-[11px] text-slate-500 font-bold uppercase tracking-wider mb-1">
+            Sustainability
+          </div>
+          <h3 class="font-editorial text-base font-bold text-slate-900 leading-snug group-hover:text-red-600 transition mb-2">
+            <a href="/?tag=Energy">Renewable Transition: Massive Grid Solar Investments</a>
+          </h3>
+          <p class="text-xs text-slate-600 leading-relaxed line-clamp-3">
+            New mega-watt utility parks come online, expanding clean generation capacity while curbing dependence on imported coal.
+          </p>
+        </div>
+      </div>
+      <div class="px-4 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+        <span class="text-slate-400 font-semibold">Energy Bureau</span>
+        <a href="/?tag=Energy" class="font-bold text-slate-900 hover:text-red-600">Explore →</a>
+      </div>
+    </article>
 
   </div>
 </section>
-
-<script>
-  // Add click handlers to cards
-  document.querySelectorAll('.card').forEach(card => {
-    card.addEventListener('click', function() {
-      const title = this.querySelector('h3').textContent;
-      console.log(`Card clicked: ${title}`);
-      // Add your navigation logic here
-    });
-  });
-</script>

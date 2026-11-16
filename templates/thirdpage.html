@@ -1,40 +1,95 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style/nav.css" />
+  <title>24/7 Fast Wire & Press Dispatches Archive | Sloth News Channel</title>
 
-  <title>News Dashboard</title>
-  <link
-    rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-  />
-  
-  
-  
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Access the Sloth News 24/7 live news wire. Chronological dispatches, fact-checked breaking bulletins, corporate filings, and global updates." />
+  <meta name="keywords" content="live news wire, fast news feed, breaking wire, newsroom archive, press bulletins" />
+  <meta name="author" content="Sloth News Wire Desk" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{{ request.base_url }}" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sloth News Channel" />
+  <meta property="og:title" content="24/7 Fast Wire & Press Dispatches Archive | Sloth News" />
+  <meta property="og:description" content="Continuous chronological dispatches and raw bulletins from the newsroom." />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@SlothNews" />
+  <meta name="twitter:title" content="24/7 Fast Wire | Sloth News Channel" />
+
+  <!-- Tailwind CSS & Stylesheets -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 
-<body class="bg-gray-100">
-    <header></header>
-    {%include 'searchbar.html' %}
-    {% include 'page123.html' %}
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-  <main class="max-w-6xl mx-auto mt-10 p-4">
-    <div class="flex items-center justify-between mb-6">
+  <!-- Master News Channel Header -->
+  <header></header>
 
+  <!-- Market Strip -->
+  <div class="market-strip">
+    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
+      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
+    </div>
+    {% if market_ticker %}
+      {% for m in market_ticker %}
+      <div class="market-item">
+        <span class="market-sym">{{ m.symbol }}</span>
+        <span class="market-val">{{ m.value }}</span>
+        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
+          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
+        </span>
+      </div>
+      {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Search & Trending Keywords -->
+  {% include 'searchbar.html' %}
+
+  <!-- Main Wire Content -->
+  <main class="max-w-6xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
+
+    <!-- Wire Header & Filter Bar -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-6 mb-8 border-b border-slate-200">
+      <div>
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-600 mb-1">
+          <span class="w-2 h-2 rounded-full bg-red-600 animate-ping"></span>
+          <span>Continuous Press Feed</span>
+        </div>
+        <h1 class="font-editorial text-3xl sm:text-4xl font-extrabold text-slate-900">
+          24/7 Fast Wire Dispatches
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-500 mt-1">
+          Real-time chronological updates gathered and synthesized across verified international feeds.
+        </p>
+      </div>
 
       <!-- Tag Filter -->
-      <form method="get" class="ml-7">
-        <label for="tag" class="text-gray-700 mr-2 font-medium">Filter by Tag:</label>
+      <form method="get" class="flex items-center gap-2 shrink-0">
+        <label for="tag" class="text-xs font-bold text-slate-700 uppercase tracking-wider">Filter:</label>
         <select
           name="tag"
           id="tag"
           onchange="this.form.submit()"
-          class="border border-gray-300 rounded-md p-2"
+          class="border border-slate-300 rounded-lg px-3 py-1.5 text-xs bg-white text-slate-900 font-semibold focus:outline-none focus:border-red-600"
         >
-          <option value="All" {% if current_tag == "All" %}selected{% endif %}>All</option>
+          <option value="All" {% if current_tag == "All" %}selected{% endif %}>All Wires</option>
           <option value="India" {% if current_tag == "India" %}selected{% endif %}>India</option>
           <option value="Finance" {% if current_tag == "Finance" %}selected{% endif %}>Finance</option>
           <option value="Economy" {% if current_tag == "Economy" %}selected{% endif %}>Economy</option>
@@ -46,37 +101,91 @@
           <option value="Global" {% if current_tag == "Global" %}selected{% endif %}>Global</option>
           <option value="Market" {% if current_tag == "Market" %}selected{% endif %}>Market</option>
         </select>
+        {% if search_query %}
+          <input type="hidden" name="search" value="{{ search_query }}">
+        {% endif %}
       </form>
     </div>
 
-    <!-- 📰 Top News Scroll Section -->
-    {% if articles %}
-      <section>
- 
-        <div class="">
-          {% for article in articles %}
+    <!-- Chronological Wire Stream -->
+    {% if articles and articles|length > 0 %}
+    <div class="space-y-4">
+      {% for article in articles %}
+      <article class="bg-white border border-slate-200 rounded-xl p-5 sm:p-6 shadow-sm hover:shadow-md transition-all group flex flex-col sm:flex-row gap-5 items-start">
         
-              <div class="">
+        <!-- Left Thumbnail (if available) -->
+        <a href="{{ url_for('article.article', article_id=article.id) }}" class="w-full sm:w-48 aspect-video sm:aspect-auto sm:h-32 rounded-lg overflow-hidden bg-slate-900 relative shrink-0 block">
+          <img
+            src="{{ article.image_url }}"
+            alt="{{ article.title }}"
+            onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            loading="lazy"
+          />
+        </a>
 
-                <div class="p-4">
-                  <h3 class="text-lg font-semibold mb-2">{{ article.title }}</h3>
-                  <p class="text-gray-700 text-sm ">{{ article.summary }}</p>
-                </div>
-              </div>
-            
-          {% endfor %}
+        <!-- Content -->
+        <div class="flex-1 flex flex-col justify-between h-full w-full">
+          <div>
+            <div class="flex items-center gap-2 text-[11px] text-slate-400 font-semibold mb-1.5">
+              <span class="text-red-600 font-bold uppercase tracking-wider">
+                <i class="fa-solid fa-bolt text-red-500 mr-1"></i> Bulletin #{{ article.id }}
+              </span>
+              <span>•</span>
+              <span>Verified Wire</span>
+              <span>•</span>
+              <span>2 min read</span>
+            </div>
+
+            <h2 class="font-editorial text-lg sm:text-xl font-bold text-slate-900 leading-snug group-hover:text-red-600 transition mb-2">
+              <a href="{{ url_for('article.article', article_id=article.id) }}">
+                {{ article.title }}
+              </a>
+            </h2>
+
+            <p class="text-xs sm:text-sm text-slate-600 leading-relaxed line-clamp-3">
+              {{ article.summary }}
+            </p>
+          </div>
+
+          <div class="mt-4 pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+            <a href="{{ url_for('article.article', article_id=article.id) }}" class="text-slate-900 hover:text-red-600 flex items-center gap-1.5 transition">
+              <span>Read Full Dispatch</span>
+              <i class="fa-solid fa-arrow-right text-[10px]"></i>
+            </a>
+            <span class="text-slate-400 text-[11px]">Sloth News Wire</span>
+          </div>
         </div>
-      </section>
+
+      </article>
+      {% endfor %}
+    </div>
+
     {% else %}
-      <p class="text-gray-600 mt-4">No articles found.</p>
+    <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-md mx-auto my-12">
+      <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-inbox"></i>
+      </div>
+      <h3 class="font-editorial text-xl font-bold text-slate-900 mb-2">No Wire Dispatches</h3>
+      <p class="text-slate-500 text-xs sm:text-sm mb-6">
+        No dispatches currently filed under this category or search query.
+      </p>
+      <a href="/thirdpage" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition inline-block">
+        Reset Wire Filters
+      </a>
+    </div>
     {% endif %}
+
+    <!-- Newsroom Edition Switcher -->
+    {% include 'page123.html' %}
+
   </main>
-<section id="">
+
+  <!-- Global Footer -->
   {% include 'footer.html' %}
-</section>
 
-
-
-  <script src="/static/nav.js"></script>
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
 </body>
+
 </html>

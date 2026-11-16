@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450" width="100%" height="100%">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0F172A"/>
+      <stop offset="50%" stop-color="#1E293B"/>
+      <stop offset="100%" stop-color="#020617"/>
+    </linearGradient>
+    <linearGradient id="accent" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#DC2626"/>
+      <stop offset="100%" stop-color="#EF4444"/>
+    </linearGradient>
+  </defs>
+  <rect width="800" height="450" fill="url(#bg)"/>
+  <circle cx="400" cy="200" r="180" fill="#DC2626" opacity="0.04" />
+  <g transform="translate(360, 150)">
+    <rect x="0" y="0" width="80" height="60" rx="8" fill="none" stroke="#94A3B8" stroke-width="3" opacity="0.6"/>
+    <circle cx="25" cy="22" r="8" fill="#94A3B8" opacity="0.6"/>
+    <path d="M10 50 L30 32 L50 45 L70 28" fill="none" stroke="#94A3B8" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+  </g>
+  <text x="400" y="260" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="20" font-weight="700" fill="#F8FAFC" text-anchor="middle" letter-spacing="2">
+    SLOTH NEWS NETWORK
+  </text>
+  <text x="400" y="285" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-size="13" font-weight="500" fill="#94A3B8" text-anchor="middle" letter-spacing="1">
+    PRESS PHOTOGRAPHY ARCHIVE
+  </text>
+  <rect x="350" y="315" width="100" height="3" rx="1.5" fill="url(#accent)"/>
+</svg>

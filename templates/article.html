@@ -4,190 +4,421 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  {% if article %}
+  <title>{{ article.title }} | Sloth News Channel</title>
+  <meta name="description" content="{{ article.summary[:160] | striptags }}" />
+  <meta name="keywords" content="Sloth News, {{ article.title }}, breaking news, intelligence analysis" />
+  <link rel="canonical" href="{{ request.base_url }}" />
+
+  <!-- Open Graph / Social SEO -->
+  <meta property="og:type" content="article" />
+  <meta property="og:site_name" content="Sloth News Channel" />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:title" content="{{ article.title }}" />
+  <meta property="og:description" content="{{ article.summary[:200] | striptags }}" />
+  <meta property="og:image" content="{{ article.image_url }}" />
+  <meta property="article:published_time" content="{{ article.created_at if article.created_at else '' }}" />
+  <meta property="article:author" content="Sloth News Intelligence Bureau" />
+  <meta property="article:section" content="News" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@SlothNews" />
+  <meta name="twitter:creator" content="@SlothNews" />
+  <meta name="twitter:title" content="{{ article.title }}" />
+  <meta name="twitter:description" content="{{ article.summary[:200] | striptags }}" />
+  <meta name="twitter:image" content="{{ article.image_url }}" />
+
+  <!-- Schema.org Structured Data: NewsArticle & BreadcrumbList -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "NewsArticle",
+        "mainEntityOfPage": {
+          "@type": "WebPage",
+          "@id": "{{ request.base_url }}"
+        },
+        "headline": {{ article.title | tojson }},
+        "description": {{ article.summary | tojson }},
+        "image": [
+          "{{ article.image_url }}"
+        ],
+        "datePublished": "{{ article.created_at if article.created_at else '2026-11-16T00:00:00Z' }}",
+        "dateModified": "{{ article.created_at if article.created_at else '2026-11-16T00:00:00Z' }}",
+        "author": {
+          "@type": "Organization",
+          "name": "Sloth News Intelligence Bureau",
+          "url": "{{ request.url_root }}about"
+        },
+        "publisher": {
+          "@type": "NewsMediaOrganization",
+          "name": "Sloth News Channel",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}"
+          }
+        }
+      },
+      {
+        "@type": "BreadcrumbList",
+        "itemListElement": [
+          {
+            "@type": "ListItem",
+            "position": 1,
+            "name": "Home",
+            "item": "{{ request.url_root }}"
+          },
+          {
+            "@type": "ListItem",
+            "position": 2,
+            "name": "Dispatches",
+            "item": "{{ request.url_root }}thirdpage"
+          },
+          {
+            "@type": "ListItem",
+            "position": 3,
+            "name": {{ article.title | tojson }},
+            "item": "{{ request.base_url }}"
+          }
+        ]
+      }
+    ]
+  }
+  </script>
+  {% else %}
+  <title>Article Not Found | Sloth News Channel</title>
+  {% endif %}
+
+  <!-- Tailwind CSS & Stylesheets -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style/nav.css" />
-  <link rel="stylesheet" href="/static/style/style.css" />
-  <title>{{ article.title }}</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --canopy: #0e2f26;
-      --leaf: #12b76a;
-      --papaya: #ff6b35;
-      --guava: #ff3d81;
-      --sun: #ffc93c;
-      --mist: #f3faf1;
-    }
-
-    body {
-      font-family: "DM Sans", system-ui, sans-serif;
-      background:
-        radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
-        radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
-        radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
-        var(--mist);
-      color: var(--canopy);
-    }
-
-    .font-display {
-      font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
-      letter-spacing: -0.02em;
-    }
-
-    /* ---------- Back link ---------- */
-    .back-link {
-      display: inline-flex;
-      align-items: center;
-      gap: .5rem;
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      padding: .4rem 1.1rem .4rem .5rem;
-      font-weight: 600;
-      font-size: .9rem;
-      color: var(--canopy);
-      text-decoration: none;
-      box-shadow: 3px 3px 0 var(--canopy);
-      transition: transform .15s ease, box-shadow .15s ease;
-    }
-
-    .back-link i {
-      display: grid;
-      place-items: center;
-      width: 1.6rem;
-      height: 1.6rem;
-      border-radius: 999px;
-      background: var(--papaya);
-      color: #fff;
-      font-size: .7rem;
-    }
-
-    .back-link:hover {
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0 var(--canopy);
-    }
-
-    .back-link:focus-visible { outline: 3px solid var(--guava); outline-offset: 3px; }
-
-    /* ---------- Article card ---------- */
-    .article-card {
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.75rem;
-      overflow: hidden;
-      padding: 2rem;
-      box-shadow: 8px 8px 0 var(--papaya);
-      position: relative;
-    }
-
-    .article-card::before {
-      content: "";
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 10px;
-      background: linear-gradient(90deg, var(--papaya), var(--guava), var(--sun), var(--leaf));
-    }
-
-    .article-title {
-      font-size: clamp(1.75rem, 4vw, 2.75rem);
-      font-weight: 800;
-      line-height: 1.1;
-      color: var(--canopy);
-    }
-
-    .article-image {
-      border: 2px solid var(--canopy);
-      border-radius: 1.25rem !important;
-      box-shadow: 5px 5px 0 var(--guava);
-      align-self: flex-start;
-    }
-
-    .article-summary {
-      font-size: 1.1rem;
-      line-height: 1.8;
-      color: #264a3f;
-      max-width: 68ch;
-    }
-
-    /* ---------- Sloth sign-off ---------- */
-    .sloth-hang {
-      display: inline-block;
-      transform-origin: 50% 0;
-      animation: hang 4.5s ease-in-out infinite;
-    }
-
-    @keyframes hang {
-      0%, 100% { transform: rotate(-7deg); }
-      50%      { transform: rotate(7deg); }
-    }
-
-    /* ---------- Scrollbar ---------- */
-    .scrollbar-custom::-webkit-scrollbar { height: 10px; }
-    .scrollbar-custom::-webkit-scrollbar-track { background: rgba(14, 47, 38, .08); border-radius: 10px; }
-    .scrollbar-custom::-webkit-scrollbar-thumb {
-      background: linear-gradient(90deg, var(--papaya), var(--guava));
-      border-radius: 10px;
-    }
-    .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--guava), var(--papaya)); }
-
-    /* ---------- Responsive ---------- */
-    html, body { max-width: 100%; overflow-x: clip; }
-    .article-title, .article-summary { overflow-wrap: anywhere; }
-
-    @media (max-width: 640px) {
-      .article-card { padding: 1.25rem; box-shadow: 5px 5px 0 var(--papaya); border-radius: 1.25rem; }
-      .article-image { box-shadow: 3px 3px 0 var(--guava); height: auto; }
-      .article-summary { font-size: 1rem; line-height: 1.7; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .sloth-hang { animation: none; }
-      .back-link { transition: none; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-<header></header>
+  <!-- Reading Progress Bar -->
+  <div class="reading-progress-bar" id="readingProgressBar"></div>
 
-<div class="max-w-6xl mx-auto mt-10 p-4">
+  <!-- Master News Channel Header -->
+  <header></header>
 
-    <a href="javascript:history.back()" class="back-link mb-6">
-        <i class="fa-solid fa-arrow-left" aria-hidden="true"></i>
-        Back to news
-    </a>
+  <!-- Article View Area -->
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
 
-    <div class="article-card mt-6">
+    {% if article %}
+    <!-- Breadcrumb Bar -->
+    <nav aria-label="Breadcrumb" class="mb-6 flex items-center justify-between text-xs text-slate-500 border-b border-slate-200 pb-3">
+      <ol class="flex items-center gap-2">
+        <li>
+          <a href="/" class="hover:text-red-600 transition font-medium">Home</a>
+        </li>
+        <li><span class="text-slate-300">/</span></li>
+        <li>
+          <a href="/thirdpage" class="hover:text-red-600 transition font-medium">Wire Dispatches</a>
+        </li>
+        <li><span class="text-slate-300">/</span></li>
+        <li class="font-bold text-slate-800 truncate max-w-[200px] sm:max-w-[350px]">
+          {{ article.title }}
+        </li>
+      </ol>
 
-        <h1 class="article-title font-display mb-6 mt-2">{{ article.title }}</h1>
+      <a href="javascript:history.back()" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-red-600 transition">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Back</span>
+      </a>
+    </nav>
 
-        <div class="md:flex md:gap-8">
+    <!-- Article Reader Box -->
+    <article class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm animate-fade-in">
 
-            <img
-            src="{{ article.image_url }}"
-            alt="{{ article.title }}"
-            class="article-image w-full md:w-1/3 object-cover mb-4 md:mb-0"
-            >
+      <!-- Category Tag & Metadata -->
+      <div class="flex flex-wrap items-center gap-3 mb-4">
+        <span class="bg-red-600 text-white font-extrabold text-[11px] tracking-wider uppercase px-2.5 py-1 rounded">
+          Newsroom Wire
+        </span>
+        <span class="text-xs font-semibold text-slate-500">
+          <i class="fa-regular fa-clock mr-1"></i>3 min read
+        </span>
+        <span class="text-slate-300">•</span>
+        <span class="text-xs font-semibold text-slate-500">
+          <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i>Fact-Checked
+        </span>
+      </div>
 
-            <p class="article-summary md:w-2/3">
-                {{ article.summary }}
-            </p>
+      <!-- Main Headline -->
+      <h1 class="article-headline font-editorial">
+        {{ article.title }}
+      </h1>
 
+      <!-- Byline Bar -->
+      <div class="article-byline-bar">
+        <div class="byline-author">
+          <img
+            src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
+            alt="SNN Newsdesk"
+            class="byline-avatar"
+          />
+          <div>
+            <div class="font-bold text-slate-900 text-sm">
+              By Sloth News Intelligence Desk
+            </div>
+            <div class="text-xs text-slate-500">
+              Published on {{ edition_date if edition_date else 'Nov 16, 2026' }} • Verified Dispatch
+            </div>
+          </div>
         </div>
 
+        <!-- Social Share Bar -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider mr-1 hidden sm:inline">Share:</span>
+          <button
+            type="button"
+            onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('{{ article.title }}') + '&url=' + encodeURIComponent(window.location.href), '_blank')"
+            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white flex items-center justify-center text-slate-600 transition"
+            title="Share on X / Twitter"
+          >
+            <i class="fa-brands fa-x-twitter text-xs"></i>
+          </button>
+          <button
+            type="button"
+            onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(window.location.href), '_blank')"
+            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-700 hover:text-white flex items-center justify-center text-slate-600 transition"
+            title="Share on LinkedIn"
+          >
+            <i class="fa-brands fa-linkedin-in text-xs"></i>
+          </button>
+          <button
+            type="button"
+            onclick="window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('{{ article.title }} - ' + window.location.href), '_blank')"
+            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-emerald-600 hover:text-white flex items-center justify-center text-slate-600 transition"
+            title="Share on WhatsApp"
+          >
+            <i class="fa-brands fa-whatsapp text-xs"></i>
+          </button>
+          <button
+            type="button"
+            onclick="navigator.clipboard.writeText(window.location.href); showNewsToast('Article link copied to clipboard!');"
+            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white flex items-center justify-center text-slate-600 transition"
+            title="Copy Article Link"
+          >
+            <i class="fa-solid fa-link text-xs"></i>
+          </button>
+        </div>
+      </div>
+
+      <!-- Featured Image with Photo Credit -->
+      <figure class="mb-8">
+        <div class="rounded-xl overflow-hidden bg-slate-900 border border-slate-200 aspect-video relative">
+          <img
+            src="{{ article.image_url }}"
+            alt="{{ article.title }}"
+            onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+            class="w-full h-full object-cover"
+          />
+        </div>
+        <figcaption class="mt-2.5 text-xs text-slate-500 flex items-center justify-between italic">
+          <span>Editorial Press Image via Sloth News Network Global Wire</span>
+          <span class="font-normal uppercase tracking-wider text-[10px] text-slate-400">Photo Ref: #{{ article.id }}</span>
+        </figcaption>
+      </figure>
+
+      <!-- Key Takeaways Box -->
+      <div class="bg-slate-50 border-l-4 border-red-600 rounded-r-xl p-5 mb-8">
+        <h3 class="font-bold text-xs uppercase tracking-wider text-slate-900 mb-2 flex items-center gap-1.5">
+          <i class="fa-solid fa-list-check text-red-600"></i> Executive Briefing & Key Points
+        </h3>
+        <ul class="space-y-1.5 text-xs sm:text-sm text-slate-700">
+          <li class="flex items-start gap-2">
+            <span class="text-red-600 font-bold">•</span>
+            <span>Primary developments reported by verified news wire dispatches.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-600 font-bold">•</span>
+            <span>Synthesized by Sloth News intelligence agents for concise, high-speed consumption.</span>
+          </li>
+          <li class="flex items-start gap-2">
+            <span class="text-red-600 font-bold">•</span>
+            <span>Cross-referenced across international and regional news feeds.</span>
+          </li>
+        </ul>
+      </div>
+
+      <!-- Article Body Content -->
+      <div class="article-body-text">
+        <p class="leading-relaxed mb-6">
+          {{ article.summary }}
+        </p>
+
+        <p class="leading-relaxed text-slate-700 mb-6">
+          The Sloth News Network intelligence desk continues to monitor real-time updates surrounding this story. Readers and subscribers are encouraged to follow our market wire and verified social broadcasts for further developments as official briefings and market responses unfold.
+        </p>
+
+        <!-- Editorial Pull Quote -->
+        <blockquote class="my-8 p-6 bg-slate-900 text-white rounded-xl border-l-4 border-red-600 font-editorial text-lg italic leading-relaxed">
+          "Accurate, rapid intelligence is the cornerstone of informed modern decision-making across global markets and governance."
+          <div class="mt-3 font-sans-ui text-xs font-bold text-red-400 not-italic uppercase tracking-wider">
+            — Sloth News Editorial Desk
+          </div>
+        </blockquote>
+      </div>
+
+      <!-- Tags & Actions Bottom Strip -->
+      <div class="mt-10 pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Topic Tags:</span>
+          <span class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-md">#News</span>
+          <span class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-md">#WorldWire</span>
+          <span class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-md">#Intelligence</span>
+        </div>
+
+        <button
+          type="button"
+          onclick="window.print()"
+          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 rounded-lg transition"
+        >
+          <i class="fa-solid fa-print"></i>
+          <span>Print Dispatch</span>
+        </button>
+      </div>
+
+      <!-- Daily Briefing Newsletter Signup Box -->
+      <div class="mt-10 bg-slate-900 text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
+        <div>
+          <h4 class="font-editorial text-xl font-bold mb-1 text-white">
+            Receive The Daily Morning Briefing
+          </h4>
+          <p class="text-xs text-slate-400 max-w-md">
+            Join 45,000+ professionals reading our 24/7 fact-checked intelligence brief every morning.
+          </p>
+        </div>
+        <form onsubmit="event.preventDefault(); showNewsToast('Subscribed! You will receive the daily morning brief.'); this.reset();" class="flex items-center gap-2 w-full md:w-auto">
+          <input
+            type="email"
+            required
+            placeholder="Enter work email..."
+            class="px-3.5 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-red-500 w-full sm:w-60"
+          />
+          <button
+            type="submit"
+            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition shrink-0"
+          >
+            Subscribe
+          </button>
+        </form>
+      </div>
+
+    </article>
+
+    <!-- Related Articles / More From Newsroom -->
+    {% if related_articles and related_articles|length > 0 %}
+    <section class="mt-12">
+      <div class="news-desk-header">
+        <h2 class="news-desk-title">
+          <i class="fa-solid fa-newspaper"></i> Related Dispatches
+        </h2>
+        <a href="/" class="news-desk-link">
+          <span>All News</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+        {% for r in related_articles %}
+        <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col">
+          <a href="{{ url_for('article.article', article_id=r.id) }}" class="aspect-video bg-slate-900 block overflow-hidden">
+            <img
+              src="{{ r.image_url }}"
+              alt="{{ r.title }}"
+              onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              loading="lazy"
+            />
+          </a>
+          <div class="p-3.5 flex-1 flex flex-col justify-between">
+            <h4 class="font-editorial text-sm font-bold text-slate-900 leading-snug group-hover:text-red-600 transition line-clamp-2 mb-2">
+              <a href="{{ url_for('article.article', article_id=r.id) }}">
+                {{ r.title }}
+              </a>
+            </h4>
+            <div class="text-[11px] text-slate-400 font-semibold flex items-center justify-between">
+              <span>SNN Wire</span>
+              <a href="{{ url_for('article.article', article_id=r.id) }}" class="text-red-600 hover:underline">
+                Read →
+              </a>
+            </div>
+          </div>
+        </article>
+        {% endfor %}
+      </div>
+    </section>
+    {% endif %}
+
+    {% else %}
+    <!-- 404 Article Not Found -->
+    <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-lg mx-auto my-12">
+      <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+      </div>
+      <h2 class="text-2xl font-bold font-editorial text-slate-900 mb-2">Dispatch Not Found</h2>
+      <p class="text-slate-500 text-sm mb-6">
+        The news article requested does not exist or may have been archived by the newsroom editors.
+      </p>
+      <a href="/" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition inline-block">
+        Return to Front Page
+      </a>
     </div>
+    {% endif %}
 
-    {% include 'footer.html' %}
-</div>
+  </main>
 
-    <script src="{{ url_for('static', filename='nav.js') }}"></script>
-    
+  <!-- Global News Footer -->
+  {% include 'footer.html' %}
+
+  <!-- Back to Top Button -->
+  <button type="button" class="back-to-top-btn" id="backToTopBtn" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
+  <script>
+    // Reading progress bar calculation
+    window.addEventListener('scroll', () => {
+      const progressBar = document.getElementById('readingProgressBar');
+      if (progressBar) {
+        const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+        const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
+        const scrolled = (scrollTop / scrollHeight) * 100;
+        progressBar.style.width = scrolled + '%';
+      }
+
+      // Back to top button
+      const btt = document.getElementById('backToTopBtn');
+      if (btt) {
+        if (window.scrollY > 350) {
+          btt.classList.add('visible');
+        } else {
+          btt.classList.remove('visible');
+        }
+      }
+    });
+
+    const bttBtn = document.getElementById('backToTopBtn');
+    if (bttBtn) {
+      bttBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  </script>
+
 </body>
+
 </html>

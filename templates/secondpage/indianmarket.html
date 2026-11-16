@@ -1,64 +1,63 @@
-
-<section class="cardbox">
-
-  <div class="flex items-center justify-between mb-4">
-    <h2 class="text-2xl font-semibold text-gray-900">
-      Indian Market
-    </h2>
-
+<div class="news-desk-header">
+  <h2 class="news-desk-title">
+    <i class="fa-solid fa-landmark text-amber-600"></i> Indian Markets & Dalal Street Desk
+  </h2>
+  <div class="flex items-center gap-2">
+    <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+      NSE • BSE • RBI Policy
+    </span>
   </div>
+</div>
 
-  <div class="flex overflow-x-auto space-x-6 pb-4 scrollbar-custom">
-
-    {% if articles %}
-
-      {% for article in articles %}
-
-      <a
-        href="{{ url_for('article.article', article_id=article.id) }}"
-        class="min-w-[300px] max-w-[300px] bg-white rounded-xl shadow-md hover:shadow-xl overflow-hidden transition-all duration-300 block"
-      >
-
-        <!-- Database Image -->
-        <div class="h-48 overflow-hidden">
-
+<div class="news-scroller pb-4">
+  {% if articles and articles|length > 0 %}
+    {% for article in articles %}
+    <article class="w-[300px] bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+      <div>
+        <a href="{{ url_for('article.article', article_id=article.id) }}" class="h-44 block overflow-hidden bg-slate-900 relative">
           <img
             src="{{ article.image_url }}"
             alt="{{ article.title }}"
-            class="w-full h-full object-cover hover:scale-105 transition-transform duration-300"
+            onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+            loading="lazy"
           />
+          <span class="absolute top-2.5 left-2.5 bg-amber-600 text-white font-extrabold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded shadow">
+            🇮🇳 India Market
+          </span>
+        </a>
 
-        </div>
+        <div class="p-4">
+          <div class="flex items-center gap-2 text-[11px] text-slate-400 font-semibold mb-1.5">
+            <span class="text-amber-700 font-bold">DALAL STREET</span>
+            <span>•</span>
+            <span>2 min read</span>
+          </div>
 
-        <!-- Database Content -->
-        <div class="p-5">
-
-          <h3 class="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
-            {{ article.title }}
+          <h3 class="font-editorial text-base font-bold text-slate-900 leading-snug group-hover:text-red-600 transition-colors line-clamp-2 mb-2">
+            <a href="{{ url_for('article.article', article_id=article.id) }}">
+              {{ article.title }}
+            </a>
           </h3>
 
-          <p class="text-gray-600 text-sm leading-6 line-clamp-3">
+          <p class="text-slate-600 text-xs leading-relaxed line-clamp-3">
             {{ article.summary }}
           </p>
-
         </div>
-
-      </a>
-
-      {% endfor %}
-
-    {% else %}
-
-      <div class="bg-white rounded-xl shadow-sm p-8 text-center w-full">
-
-        <p class="text-gray-500">
-          No Indian Market articles found.
-        </p>
-
       </div>
 
-    {% endif %}
-
-  </div>
-
-</section>
+      <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+        <span class="text-slate-400 text-[11px]">SNN India Bureau</span>
+        <a href="{{ url_for('article.article', article_id=article.id) }}" class="text-slate-900 hover:text-red-600 flex items-center gap-1 transition">
+          <span>Read Dispatch</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+    </article>
+    {% endfor %}
+  {% else %}
+    <div class="bg-white border border-slate-200 rounded-xl p-8 text-center w-full">
+      <p class="text-slate-500 text-sm">No India market dispatches currently filed. Check back shortly.</p>
+    </div>
+  {% endif %}
+</div>

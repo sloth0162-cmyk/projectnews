@@ -4,313 +4,434 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sloth News Channel | 24/7 Broadcast, Market Intelligence & Global Briefs</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Stay informed with Sloth News Channel (SNN). Real-time breaking news, global markets, cryptocurrency intelligence, technology breakthroughs, Indian economy, and verified editorial analysis." />
+  <meta name="keywords" content="Sloth News, breaking news, live news channel, market intelligence, financial news, cryptocurrency, tech news, geopolitics, Indian economy, editorial" />
+  <meta name="author" content="Sloth News Network" />
+  <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
+  <meta name="theme-color" content="#0b1120" />
+  <link rel="canonical" href="{{ request.base_url }}" />
+
+  <!-- Open Graph / Facebook -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sloth News Channel" />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:title" content="Sloth News Channel | 24/7 Global Intelligence & Breaking News" />
+  <meta property="og:description" content="Real-time breaking news, stock markets, crypto, tech developments, and in-depth reporting from the Sloth News intelligence desk." />
+  <meta property="og:image" content="{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:site" content="@SlothNews" />
+  <meta name="twitter:creator" content="@SlothNews" />
+  <meta name="twitter:title" content="Sloth News Channel | 24/7 Global Intelligence" />
+  <meta name="twitter:description" content="Real-time breaking news, stock markets, crypto, and in-depth reporting." />
+  <meta name="twitter:image" content="{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}" />
+
+  <!-- JSON-LD Structured Data: NewsMediaOrganization -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "NewsMediaOrganization",
+    "name": "Sloth News Channel",
+    "alternateName": "SNN",
+    "url": "{{ request.url_root }}",
+    "logo": "{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}",
+    "foundingDate": "2024",
+    "description": "The independent 24/7 global intelligence and news network delivering fact-checked briefings on markets, geopolitics, and innovation.",
+    "sameAs": [
+      "https://twitter.com/SlothNews",
+      "https://linkedin.com/company/slothnews",
+      "https://youtube.com/@SlothNews"
+    ],
+    "publishingPrinciples": "{{ request.url_root }}about",
+    "ethicsPolicy": "{{ request.url_root }}about"
+  }
+  </script>
+
+  <!-- Tailwind CSS & Stylesheets -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style/nav.css" />
-  <link rel="stylesheet" href="/static/style/style.css" />
-  <title>Sloth Newz</title>
-  
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --canopy: #0e2f26;
-      --leaf: #12b76a;
-      --papaya: #ff6b35;
-      --guava: #ff3d81;
-      --sun: #ffc93c;
-      --mist: #f3faf1;
-
-      /* card accent cycle */
-      --c0: var(--papaya);
-      --c1: var(--guava);
-      --c2: var(--leaf);
-      --c3: var(--sun);
-    }
-
-    body {
-      font-family: "DM Sans", system-ui, sans-serif;
-      background:
-        radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
-        radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
-        radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
-        var(--mist);
-      color: var(--canopy);
-    }
-
-    .font-display {
-      font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
-      letter-spacing: -0.02em;
-    }
-
-    /* ---------- Page title ---------- */
-    .page-title {
-      font-size: clamp(2.25rem, 5vw, 3.5rem);
-      font-weight: 800;
-      line-height: 1;
-      color: var(--canopy);
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    .sloth-hang {
-      display: inline-block;
-      transform-origin: 50% 0;
-      animation: hang 4.5s ease-in-out infinite;
-    }
-
-    @keyframes hang {
-      0%, 100% { transform: rotate(-7deg); }
-      50%      { transform: rotate(7deg); }
-    }
-
-    /* ---------- Filter pill ---------- */
-    .filter-wrap {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      padding: .35rem .4rem .35rem 1.1rem;
-      box-shadow: 4px 4px 0 var(--canopy);
-    }
-
-    .filter-wrap label {
-      font-weight: 600;
-      font-size: .9rem;
-      color: var(--canopy);
-      margin: 0;
-    }
-
-    .filter-wrap select {
-      appearance: none;
-      -webkit-appearance: none;
-      background: var(--papaya)
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='white' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E")
-        no-repeat right .9rem center;
-      color: #fff;
-      font-weight: 600;
-      border: 0;
-      border-radius: 999px;
-      padding: .5rem 2.4rem .5rem 1.1rem;
-      cursor: pointer;
-    }
-
-    .filter-wrap select option {
-      color: var(--canopy);
-      background: #fff;
-    }
-
-    .filter-wrap select:hover { background-color: var(--guava); }
-
-    /* ---------- Section heading ---------- */
-    .section-title {
-      font-size: 1.75rem;
-      font-weight: 800;
-      display: inline-block;
-      position: relative;
-      padding-bottom: .35rem;
-    }
-
-    .section-title::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--papaya), var(--guava), var(--sun), var(--leaf));
-      opacity: .9;
-      z-index: -1;
-    }
-
-    /* ---------- Headline cards ---------- */
-    .news-card {
-      --accent: var(--c0);
-      min-width: 300px;
-      max-width: 300px;
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.5rem;
-      overflow: hidden;
-      box-shadow: 6px 6px 0 var(--accent);
-      transition: transform .2s ease, box-shadow .2s ease;
-    }
-
-    .news-card:hover,
-    .news-card:focus-within {
-      transform: translate(-3px, -3px);
-      box-shadow: 9px 9px 0 var(--accent);
-    }
-
-    .news-card a { display: block; color: inherit; text-decoration: none; }
-    .news-card a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-
-    .news-card .thumb {
-      position: relative;
-      overflow: hidden;
-      border-bottom: 2px solid var(--canopy);
-    }
-
-    .news-card .thumb::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--accent) 45%, transparent));
-      pointer-events: none;
-    }
-
-    .news-card img { transition: transform .5s ease; }
-    .news-card:hover img { transform: scale(1.06); }
-
-    .news-card h3 { font-family: "Bricolage Grotesque", sans-serif; letter-spacing: -0.01em; }
-    .news-card:hover h3 { color: var(--accent); }
-
-    .news-card .read-more {
-      display: inline-flex;
-      align-items: center;
-      gap: .4rem;
-      margin-top: .6rem;
-      font-size: .8rem;
-      font-weight: 600;
-      color: var(--canopy);
-    }
-
-    .news-card .read-more i {
-      display: grid;
-      place-items: center;
-      width: 1.5rem;
-      height: 1.5rem;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #fff;
-      font-size: .65rem;
-      transition: transform .2s ease;
-    }
-
-    .news-card:hover .read-more i { transform: translateX(4px); }
-
-    /* ---------- Scrollbar ---------- */
-    .scrollbar-custom { scroll-snap-type: x proximity; padding: .5rem .5rem 1.5rem .25rem; }
-    .scrollbar-custom > * { scroll-snap-align: start; }
-
-    .scrollbar-custom::-webkit-scrollbar { height: 10px; }
-    .scrollbar-custom::-webkit-scrollbar-track { background: rgba(14, 47, 38, .08); border-radius: 10px; }
-    .scrollbar-custom::-webkit-scrollbar-thumb {
-      background: linear-gradient(90deg, var(--papaya), var(--guava));
-      border-radius: 10px;
-    }
-    .scrollbar-custom::-webkit-scrollbar-thumb:hover { background: linear-gradient(90deg, var(--guava), var(--papaya)); }
-
-    /* ---------- Empty state ---------- */
-    .empty-state {
-      background: #fff;
-      border: 2px dashed var(--canopy);
-      border-radius: 1.5rem;
-      padding: 2rem;
-      text-align: center;
-      font-weight: 500;
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .sloth-hang { animation: none; }
-      .news-card, .news-card img, .news-card .read-more i { transition: none; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Master News Channel Header -->
   <header></header>
-  {%include 'searchbar.html' %}
 
-  <main class="max-w-6xl mx-auto mt-10 p-4">
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-      <h1 class="page-title font-display">
-        <span class="sloth-hang" aria-hidden="true">🦥</span>
-        Top News
-      </h1>
+  <!-- Breaking News Ticker Bar -->
+  <div class="breaking-ticker-wrap">
+    <div class="breaking-label">
+      <span class="breaking-pulse" aria-hidden="true"></span>
+      <span>Breaking</span>
+    </div>
+    <div class="breaking-content">
+      <div class="breaking-marquee">
+        {% if articles and articles|length > 0 %}
+          {% for item in articles[:6] %}
+          <a href="{{ url_for('article.article', article_id=item.id) }}" class="breaking-item">
+            <span class="breaking-dot">●</span>
+            <span>{{ item.title }}</span>
+          </a>
+          {% endfor %}
+        {% else %}
+          <span class="breaking-item">
+            <span class="breaking-dot">●</span>
+            <span>Markets open steady as central banks signal measured policy stance.</span>
+          </span>
+          <span class="breaking-item">
+            <span class="breaking-dot">●</span>
+            <span>Tech earnings surge on institutional AI infrastructure investments.</span>
+          </span>
+          <span class="breaking-item">
+            <span class="breaking-dot">●</span>
+            <span>Sloth News 24/7 Intelligence Desk monitors global trade developments.</span>
+          </span>
+        {% endif %}
+      </div>
+    </div>
+  </div>
 
-      <!-- Tag Filter -->
-      <form method="get" class="filter-wrap">
-        <label for="tag">Filter by Tag:</label>
-        <select name="tag" id="tag" onchange="this.form.submit()">
-          <option value="All" {% if current_tag=="All" %}selected{% endif %}>All</option>
-          <option value="India" {% if current_tag=="India" %}selected{% endif %}>India</option>
-          <option value="Finance" {% if current_tag=="Finance" %}selected{% endif %}>Finance</option>
-          <option value="Economy" {% if current_tag=="Economy" %}selected{% endif %}>Economy</option>
-          <option value="Geopolitics" {% if current_tag=="Geopolitics" %}selected{% endif %}>Geopolitics</option>
-          <option value="Technology" {% if current_tag=="Technology" %}selected{% endif %}>Technology</option>
-          <option value="Energy" {% if current_tag=="Energy" %}selected{% endif %}>Energy</option>
-          <option value="Conflict" {% if current_tag=="Conflict" %}selected{% endif %}>Conflict</option>
-          <option value="Policy" {% if current_tag=="Policy" %}selected{% endif %}>Policy</option>
-          <option value="Global" {% if current_tag=="Global" %}selected{% endif %}>Global</option>
-          <option value="Market" {% if current_tag=="Market" %}selected{% endif %}>Market</option>
-        </select>
-      </form>
+  <!-- Financial Market Strip -->
+  <div class="market-strip">
+    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
+      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
+    </div>
+    {% if market_ticker %}
+      {% for m in market_ticker %}
+      <div class="market-item">
+        <span class="market-sym">{{ m.symbol }}</span>
+        <span class="market-val">{{ m.value }}</span>
+        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
+          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
+        </span>
+      </div>
+      {% endfor %}
+    {% else %}
+      <div class="market-item">
+        <span class="market-sym">SENSEX</span>
+        <span class="market-val">81,420.5</span>
+        <span class="market-change up">▲ +0.42%</span>
+      </div>
+      <div class="market-item">
+        <span class="market-sym">NIFTY 50</span>
+        <span class="market-val">24,860.2</span>
+        <span class="market-change up">▲ +0.38%</span>
+      </div>
+      <div class="market-item">
+        <span class="market-sym">NASDAQ</span>
+        <span class="market-val">18,342.9</span>
+        <span class="market-change down">▼ -0.15%</span>
+      </div>
+      <div class="market-item">
+        <span class="market-sym">BTC/USD</span>
+        <span class="market-val">$91,420</span>
+        <span class="market-change up">▲ +2.14%</span>
+      </div>
+      <div class="market-item">
+        <span class="market-sym">BRENT CRUDE</span>
+        <span class="market-val">$74.20</span>
+        <span class="market-change down">▼ -0.81%</span>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Search & Trending Keywords Strip -->
+  {% include 'searchbar.html' %}
+
+  <!-- Main News Content Hub -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
+
+    <!-- Category Filter Bar -->
+    <div class="flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full scrollbar-none">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
+          Channel:
+        </span>
+        {% set tags = ["All", "India", "Finance", "Economy", "Geopolitics", "Technology", "Energy", "Conflict", "Policy", "Global", "Market"] %}
+        {% for t in tags %}
+          <a
+            href="{% if t == 'All' %}/{% else %}/?tag={{ t }}{% endif %}"
+            class="px-3.5 py-1.5 rounded-full text-xs font-bold transition-all shrink-0 {% if current_tag == t %}bg-slate-900 text-white shadow-sm{% else %}bg-white border border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-100{% endif %}"
+          >
+            {{ t }}
+          </a>
+        {% endfor %}
+      </div>
+
+      <div class="text-xs text-slate-500 font-medium shrink-0">
+        Showing: <strong class="text-slate-800">{{ current_tag }}</strong> {% if articles %}({{ articles|length }} reports){% endif %}
+      </div>
     </div>
 
-    <!-- 📰 Top News Scroll Section -->
-    {% if articles %}
-    <section>
-      <h2 class="section-title font-display mb-5">Top Headlines</h2>
-      <div class="flex overflow-x-auto space-x-6 scrollbar-custom">
-        {% for article in articles %}
-        <div class="news-card" style="--accent: var(--c{{ loop.index0 % 4 }});">
-          <a href="{{ url_for('article.article', article_id=article.id) }}">
-            <div class="thumb">
-              
-<div class="thumb relative overflow-hidden h-40 bg-gray-100">
-  <!-- Blurred background fills the entire box -->
-  <img
-    src="{{ article.image_url }}"
-    alt=""
-    aria-hidden="true"
-    class="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50"
-  >
+    <!-- 📰 Hero Broadcast Section: Lead Story + Top Newsroom Grid -->
+    {% if articles and articles|length > 0 %}
+    <section class="mb-12 animate-fade-in" id="top-headlines">
+      <div class="news-desk-header">
+        <h2 class="news-desk-title">
+          <i class="fa-solid fa-newspaper"></i> Top Newsroom Dispatch
+        </h2>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          Lead Coverage
+        </span>
+      </div>
 
-  <!-- Original image: fully visible and centered -->
-  <img
-    src="{{ article.image_url }}"
-    alt="News image"
-    class="relative z-10 w-full h-full object-contain object-center"
-  >
-</div>
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- 1. Major Lead Story Anchor (7 cols) -->
+        {% set lead = articles[0] %}
+        <article class="lg:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col group">
+          <a href="{{ url_for('article.article', article_id=lead.id) }}" class="block relative overflow-hidden bg-slate-900 aspect-video">
+            <img
+              src="{{ lead.image_url }}"
+              alt="{{ lead.title }}"
+              onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+              loading="eager"
+            />
+            <div class="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-transparent to-transparent"></div>
+            <span class="absolute top-3 left-3 bg-red-600 text-white font-extrabold text-[11px] tracking-wider uppercase px-2.5 py-1 rounded shadow">
+              <i class="fa-solid fa-bolt mr-1"></i> Special Report
+            </span>
+            <div class="absolute bottom-3 left-4 right-4 text-white">
+              <span class="text-xs font-bold text-red-400 uppercase tracking-wider">Lead Anchor Analysis</span>
             </div>
+          </a>
 
-            <div class="p-4 h-[200px]">
-              <h3 class="text-lg font-bold mb-2 line-clamp-3 leading-7">
-                {{ article.title }}
+          <div class="p-6 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-3 text-xs text-slate-500 mb-2">
+                <span class="font-bold text-red-600 uppercase tracking-wider">World Wire</span>
+                <span>•</span>
+                <span><i class="fa-regular fa-clock mr-1"></i>3 min read</span>
+                <span>•</span>
+                <span>SNN Bureau</span>
+              </div>
+
+              <h3 class="font-editorial text-2xl sm:text-3xl font-extrabold text-slate-900 leading-snug mb-3 group-hover:text-red-600 transition-colors">
+                <a href="{{ url_for('article.article', article_id=lead.id) }}">
+                  {{ lead.title }}
+                </a>
               </h3>
 
-              <p class="text-gray-700 text-sm line-clamp-3 leading-5">
+              <p class="text-slate-600 text-sm sm:text-base leading-relaxed line-clamp-3 mb-4">
+                {{ lead.summary }}
+              </p>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex items-center justify-between">
+              <a href="{{ url_for('article.article', article_id=lead.id) }}" class="text-xs font-bold uppercase tracking-wider text-slate-900 hover:text-red-600 flex items-center gap-1.5 transition">
+                <span>Read Full Coverage</span>
+                <i class="fa-solid fa-arrow-right text-[10px]"></i>
+              </a>
+              <div class="flex items-center gap-2 text-slate-400 text-xs">
+                <button type="button" onclick="navigator.clipboard.writeText('{{ request.url_root }}article/{{ lead.id }}'); showNewsToast('Article link copied to clipboard!');" class="hover:text-slate-700" title="Share story">
+                  <i class="fa-solid fa-share-nodes"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+        </article>
+
+        <!-- 2. Fast Wire Feed & Secondary Lead Stories (5 cols) -->
+        <div class="lg:col-span-5 flex flex-col gap-4">
+          
+          <!-- Secondary Top Story (if available) -->
+          {% if articles|length > 1 %}
+            {% set second_art = articles[1] %}
+            <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col sm:flex-row group">
+              <a href="{{ url_for('article.article', article_id=second_art.id) }}" class="sm:w-2/5 aspect-video sm:aspect-auto overflow-hidden bg-slate-900 relative shrink-0">
+                <img
+                  src="{{ second_art.image_url }}"
+                  alt="{{ second_art.title }}"
+                  onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                  loading="lazy"
+                />
+                <span class="absolute top-2 left-2 bg-slate-900/90 text-white font-bold text-[10px] px-2 py-0.5 rounded">
+                  Top Story
+                </span>
+              </a>
+              <div class="p-4 flex-1 flex flex-col justify-between">
+                <div>
+                  <span class="text-[10px] font-bold uppercase tracking-wider text-slate-500">Fast Wire</span>
+                  <h4 class="font-editorial text-lg font-bold text-slate-900 leading-snug my-1 group-hover:text-red-600 transition line-clamp-2">
+                    <a href="{{ url_for('article.article', article_id=second_art.id) }}">
+                      {{ second_art.title }}
+                    </a>
+                  </h4>
+                  <p class="text-slate-600 text-xs line-clamp-2 leading-relaxed">
+                    {{ second_art.summary }}
+                  </p>
+                </div>
+                <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+                  <span>2 min read</span>
+                  <a href="{{ url_for('article.article', article_id=second_art.id) }}" class="font-bold text-slate-900 hover:text-red-600">
+                    Read →
+                  </a>
+                </div>
+              </div>
+            </article>
+          {% endif %}
+
+          <!-- Fast Wire Live Chronological List -->
+          <div class="bg-white border border-slate-200 rounded-xl p-4 shadow-sm flex-1 flex flex-col">
+            <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-2">
+              <h4 class="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                <i class="fa-solid fa-bolt text-amber-500"></i> Fast Wire • Just In
+              </h4>
+              <a href="/thirdpage" class="text-[11px] font-bold text-blue-600 hover:text-blue-800">
+                Full Wire →
+              </a>
+            </div>
+
+            <div class="divide-y divide-slate-100 overflow-y-auto max-h-[300px] pr-1">
+              {% for wire in articles[2:7] %}
+              <a href="{{ url_for('article.article', article_id=wire.id) }}" class="py-2.5 block group transition">
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="text-[10px] font-extrabold text-red-600 uppercase tracking-wider">
+                    BULLETIN
+                  </span>
+                  <span class="text-slate-300">•</span>
+                  <span class="text-[11px] text-slate-400">Recent</span>
+                </div>
+                <h5 class="text-xs sm:text-sm font-semibold text-slate-900 group-hover:text-red-600 transition leading-snug line-clamp-2">
+                  {{ wire.title }}
+                </h5>
+              </a>
+              {% endfor %}
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <!-- 📰 Top Headlines Grid: Curated Reports -->
+    <section class="mb-14">
+      <div class="news-desk-header">
+        <h2 class="news-desk-title">
+          <i class="fa-solid fa-list-check"></i> Latest Channel Wire
+        </h2>
+        <a href="/thirdpage" class="news-desk-link">
+          <span>Explore Archive</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </a>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {% for article in articles[1:13] %}
+        <article class="news-standard-card group">
+          <a href="{{ url_for('article.article', article_id=article.id) }}" class="card-thumb block">
+            <img
+              src="{{ article.image_url }}"
+              alt="{{ article.title }}"
+              onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+              class="w-full h-full object-cover"
+              loading="lazy"
+            />
+            <span class="news-badge-tag">
+              {{ current_tag if current_tag != 'All' else 'Newsdesk' }}
+            </span>
+          </a>
+
+          <div class="p-5 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2 text-[11px] text-slate-500 mb-2">
+                <span class="font-bold text-red-600 uppercase tracking-wider">SNN Verified</span>
+                <span>•</span>
+                <span>2 min read</span>
+              </div>
+
+              <h3 class="font-editorial text-xl font-bold text-slate-900 leading-snug mb-2 group-hover:text-red-600 transition-colors line-clamp-2">
+                <a href="{{ url_for('article.article', article_id=article.id) }}">
+                  {{ article.title }}
+                </a>
+              </h3>
+
+              <p class="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3 mb-4">
                 {{ article.summary }}
               </p>
             </div>
-          </a>
-        </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+              <a href="{{ url_for('article.article', article_id=article.id) }}" class="text-slate-900 hover:text-red-600 transition flex items-center gap-1">
+                <span>Full Story</span>
+                <i class="fa-solid fa-chevron-right text-[10px]"></i>
+              </a>
+              <span class="text-slate-400 text-[11px]">Sloth Newsroom</span>
+            </div>
+          </div>
+        </article>
         {% endfor %}
       </div>
     </section>
+
     {% else %}
-    <p class="empty-state mt-4">No articles found. Try a different tag.</p>
+    <!-- Empty State -->
+    <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center max-w-xl mx-auto my-12">
+      <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-magnifying-glass"></i>
+      </div>
+      <h3 class="text-xl font-bold text-slate-900 mb-2 font-editorial">No dispatches found</h3>
+      <p class="text-slate-500 text-sm mb-6">
+        No articles matched the filter <strong>"{{ current_tag }}"</strong> or query <strong>"{{ search_query }}"</strong>.
+      </p>
+      <div class="flex justify-center gap-3">
+        <a href="/" class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition">
+          View All Headlines
+        </a>
+        <a href="/finance" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-800 rounded-lg text-xs font-bold uppercase tracking-wider transition">
+          Check Financial Wire
+        </a>
+      </div>
+    </div>
     {% endif %}
+
+    <!-- Included Channel Sections -->
+    <section id="channel-desks" class="space-y-12">
+      {% include 'discover.html' %}
+      {% include 'finance.html' %}
+      {% include 'india.html' %}
+      {% include 'page123.html' %}
+    </section>
+
   </main>
-  <section id="">
-    {% include 'discover.html' %}
-    {% include 'finance.html' %}
-    {% include 'india.html' %}
-    {% include 'page123.html' %}
-    {% include 'footer.html' %}
-  </section>
 
+  <!-- Global Institutional News Footer -->
+  {% include 'footer.html' %}
 
+  <!-- Back to Top Floating Button -->
+  <button type="button" class="back-to-top-btn" id="backToTopBtn" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
 
-  <script src="/static/nav.js"></script>
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
+  <script>
+    // Back to top floating button behavior
+    const bttBtn = document.getElementById('backToTopBtn');
+    if (bttBtn) {
+      window.addEventListener('scroll', () => {
+        if (window.scrollY > 350) {
+          bttBtn.classList.add('visible');
+        } else {
+          bttBtn.classList.remove('visible');
+        }
+      });
+      bttBtn.addEventListener('click', () => {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  </script>
 </body>
 
 </html>

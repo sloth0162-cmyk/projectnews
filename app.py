@@ -1,5 +1,5 @@
 # app.py
-from flask import Blueprint, Flask, jsonify, render_template, request, redirect, url_for, session
+from flask import Blueprint, Flask, jsonify, render_template, request, redirect, url_for, session, Response
 from agents.scraper_agent import scrape_news
 from agents.summarizer_agent import summarize_text
 from agents.classifier_agent import classify_article, save_tags_to_article
@@ -14,6 +14,7 @@ from routes.route import article_bp
 from second import second
 import time
 import os
+from datetime import datetime
 
 # -----------------------------
 # 🔧 Flask App Setup
@@ -26,6 +27,110 @@ supabase = create_client(Config.SUPABASE_URL, Config.SUPABASE_KEY)
 PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
 app.register_blueprint(second, url_prefix="/secondpage")
+
+
+# -----------------------------
+# 🌐 Global News Context Processor
+# -----------------------------
+@app.context_processor
+def inject_global_news_data():
+    now = datetime.now()
+    user = session.get("user")
+    user_name = "Subscriber"
+    user_avatar = "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+    if user:
+        metadata = user.get("user_metadata") or {}
+        user_name = (
+            metadata.get("full_name")
+            or metadata.get("name")
+            or user.get("email", "").split("@")[0]
+            or "Subscriber"
+        )
+        user_avatar = (
+            metadata.get("avatar_url")
+            or metadata.get("picture")
+            or user_avatar
+        )
+
+    return {
+        "current_user_data": user,
+        "is_logged_in": bool(user),
+        "user_name": user_name,
+        "user_avatar": user_avatar,
+        "current_year": now.year,
+        "edition_date": now.strftime("%A, %B %d, %Y"),
+        "live_time": now.strftime("%H:%M IST"),
+        "site_name": "Sloth News Channel",
+        "site_tagline": "The 24/7 Intelligence & Broadcast Network",
+        "market_ticker": [
+            {"symbol": "SENSEX", "value": "81,420.5", "change": "+0.42%", "up": True},
+            {"symbol": "NIFTY 50", "value": "24,860.2", "change": "+0.38%", "up": True},
+            {"symbol": "NASDAQ", "value": "18,342.9", "change": "-0.15%", "up": False},
+            {"symbol": "S&P 500", "value": "5,864.6", "change": "+0.22%", "up": True},
+            {"symbol": "BTC/USD", "value": "$91,420", "change": "+2.14%", "up": True},
+            {"symbol": "BRENT CRUDE", "value": "$74.20", "change": "-0.81%", "up": False},
+            {"symbol": "GOLD", "value": "$2,684.5", "change": "+0.54%", "up": True},
+        ],
+    }
+
+
+# -----------------------------
+# 🔍 SEO: robots.txt & sitemap.xml
+# -----------------------------
+@app.route("/robots.txt")
+def robots():
+    content = f"""User-agent: *
+Allow: /
+Disallow: /run_pipeline
+Disallow: /run_finance_pipeline
+Disallow: /auth/
+Sitemap: {request.url_root.rstrip('/')}/sitemap.xml
+"""
+    return Response(content, mimetype="text/plain")
+
+
+@app.route("/sitemap.xml")
+def sitemap():
+    base_url = request.url_root.rstrip("/")
+    pages = [
+        {"loc": f"{base_url}/", "changefreq": "always", "priority": "1.0"},
+        {"loc": f"{base_url}/secondpage", "changefreq": "hourly", "priority": "0.9"},
+        {"loc": f"{base_url}/finance", "changefreq": "hourly", "priority": "0.9"},
+        {"loc": f"{base_url}/editorial", "changefreq": "daily", "priority": "0.8"},
+        {"loc": f"{base_url}/thirdpage", "changefreq": "daily", "priority": "0.7"},
+        {"loc": f"{base_url}/about", "changefreq": "monthly", "priority": "0.5"},
+    ]
+    try:
+        res = (
+            supabase.table("articles")
+            .select("id, created_at")
+            .order("id", desc=True)
+            .limit(50)
+            .execute()
+        )
+        for art in (res.data or []):
+            pages.append({
+                "loc": f"{base_url}/article/{art['id']}",
+                "changefreq": "weekly",
+                "priority": "0.8",
+                "lastmod": (art.get("created_at") or "")[:10],
+            })
+    except Exception as e:
+        print(f"⚠️ Sitemap Supabase fetch error: {e}")
+
+    xml = ['<?xml version="1.0" encoding="UTF-8"?>']
+    xml.append('<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">')
+    for page in pages:
+        xml.append("  <url>")
+        xml.append(f"    <loc>{page['loc']}</loc>")
+        if page.get("lastmod"):
+            xml.append(f"    <lastmod>{page['lastmod']}</lastmod>")
+        xml.append(f"    <changefreq>{page['changefreq']}</changefreq>")
+        xml.append(f"    <priority>{page['priority']}</priority>")
+        xml.append("  </url>")
+    xml.append("</urlset>")
+
+    return Response("\n".join(xml), mimetype="application/xml")
 
 
 # -----------------------------
@@ -101,23 +206,18 @@ def third_page():
     if tag and tag.lower() != "all":
         query = query.ilike("tags", f"%{tag}%")
 
-    result = query.execute()
-    articles = result.data or []
-     # Search filter
     if search:
         try:
             query = query.or_(f"title.ilike.%{search}%,summary.ilike.%{search}%")
         except Exception as e:
             print(f"⚠️ Search filter error: {e}")
 
-    # Execute query
     try:
         result = query.execute()
         articles = result.data or []
     except Exception as e:
         print(f"⚠️ Error fetching articles: {e}")
         articles = []
-
 
     return render_template(
         "thirdpage.html",

@@ -1,38 +1,59 @@
-<section class="cardbox">
-  <div class="flex items-center justify-between mb-4">
-    <h2>Finance Highlights</h2>
-    <a href="/finance" class="text-blue-600 hover:text-blue-800 font-medium transition-all">
-      View all →
+<!-- Sloth News Channel: Financial Markets Desk Section -->
+<section class="mt-14 mb-10" aria-labelledby="finance-desk-heading">
+
+  <div class="news-desk-header">
+    <h2 id="finance-desk-heading" class="news-desk-title">
+      <i class="fa-solid fa-chart-pie"></i> Financial Intelligence Desk
+    </h2>
+    <a href="/finance" class="news-desk-link">
+      <span>Full Finance Portal</span>
+      <i class="fa-solid fa-arrow-right"></i>
     </a>
   </div>
 
-  {% if finance_articles %}
-  <div class="card-container">
+  {% if finance_articles and finance_articles|length > 0 %}
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
     {% for article in finance_articles %}
-      <a href="/finance"
-         class="block min-w-[300px] bg-white rounded-xl shadow-md hover:shadow-lg transition-all duration-300 overflow-hidden cursor-pointer">
-
-        <!-- Header Banner -->
-        <div class="bg-sky-200 text-sky-900 font-semibold text-lg p-3">
-          {{ article.title[:70] }}{% if article.title|length > 70 %}...{% endif %}
+    <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+      <div>
+        <div class="bg-slate-900 text-white p-3.5 flex items-center justify-between">
+          <span class="text-[11px] font-extrabold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+            <i class="fa-solid fa-chart-line"></i> {{ article.source or "Financial Wire" }}
+          </span>
+          <span class="text-[10px] text-slate-400 font-semibold">
+            Market Briefing
+          </span>
         </div>
 
-        <!-- Body -->
-        <div class="p-4">
-          <p class="text-gray-700 text-sm line-clamp-3">
-            {{ article.summary or "No summary available." }}
-          </p>
-          <p class="text-xs text-gray-500 mt-2">
-            {{ article.source or "Finance Feed" }}
+        <div class="p-5">
+          <h3 class="font-editorial text-lg font-bold text-slate-900 leading-snug mb-2.5 group-hover:text-red-600 transition-colors">
+            <a href="/finance">
+              {{ article.title }}
+            </a>
+          </h3>
+
+          <p class="text-slate-600 text-xs sm:text-sm leading-relaxed line-clamp-3">
+            {{ article.summary or "Comprehensive financial intelligence brief." }}
           </p>
         </div>
+      </div>
 
-      </a>
+      <div class="px-5 py-3 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs">
+        <span class="text-slate-400 font-medium">
+          {{ article.created_at[:10] if article.created_at else 'Live Wire' }}
+        </span>
+        <a href="/finance" class="font-bold text-slate-900 hover:text-red-600 flex items-center gap-1 transition">
+          <span>Read Analysis</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </a>
+      </div>
+    </article>
     {% endfor %}
   </div>
   {% else %}
-    <p class="text-gray-600 text-sm">
-      No finance articles available right now.
-    </p>
+  <div class="bg-white border border-slate-200 rounded-xl p-8 text-center text-slate-500 text-sm">
+    <p>Financial wire updates synchronizing with global markets. Check back shortly or run the finance news pipeline.</p>
+  </div>
   {% endif %}
+
 </section>

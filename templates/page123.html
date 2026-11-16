@@ -1,15 +1,83 @@
-<section class="flex justify-center items-center gap-6 py-12 ">
-  <a href="/dashboard" 
-     class="rounded-full bg-white text-blue-700 font-semibold shadow-md px-8 py-4 transition-all duration-300 hover:bg-blue-700 hover:text-white hover:shadow-xl transform hover:-translate-y-1">
-     Page 1
-  </a>
+<!-- Sloth News Channel: Newsroom Edition & Wire Navigation -->
+<nav aria-label="Newsroom Editions" class="my-14 py-8 border-y border-slate-200">
+  <div class="max-w-4xl mx-auto px-4">
+    <div class="text-center mb-6">
+      <span class="text-xs font-bold text-red-600 uppercase tracking-widest">
+        Edition & Wire Portals
+      </span>
+      <h3 class="font-editorial text-2xl font-bold text-slate-900 mt-1">
+        Explore The Sloth Newsroom Network
+      </h3>
+    </div>
 
-  <a href="/secondpage" 
-     class="rounded-full bg-white text-blue-700 font-semibold shadow-md px-8 py-4 transition-all duration-300 hover:bg-blue-700 hover:text-white hover:shadow-xl transform hover:-translate-y-1">
-     Page 2
-  </a>
-    <a href="/thirdpage" 
-     class="rounded-full bg-white text-blue-700 font-semibold shadow-md px-8 py-4 transition-all duration-300 hover:bg-blue-700 hover:text-white hover:shadow-xl transform hover:-translate-y-1">
-     Page 3
-  </a>
-</section>
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+      
+      <!-- Edition 1: Front Page -->
+      <a
+        href="/"
+        class="group p-5 bg-white border border-slate-200 rounded-xl hover:border-slate-900 hover:shadow-md transition-all flex flex-col justify-between"
+      >
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-red-50 text-red-600 flex items-center justify-center text-lg mb-3 group-hover:bg-red-600 group-hover:text-white transition">
+            <i class="fa-solid fa-newspaper"></i>
+          </div>
+          <div class="font-editorial font-bold text-base text-slate-900 group-hover:text-red-600 transition mb-1">
+            01 • Front Page
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Lead anchor stories, breaking dispatches & top verified coverage.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-900 group-hover:text-red-600 flex items-center gap-1">
+          <span>Enter Front Page</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </div>
+      </a>
+
+      <!-- Edition 2: Topic Desks -->
+      <a
+        href="/secondpage"
+        class="group p-5 bg-white border border-slate-200 rounded-xl hover:border-slate-900 hover:shadow-md transition-all flex flex-col justify-between"
+      >
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center text-lg mb-3 group-hover:bg-blue-600 group-hover:text-white transition">
+            <i class="fa-solid fa-layer-group"></i>
+          </div>
+          <div class="font-editorial font-bold text-base text-slate-900 group-hover:text-red-600 transition mb-1">
+            02 • Sector Desks
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Crypto, Dalal Street, Commodities, Tech AI & Real Estate desks.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-900 group-hover:text-red-600 flex items-center gap-1">
+          <span>Browse Sector Desks</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </div>
+      </a>
+
+      <!-- Edition 3: 24/7 Wire Feed -->
+      <a
+        href="/thirdpage"
+        class="group p-5 bg-white border border-slate-200 rounded-xl hover:border-slate-900 hover:shadow-md transition-all flex flex-col justify-between"
+      >
+        <div>
+          <div class="w-10 h-10 rounded-lg bg-amber-50 text-amber-600 flex items-center justify-center text-lg mb-3 group-hover:bg-amber-600 group-hover:text-white transition">
+            <i class="fa-solid fa-rss"></i>
+          </div>
+          <div class="font-editorial font-bold text-base text-slate-900 group-hover:text-red-600 transition mb-1">
+            03 • Fast Wire Archive
+          </div>
+          <p class="text-xs text-slate-500 leading-relaxed">
+            Live chronological stream of raw dispatches and archive bulletins.
+          </p>
+        </div>
+        <div class="mt-4 pt-3 border-t border-slate-100 text-xs font-bold text-slate-900 group-hover:text-red-600 flex items-center gap-1">
+          <span>Access Wire Stream</span>
+          <i class="fa-solid fa-arrow-right text-[10px]"></i>
+        </div>
+      </a>
+
+    </div>
+  </div>
+</nav>

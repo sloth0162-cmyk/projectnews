@@ -1,38 +1,206 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Financial Markets & Economic Intelligence | Sloth News Channel</title>
+
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Sloth News Financial Desk: Real-time intelligence on stock markets, indices, central bank monetary policy, corporate earnings, and cryptocurrency assets." />
+  <meta name="keywords" content="finance news, market intelligence, stock markets, Wall Street, Dalal Street, Nifty, Sensex, Nasdaq, economy, central banks" />
+  <meta name="author" content="Sloth News Financial Bureau" />
+  <meta name="robots" content="index, follow" />
+  <link rel="canonical" href="{{ request.base_url }}" />
+
+  <!-- Open Graph -->
+  <meta property="og:type" content="website" />
+  <meta property="og:site_name" content="Sloth News Channel" />
+  <meta property="og:title" content="Financial Markets & Economic Intelligence | Sloth News" />
+  <meta property="og:description" content="Live financial news, market indices, corporate earnings, and economic dispatches." />
+  <meta property="og:url" content="{{ request.base_url }}" />
+  <meta property="og:image" content="{{ url_for('static', filename='images/news-placeholder.svg', _external=True) }}" />
+
+  <!-- Tailwind CSS & Stylesheets -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style/nav.css" />
-  <title>Sloth Newz - Finance</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
-<body class="bg-gray-100">
 
-<header></header>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-<main class="max-w-6xl mx-auto mt-10 p-4">
-  <div class="flex items-center justify-between mb-6">
-    <h1 class="text-3xl font-bold text-gray-800">Finance News & Insights</h1>
-    <a href="/run_finance_pipeline" class="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700">Update Feed</a>
-  </div>
+  <!-- Master News Channel Header -->
+  <header></header>
 
-  {% if articles %}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {% for article in articles %}
-      <div class="bg-white rounded-lg shadow-md p-4">
-        <h2 class="text-xl font-semibold mb-2 text-gray-900">{{ article.title }}</h2>
-        <p class="text-gray-700 text-sm whitespace-pre-line mb-2">{{ article.summary }}</p>
-        <span class="inline-block text-xs bg-blue-100 text-blue-700 font-semibold px-2 py-1 rounded">{{ article.tag }}</span>
-        <p class="text-xs text-gray-500 mt-2">{{ article.created_at }}</p>
+  <!-- Market Strip -->
+  <div class="market-strip">
+    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
+      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
+    </div>
+    {% if market_ticker %}
+      {% for m in market_ticker %}
+      <div class="market-item">
+        <span class="market-sym">{{ m.symbol }}</span>
+        <span class="market-val">{{ m.value }}</span>
+        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
+          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
+        </span>
       </div>
       {% endfor %}
+    {% endif %}
+  </div>
+
+  <!-- Search & Trending Keywords -->
+  {% include 'searchbar.html' %}
+
+  <!-- Main Financial Hub -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
+
+    <!-- Finance Desk Masthead Banner -->
+    <div class="bg-slate-900 text-white rounded-2xl p-6 sm:p-10 mb-10 shadow-md flex flex-col md:flex-row items-start md:items-center justify-between gap-6 relative overflow-hidden">
+      <div class="relative z-10 max-w-2xl">
+        <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-red-400 mb-2">
+          <span class="w-2 h-2 rounded-full bg-red-500 animate-ping"></span>
+          <span>Bloomberg & Reuters Wire Integrated</span>
+        </div>
+        <h1 class="font-editorial text-3xl sm:text-5xl font-extrabold text-white leading-tight">
+          Financial Intelligence & Markets Desk
+        </h1>
+        <p class="text-xs sm:text-sm text-slate-300 mt-3 leading-relaxed">
+          Comprehensive real-time tracking of institutional equity movements, central bank policy announcements, macroeconomic indicators, and sovereign bond yields.
+        </p>
+      </div>
+
+      <div class="relative z-10 flex flex-wrap gap-3">
+        <a
+          href="/run_finance_pipeline"
+          class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white font-bold text-xs uppercase tracking-wider rounded-lg transition flex items-center gap-2 shadow"
+        >
+          <i class="fa-solid fa-arrows-rotate"></i>
+          <span>Update Market Wire</span>
+        </a>
+        <a
+          href="/"
+          class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs uppercase tracking-wider rounded-lg transition"
+        >
+          Front Page
+        </a>
+      </div>
+
+      <!-- Subtle background graphic -->
+      <i class="fa-solid fa-chart-line absolute -right-10 -bottom-10 text-slate-800/40 text-[200px] pointer-events-none select-none"></i>
     </div>
-  {% else %}
-    <p class="text-gray-600">No finance articles yet. Run the finance pipeline.</p>
-  {% endif %}
-</main>
-{% include 'footer.html' %}
-<script src="/static/nav.js"></script>
+
+    <!-- Live Market Snapshot Cards -->
+    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
+      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">SENSEX</div>
+        <div class="font-bold text-base text-slate-900 mt-1">81,420.5</div>
+        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +0.42%</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">NIFTY 50</div>
+        <div class="font-bold text-base text-slate-900 mt-1">24,860.2</div>
+        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +0.38%</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">NASDAQ</div>
+        <div class="font-bold text-base text-slate-900 mt-1">18,342.9</div>
+        <div class="text-xs font-bold text-red-600 mt-0.5">▼ -0.15%</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">S&P 500</div>
+        <div class="font-bold text-base text-slate-900 mt-1">5,864.6</div>
+        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +0.22%</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">BTC / USD</div>
+        <div class="font-bold text-base text-slate-900 mt-1">$91,420</div>
+        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +2.14%</div>
+      </div>
+      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">BRENT CRUDE</div>
+        <div class="font-bold text-base text-slate-900 mt-1">$74.20</div>
+        <div class="text-xs font-bold text-red-600 mt-0.5">▼ -0.81%</div>
+      </div>
+    </div>
+
+    <!-- Financial Reports Grid -->
+    <div class="news-desk-header">
+      <h2 class="news-desk-title">
+        <i class="fa-solid fa-newspaper text-red-600"></i> Financial Dispatches & Intelligence
+      </h2>
+      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+        {{ articles|length if articles else 0 }} Reports Filed
+      </span>
+    </div>
+
+    {% if articles and articles|length > 0 %}
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      {% for article in articles %}
+      <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+        <div>
+          <div class="bg-slate-900 text-white px-4 py-3 flex items-center justify-between">
+            <span class="text-[11px] font-extrabold uppercase tracking-wider text-red-400 flex items-center gap-1.5">
+              <i class="fa-solid fa-chart-line"></i> {{ article.source or "Finance Wire" }}
+            </span>
+            <span class="text-[10px] text-slate-400 font-semibold">
+              Verified Analysis
+            </span>
+          </div>
+
+          <div class="p-5">
+            <h3 class="font-editorial text-xl font-bold text-slate-900 leading-snug mb-3 group-hover:text-red-600 transition-colors">
+              {{ article.title }}
+            </h3>
+
+            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed whitespace-pre-line mb-4">
+              {{ article.summary }}
+            </p>
+          </div>
+        </div>
+
+        <div class="px-5 py-3.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+          <span class="text-slate-400 text-[11px]">
+            {{ article.created_at[:10] if article.created_at else 'Live Wire' }}
+          </span>
+          <span class="text-slate-700 text-xs font-bold uppercase tracking-wider">
+            SNN Markets
+          </span>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-12 text-center max-w-lg mx-auto my-8">
+      <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
+        <i class="fa-solid fa-chart-line"></i>
+      </div>
+      <h3 class="font-editorial text-xl font-bold text-slate-900 mb-2">No Finance Dispatches Yet</h3>
+      <p class="text-slate-500 text-xs sm:text-sm mb-6">
+        The financial news scraper and analysis pipeline has not been executed yet. Click below to fetch and summarize latest financial news feeds.
+      </p>
+      <a
+        href="/run_finance_pipeline"
+        class="px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition inline-flex items-center gap-2"
+      >
+        <i class="fa-solid fa-bolt"></i>
+        <span>Trigger Finance Pipeline</span>
+      </a>
+    </div>
+    {% endif %}
+
+  </main>
+
+  <!-- Global Footer -->
+  {% include 'footer.html' %}
+
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
 </body>
+
 </html>

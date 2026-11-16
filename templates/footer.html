@@ -1,67 +1,154 @@
-<style>
-    footer{
-         background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
-    }
-</style>
-<footer class="backdrop-blur-md border-bg-blue-500/30 shadow-md mt-1">
-  <div class="max-w-7xl mx-auto px-6 py-10 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 text-slate-700">
-    
-    <!-- Brand Section -->
-    <div>
-      <h2 class="text-2xl font-extrabold bg-gradient-to-r from-amber-700 to-yellow-500 bg-clip-text text-transparent">
-        Sloth Newz
-      </h2>
-      <p class="mt-3 text-sm text-slate-500">
-        Stay updated with the latest in finance, crypto, and business insights — designed for modern professionals.
-      </p>
-    </div>
+<!-- Sloth News Network: Global Institutional Footer -->
+<footer class="bg-slate-950 text-slate-400 border-t border-slate-800 mt-16 pt-14 pb-8">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6">
 
-    <!-- Quick Links -->
-    <div>
-      <h3 class="text-lg font-semibold text-slate-800 mb-3">Quick Links</h3>
-      <ul class="space-y-2 text-sm">
-        <li><a href="/" class="hover:text-indigo-600 transition">Home</a></li>
-        <li><a href="/finance" class="hover:text-indigo-600 transition">Finance</a></li>
-        <li><a href="/crypto" class="hover:text-indigo-600 transition">Crypto</a></li>
-        <li><a href="/business" class="hover:text-indigo-600 transition">Business</a></li>
-        <li><a href="/editorial" class="hover:text-indigo-600 transition">Editorial</a></li>
-        <li><a href="/about" class="hover:text-indigo-600 transition">About</a></li>
-      </ul>
-    </div>
-
-    <!-- Resources -->
-    <div>
-      <h3 class="text-lg font-semibold text-slate-800 mb-3">Resources</h3>
-      <ul class="space-y-2 text-sm">
-        <li><a href="#" class="hover:text-indigo-600 transition">Help Center</a></li>
-        <li><a href="#" class="hover:text-indigo-600 transition">Privacy Policy</a></li>
-        <li><a href="#" class="hover:text-indigo-600 transition">Terms & Conditions</a></li>
-        <li><a href="#" class="hover:text-indigo-600 transition">Advertise</a></li>
-      </ul>
-    </div>
-
-    <!-- Social / Contact -->
-    <div>
-      <h3 class="text-lg font-semibold text-slate-800 mb-3">Connect</h3>
-      <div class="flex space-x-4">
-        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-twitter"></i></a>
-        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-linkedin"></i></a>
-        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-github"></i></a>
-        <a href="#" class="text-slate-500 hover:text-indigo-600 transition text-xl"><i class="fab fa-youtube"></i></a>
+    <!-- Top Newsroom Newsletter Bar -->
+    <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 sm:p-8 mb-12 flex flex-col lg:flex-row items-center justify-between gap-6">
+      <div class="max-w-xl">
+        <div class="text-xs font-bold uppercase tracking-widest text-red-500 mb-1">
+          Daily Intelligence Briefing
+        </div>
+        <h3 class="font-editorial text-2xl font-bold text-white mb-2">
+          Stay Ahead with Fact-Checked Global Insights
+        </h3>
+        <p class="text-xs sm:text-sm text-slate-400 leading-relaxed">
+          Get our essential 5-minute morning briefing delivering market movements, geopolitical developments, and technology updates directly to your inbox.
+        </p>
       </div>
-      <p class="mt-4 text-sm text-slate-500">
-        Email: <a href="mailto:contact@finpulse.com" class="hover:text-indigo-600">contact@finpulse.com</a>
-      </p>
+
+      <form
+        onsubmit="event.preventDefault(); showNewsToast('Subscribed! Welcome to Sloth News Intelligence Briefing.'); this.reset();"
+        class="flex flex-col sm:flex-row items-center gap-2.5 w-full lg:w-auto"
+      >
+        <div class="relative w-full sm:w-72">
+          <input
+            type="email"
+            required
+            placeholder="Enter your email address..."
+            class="w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
+          />
+        </div>
+        <button
+          type="submit"
+          class="w-full sm:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shrink-0"
+        >
+          Subscribe Free
+        </button>
+      </form>
     </div>
 
-  </div>
+    <!-- Main Footer Directory Links -->
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-8 pb-12 border-b border-slate-800 text-xs">
 
-  <!-- Bottom Strip -->
-  <div class="border-t border-white/30 mt-8 py-4 text-center text-sm text-slate-500">
-    © <span id="year"></span> <span class="font-semibold text-slate-700">FinPulse Daily</span>. All rights reserved.
+      <!-- Col 1: Brand & Bureau -->
+      <div class="col-span-2 md:col-span-1">
+        <a href="/" class="inline-block text-white font-serif font-extrabold text-xl tracking-tight mb-3">
+          SLOTH <span class="text-red-500">NEWS</span>
+        </a>
+        <p class="text-slate-400 text-xs leading-relaxed mb-4">
+          Independent 24/7 global intelligence and news media network delivering fact-checked reporting on markets, geopolitics, and innovation.
+        </p>
+        <div class="flex items-center gap-3 text-slate-400">
+          <a href="#" class="w-8 h-8 rounded-full bg-slate-900 hover:bg-red-600 hover:text-white flex items-center justify-center transition" title="X / Twitter">
+            <i class="fa-brands fa-x-twitter"></i>
+          </a>
+          <a href="#" class="w-8 h-8 rounded-full bg-slate-900 hover:bg-blue-600 hover:text-white flex items-center justify-center transition" title="LinkedIn">
+            <i class="fa-brands fa-linkedin-in"></i>
+          </a>
+          <a href="#" class="w-8 h-8 rounded-full bg-slate-900 hover:bg-red-700 hover:text-white flex items-center justify-center transition" title="YouTube">
+            <i class="fa-brands fa-youtube"></i>
+          </a>
+          <a href="#" class="w-8 h-8 rounded-full bg-slate-900 hover:bg-amber-600 hover:text-white flex items-center justify-center transition" title="RSS Feed">
+            <i class="fa-solid fa-rss"></i>
+          </a>
+        </div>
+      </div>
+
+      <!-- Col 2: News Desks -->
+      <div>
+        <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-4 border-l-2 border-red-500 pl-2">
+          News Desks
+        </h4>
+        <ul class="space-y-2.5">
+          <li><a href="/" class="hover:text-white transition">Front Page</a></li>
+          <li><a href="/?tag=India" class="hover:text-white transition">India National</a></li>
+          <li><a href="/?tag=Global" class="hover:text-white transition">World & Geopolitics</a></li>
+          <li><a href="/finance" class="hover:text-white transition">Markets & Finance</a></li>
+          <li><a href="/secondpage#crypto" class="hover:text-white transition">Crypto & Web3</a></li>
+          <li><a href="/secondpage#tech" class="hover:text-white transition">Technology & AI</a></li>
+          <li><a href="/secondpage#commodities" class="hover:text-white transition">Energy & Gold</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 3: Opinion & Analysis -->
+      <div>
+        <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-4 border-l-2 border-red-500 pl-2">
+          Opinion & Features
+        </h4>
+        <ul class="space-y-2.5">
+          <li><a href="/editorial" class="hover:text-white transition">Daily Editorial</a></li>
+          <li><a href="/editorial#columns" class="hover:text-white transition">Guest Columnists</a></li>
+          <li><a href="/secondpage#realestate" class="hover:text-white transition">Real Estate Focus</a></li>
+          <li><a href="/thirdpage" class="hover:text-white transition">24/7 Fast Wire</a></li>
+          <li><a href="/secondpage#business" class="hover:text-white transition">Corporate Strategy</a></li>
+          <li><a href="/about" class="hover:text-white transition">Newsroom Standards</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 4: Network Services -->
+      <div>
+        <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-4 border-l-2 border-red-500 pl-2">
+          Reader Services
+        </h4>
+        <ul class="space-y-2.5">
+          <li><a href="/profile" class="hover:text-white transition">Reader Account</a></li>
+          <li><a href="/profile#bookmarks" class="hover:text-white transition">Saved Dispatches</a></li>
+          <li><a href="/sitemap.xml" class="hover:text-white transition">XML Sitemap</a></li>
+          <li><a href="/robots.txt" class="hover:text-white transition">Crawler Standards</a></li>
+          <li><a href="/run_pipeline" class="hover:text-white transition">News Pipeline Console</a></li>
+          <li><a href="/about" class="hover:text-white transition">Press Contacts</a></li>
+        </ul>
+      </div>
+
+      <!-- Col 5: Editorial Standards -->
+      <div>
+        <h4 class="font-bold text-white text-xs uppercase tracking-wider mb-4 border-l-2 border-red-500 pl-2">
+          Trust & Ethics
+        </h4>
+        <ul class="space-y-2.5">
+          <li><a href="/about" class="hover:text-white transition">Code of Ethics</a></li>
+          <li><a href="/about" class="hover:text-white transition">Fact-Checking Policy</a></li>
+          <li><a href="/about" class="hover:text-white transition">Corrections Log</a></li>
+          <li><a href="/about" class="hover:text-white transition">Editorial Independence</a></li>
+          <li><a href="/about" class="hover:text-white transition">Privacy Policy</a></li>
+          <li><a href="/about" class="hover:text-white transition">Terms of Service</a></li>
+        </ul>
+      </div>
+
+    </div>
+
+    <!-- Bottom Strip -->
+    <div class="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-slate-500">
+      <div>
+        © <span id="footerYear">{{ current_year if current_year else 2026 }}</span>
+        <strong class="text-slate-300">Sloth News Network (SNN)</strong>. All rights reserved.
+      </div>
+      <div class="flex items-center gap-4">
+        <a href="/about" class="hover:text-slate-300 transition">Privacy</a>
+        <span>•</span>
+        <a href="/about" class="hover:text-slate-300 transition">Terms</a>
+        <span>•</span>
+        <a href="/about" class="hover:text-slate-300 transition">Editorial Guidelines</a>
+        <span>•</span>
+        <a href="/sitemap.xml" class="hover:text-slate-300 transition">Sitemap</a>
+      </div>
+    </div>
+
   </div>
 </footer>
 
 <script>
-  document.getElementById("year").textContent = new Date().getFullYear();
+  // Ensure correct footer year
+  const fy = document.getElementById("footerYear");
+  if (fy) fy.textContent = new Date().getFullYear();
 </script>

@@ -4,663 +4,278 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="/static/style/nav.css" />
-  <link rel="stylesheet" href="/static/style/style.css" />
-  <title>Your Profile | Sloth Newz</title>
+  <title>Subscriber Account & Reading Preferences | Sloth News Channel</title>
 
+  <!-- SEO Meta Tags -->
+  <meta name="description" content="Manage your Sloth News Channel reader profile, saved wire dispatches, and newsletter subscription preferences." />
+  <meta name="robots" content="noindex, nofollow" />
+
+  <!-- Tailwind CSS & Stylesheets -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,600;12..96,800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet" />
-
-  <style>
-    :root {
-      --canopy: #0e2f26;
-      --leaf: #12b76a;
-      --papaya: #ff6b35;
-      --guava: #ff3d81;
-      --sun: #ffc93c;
-      --mist: #f3faf1;
-
-      /* card accent cycle (same as dashboard) */
-      --c0: var(--papaya);
-      --c1: var(--guava);
-      --c2: var(--leaf);
-      --c3: var(--sun);
-    }
-
-    body {
-      font-family: "DM Sans", system-ui, sans-serif;
-      background:
-        radial-gradient(900px 400px at 8% -5%, rgba(255, 201, 60, .35), transparent 60%),
-        radial-gradient(700px 380px at 95% 0%, rgba(255, 61, 129, .18), transparent 60%),
-        radial-gradient(800px 500px at 50% 110%, rgba(18, 183, 106, .20), transparent 60%),
-        var(--mist);
-      color: var(--canopy);
-    }
-
-    [hidden] { display: none !important; }
-
-    .font-display {
-      font-family: "Bricolage Grotesque", "DM Sans", sans-serif;
-      letter-spacing: -0.02em;
-    }
-
-    /* ---------- Page title ---------- */
-    .page-title {
-      font-size: clamp(2.25rem, 5vw, 3.5rem);
-      font-weight: 800;
-      line-height: 1;
-      color: var(--canopy);
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-    }
-
-    .sloth-hang {
-      display: inline-block;
-      transform-origin: 50% 0;
-      animation: hang 4.5s ease-in-out infinite;
-    }
-
-    @keyframes hang {
-      0%, 100% { transform: rotate(-7deg); }
-      50%      { transform: rotate(7deg); }
-    }
-
-    /* ---------- Section heading ---------- */
-    .section-title {
-      font-size: 1.75rem;
-      font-weight: 800;
-      display: inline-block;
-      position: relative;
-      padding-bottom: .35rem;
-    }
-
-    .section-title::after {
-      content: "";
-      position: absolute;
-      left: 0;
-      bottom: 0;
-      width: 100%;
-      height: 10px;
-      border-radius: 999px;
-      background: linear-gradient(90deg, var(--papaya), var(--guava), var(--sun), var(--leaf));
-      opacity: .9;
-      z-index: -1;
-    }
-
-    /* count pill – same look as the dashboard filter pill */
-    .count-pill {
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      padding: .35rem 1rem;
-      font-weight: 600;
-      font-size: .85rem;
-      box-shadow: 3px 3px 0 var(--canopy);
-    }
-
-    /* ---------- Notice ---------- */
-    .notice {
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1rem;
-      padding: .8rem 1.1rem;
-      font-weight: 500;
-      font-size: .92rem;
-      box-shadow: 4px 4px 0 var(--leaf);
-    }
-
-    /* ---------- Profile card ---------- */
-    .profile-card {
-      position: relative;
-      display: flex;
-      align-items: center;
-      gap: 1.5rem;
-      padding: clamp(1.4rem, 4vw, 2.25rem);
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.5rem;
-      box-shadow: 6px 6px 0 var(--papaya);
-    }
-
-    .avatar-wrap {
-      flex: 0 0 auto;
-      width: 112px;
-      height: 112px;
-      padding: 5px;
-      border-radius: 50%;
-      border: 2px solid var(--canopy);
-      background: linear-gradient(135deg, var(--sun), var(--papaya), var(--guava));
-    }
-
-    .profile-avatar {
-      display: block;
-      width: 100%;
-      height: 100%;
-      border-radius: 50%;
-      object-fit: cover;
-      background: var(--mist);
-    }
-
-    .profile-copy { min-width: 0; padding-right: 3rem; }
-    .profile-label { margin: 0 0 .3rem; font-size: .9rem; font-weight: 600; color: var(--papaya); }
-    .profile-name {
-      margin: 0;
-      overflow-wrap: anywhere;
-      font-size: clamp(1.6rem, 4vw, 2.35rem);
-      line-height: 1.1;
-      font-weight: 800;
-    }
-    .profile-caption { margin: .5rem 0 0; font-size: .9rem; color: #62736b; }
-
-    /* ---------- Options menu ---------- */
-    .profile-actions { position: absolute; top: 1.1rem; right: 1.1rem; }
-
-    .dots-button {
-      display: grid;
-      place-items: center;
-      width: 42px;
-      height: 42px;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      background: #fff;
-      color: var(--canopy);
-      cursor: pointer;
-      box-shadow: 3px 3px 0 var(--canopy);
-      transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
-    }
-    .dots-button:hover,
-    .dots-button[aria-expanded="true"] {
-      background: var(--sun);
-      transform: translate(-2px, -2px);
-      box-shadow: 5px 5px 0 var(--canopy);
-    }
-
-    .profile-menu {
-      position: absolute;
-      z-index: 20;
-      top: 52px;
-      right: 0;
-      width: 190px;
-      padding: .4rem;
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.1rem;
-      box-shadow: 5px 5px 0 var(--guava);
-    }
-
-    .profile-menu button {
-      display: flex;
-      align-items: center;
-      gap: .6rem;
-      width: 100%;
-      padding: .6rem .8rem;
-      border: 0;
-      border-radius: .7rem;
-      background: transparent;
-      color: var(--canopy);
-      font: inherit;
-      font-size: .92rem;
-      font-weight: 600;
-      text-align: left;
-      cursor: pointer;
-    }
-    .profile-menu button:hover { background: var(--papaya); color: #fff; }
-
-    /* ---------- Saved cards (same system as dashboard news-card) ---------- */
-    .saved-grid {
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 1.75rem;
-      padding-bottom: .5rem;
-    }
-
-    .saved-card {
-      --accent: var(--c0);
-      min-width: 0;
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.5rem;
-      overflow: hidden;
-      box-shadow: 6px 6px 0 var(--accent);
-      transition: transform .2s ease, box-shadow .2s ease;
-    }
-
-    .saved-card:hover,
-    .saved-card:focus-within {
-      transform: translate(-3px, -3px);
-      box-shadow: 9px 9px 0 var(--accent);
-    }
-
-    .saved-card a { display: block; height: 100%; color: inherit; text-decoration: none; }
-    .saved-card a:focus-visible { outline: 3px solid var(--accent); outline-offset: -3px; }
-
-    .saved-card .thumb {
-      position: relative;
-      overflow: hidden;
-      height: 10rem;
-      background: #f3f4f6;
-      border-bottom: 2px solid var(--canopy);
-    }
-
-    .saved-card .thumb::after {
-      content: "";
-      position: absolute;
-      inset: 0;
-      background: linear-gradient(180deg, transparent 55%, color-mix(in srgb, var(--accent) 45%, transparent));
-      pointer-events: none;
-      z-index: 20;
-    }
-
-    .saved-card img { transition: transform .5s ease; }
-    .saved-card:hover img { transform: scale(1.06); }
-
-    .saved-card h3 { font-family: "Bricolage Grotesque", sans-serif; letter-spacing: -0.01em; }
-    .saved-card:hover h3 { color: var(--accent); }
-
-    .saved-card .read-more {
-      display: inline-flex;
-      align-items: center;
-      gap: .4rem;
-      margin-top: .6rem;
-      font-size: .8rem;
-      font-weight: 600;
-    }
-
-    .saved-card .read-more i {
-      display: grid;
-      place-items: center;
-      width: 1.5rem;
-      height: 1.5rem;
-      border-radius: 999px;
-      background: var(--accent);
-      color: #fff;
-      font-size: .65rem;
-      transition: transform .2s ease;
-    }
-    .saved-card:hover .read-more i { transform: translateX(4px); }
-
-    /* ---------- Empty state ---------- */
-    .empty-state {
-      display: flex;
-      align-items: center;
-      gap: 1.1rem;
-      background: #fff;
-      border: 2px dashed var(--canopy);
-      border-radius: 1.5rem;
-      padding: 1.75rem;
-      font-weight: 500;
-    }
-    .empty-icon {
-      flex: 0 0 auto;
-      display: grid;
-      place-items: center;
-      width: 3.5rem;
-      height: 3.5rem;
-      border-radius: 1.1rem;
-      background: var(--papaya);
-      color: #fff;
-      font-size: 1.35rem;
-    }
-    .empty-state h3 { margin: 0 0 .25rem; font-size: 1.1rem; font-weight: 800; }
-    .empty-state p { margin: 0; color: #62736b; line-height: 1.55; font-size: .93rem; }
-
-    /* ---------- Editorial card ---------- */
-    .editorial-card {
-      display: flex;
-      align-items: center;
-      gap: 1.25rem;
-      padding: clamp(1.4rem, 4vw, 2rem);
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.5rem;
-      box-shadow: 6px 6px 0 var(--guava);
-    }
-    .editorial-icon {
-      flex: 0 0 auto;
-      display: grid;
-      place-items: center;
-      width: 4rem;
-      height: 4rem;
-      border-radius: 999px;
-      background: var(--guava);
-      border: 2px solid var(--canopy);
-      color: #fff;
-      font-size: 1.5rem;
-    }
-    .editorial-copy p { margin: 0; font-weight: 500; }
-
-    /* ---------- Modal ---------- */
-    .modal-backdrop {
-      position: fixed;
-      z-index: 1000;
-      inset: 0;
-      display: none;
-      align-items: center;
-      justify-content: center;
-      padding: 1.25rem;
-      background: rgba(14, 47, 38, .6);
-    }
-    .modal-backdrop.is-open { display: flex; }
-
-    .edit-modal {
-      width: min(100%, 440px);
-      padding: 1.75rem;
-      background: #fff;
-      border: 2px solid var(--canopy);
-      border-radius: 1.5rem;
-      box-shadow: 8px 8px 0 var(--sun);
-    }
-
-    .modal-header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; margin-bottom: 1.4rem; }
-    .modal-header h2 { margin: 0 0 .3rem; font-size: 1.55rem; font-weight: 800; }
-    .modal-header p { margin: 0; color: #62736b; font-size: .9rem; }
-
-    .modal-close {
-      flex: 0 0 auto;
-      display: grid;
-      place-items: center;
-      width: 36px;
-      height: 36px;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      background: #fff;
-      color: var(--canopy);
-      cursor: pointer;
-      transition: background-color .2s ease;
-    }
-    .modal-close:hover { background: var(--sun); }
-
-    .form-field { display: block; margin-bottom: 1rem; }
-    .form-field span { display: block; margin-bottom: .4rem; font-size: .9rem; font-weight: 600; }
-    .form-field input {
-      width: 100%;
-      min-height: 46px;
-      padding: .65rem .9rem;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      outline: none;
-      background: #fff;
-      color: var(--canopy);
-      font: inherit;
-    }
-    .form-field input:focus { border-color: var(--leaf); box-shadow: 0 0 0 3px rgba(18, 183, 106, .25); }
-
-    .modal-actions { display: flex; justify-content: flex-end; gap: .7rem; margin-top: 1.5rem; }
-
-    .btn {
-      min-height: 44px;
-      padding: .55rem 1.3rem;
-      border: 2px solid var(--canopy);
-      border-radius: 999px;
-      font: inherit;
-      font-weight: 600;
-      cursor: pointer;
-      box-shadow: 3px 3px 0 var(--canopy);
-      transition: transform .2s ease, box-shadow .2s ease, background-color .2s ease;
-    }
-    .btn:hover { transform: translate(-2px, -2px); box-shadow: 5px 5px 0 var(--canopy); }
-    .btn-secondary { background: #fff; color: var(--canopy); }
-    .btn-primary { background: var(--papaya); color: #fff; }
-    .btn-primary:hover { background-color: var(--guava); }
-
-    .dots-button:focus-visible,
-    .modal-close:focus-visible,
-    .btn:focus-visible,
-    .profile-menu button:focus-visible {
-      outline: 3px solid var(--leaf);
-      outline-offset: 2px;
-    }
-
-    /* ---------- Responsive ---------- */
-    @media (max-width: 900px) {
-      .saved-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-
-    @media (max-width: 720px) {
-      .profile-card { align-items: flex-start; gap: 1rem; }
-      .avatar-wrap { width: 84px; height: 84px; }
-      .profile-copy { padding-top: .3rem; padding-right: 2rem; }
-      .profile-actions { top: .7rem; right: .7rem; }
-      .dots-button { width: 38px; height: 38px; }
-      .saved-grid { grid-template-columns: 1fr; }
-    }
-
-    @media (max-width: 420px) {
-      .avatar-wrap { width: 68px; height: 68px; }
-      .profile-name { font-size: 1.4rem; }
-      .empty-state { align-items: flex-start; padding: 1.25rem; }
-      .empty-icon { width: 2.8rem; height: 2.8rem; }
-      .editorial-icon { width: 3.2rem; height: 3.2rem; font-size: 1.2rem; }
-      .modal-actions { flex-direction: column-reverse; }
-      .modal-actions .btn { width: 100%; }
-    }
-
-    @media (prefers-reduced-motion: reduce) {
-      .sloth-hang { animation: none; }
-      .saved-card, .saved-card img, .saved-card .read-more i,
-      .dots-button, .btn, .modal-close { transition: none; }
-    }
-  </style>
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
 
-<body>
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+
+  <!-- Master News Channel Header -->
   <header></header>
 
-  <main class="max-w-6xl mx-auto mt-10 p-4">
-    <div class="flex flex-wrap items-center justify-between gap-4 mb-8">
-      <h1 class="page-title font-display">
-        <span class="sloth-hang" aria-hidden="true">🦥</span>
-        Your Profile
-      </h1>
+  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 w-full flex-1">
+
+    <!-- Profile Masthead Header -->
+    <div class="border-b border-slate-200 pb-4 mb-8 flex items-center justify-between">
+      <div>
+        <div class="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">
+          Subscriber Center
+        </div>
+        <h1 class="font-editorial text-3xl sm:text-4xl font-extrabold text-slate-900">
+          Reader Account & Settings
+        </h1>
+      </div>
+      <a href="/" class="text-xs font-bold text-slate-700 hover:text-red-600 transition flex items-center gap-1.5">
+        <i class="fa-solid fa-arrow-left"></i>
+        <span>Front Page</span>
+      </a>
     </div>
 
     {% if notice %}
-      <div class="notice mb-6" role="status">{{ notice }}</div>
+      <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2" role="status">
+        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+        <span>{{ notice }}</span>
+      </div>
     {% endif %}
 
-    <!-- Profile card -->
-    <section class="profile-card" aria-label="Profile information">
-      <div class="avatar-wrap">
-        <img
-          id="profile-avatar"
-          class="profile-avatar"
-          src="{{ avatar_url }}"
-          alt="{{ display_name }}'s profile picture"
-          referrerpolicy="no-referrer"
-        />
-      </div>
+    <!-- Profile Information Card -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm mb-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 relative" aria-label="Profile information">
+      
+      <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
+        <div class="relative">
+          <img
+            id="profile-avatar"
+            src="{{ avatar_url }}"
+            alt="{{ display_name }}"
+            class="w-24 h-24 rounded-full object-cover border-4 border-slate-100 shadow-sm"
+            referrerpolicy="no-referrer"
+          />
+          <span class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full" title="Active Session"></span>
+        </div>
 
-      <div class="profile-copy">
-        <p class="profile-label">Hello, Sloth!</p>
-        <h2 class="profile-name font-display">{{ display_name }}</h2>
-        <p class="profile-caption">Your reader profile</p>
-      </div>
-
-      <div class="profile-actions">
-        <button
-          type="button"
-          id="profile-menu-button"
-          class="dots-button"
-          aria-label="Profile options"
-          aria-haspopup="true"
-          aria-expanded="false"
-        >
-          <i class="fa-solid fa-ellipsis-vertical" aria-hidden="true"></i>
-        </button>
-        <div id="profile-menu" class="profile-menu" role="menu" hidden>
-          <button type="button" id="edit-name-open" role="menuitem">
-            <i class="fa-solid fa-pen" aria-hidden="true"></i>
-            Edit name
-          </button>
+        <div>
+          <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
+            <h2 class="font-editorial text-2xl font-bold text-slate-900">
+              {{ display_name }}
+            </h2>
+            <span class="px-2 py-0.5 bg-red-100 text-red-700 font-extrabold text-[10px] tracking-wider uppercase rounded">
+              Subscriber
+            </span>
+          </div>
+          <p class="text-xs text-slate-500 mb-2">
+            Reader ID: #{{ session.get('user', {}).get('id', 'Guest')[:8] if session.get('user') else 'Guest' }}
+          </p>
+          <div class="text-xs text-slate-600 flex items-center justify-center sm:justify-start gap-2">
+            <span><i class="fa-solid fa-envelope text-slate-400 mr-1"></i>{{ session.get('user', {}).get('email', 'Connected via Google') }}</span>
+          </div>
         </div>
       </div>
-    </section>
 
-    <!-- Saved News -->
-    <section class="mt-14" aria-labelledby="saved-news-heading">
-      <div class="flex flex-wrap items-center justify-between gap-3 mb-6">
-        <h2 id="saved-news-heading" class="section-title font-display">Saved News</h2>
-        {% if saved_articles %}<span class="count-pill">{{ saved_articles|length }} saved</span>{% endif %}
+      <div class="relative">
+        <button
+          type="button"
+          id="edit-name-open"
+          class="px-4 py-2 border border-slate-300 hover:border-slate-900 bg-white hover:bg-slate-900 hover:text-white rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center gap-2"
+        >
+          <i class="fa-solid fa-pen"></i>
+          <span>Edit Name</span>
+        </button>
       </div>
 
-      {% if saved_articles %}
-        <div class="saved-grid">
-          {% for article in saved_articles %}
-          <div class="saved-card" style="--accent: var(--c{{ loop.index0 % 4 }});">
-            <a href="{{ url_for('article.article', article_id=article.id) }}">
-              <div class="thumb">
-                {% set img = article.image_url or 'https://cdn-icons-png.flaticon.com/512/2965/2965879.png' %}
-                <!-- Blurred background fills the box -->
-                <img
-                  src="{{ img }}"
-                  alt=""
-                  aria-hidden="true"
-                  loading="lazy"
-                  class="absolute inset-0 w-full h-full object-cover blur-xl scale-110 opacity-50"
-                >
-                <!-- Original image: fully visible and centered -->
-                <img
-                  src="{{ img }}"
-                  alt=""
-                  loading="lazy"
-                  class="relative z-10 w-full h-full object-contain object-center"
-                >
-              </div>
+    </section>
 
-              <div class="p-4">
-                <h3 class="text-lg font-bold mb-2 line-clamp-2 leading-7">{{ article.title }}</h3>
-                {% if article.summary %}
-                  <p class="text-gray-700 text-sm line-clamp-3 leading-5">{{ article.summary }}</p>
-                {% endif %}
-                <span class="read-more">Read story <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></span>
-              </div>
+    <!-- Saved News & Bookmarks -->
+    <section class="mb-12" id="bookmarks" aria-labelledby="saved-news-heading">
+      <div class="news-desk-header">
+        <h2 id="saved-news-heading" class="news-desk-title">
+          <i class="fa-regular fa-bookmark"></i> Saved Wire Dispatches
+        </h2>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          {{ saved_articles|length if saved_articles else 0 }} Saved
+        </span>
+      </div>
+
+      {% if saved_articles and saved_articles|length > 0 %}
+        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+          {% for article in saved_articles %}
+          <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
+            <a href="{{ url_for('article.article', article_id=article.id) }}" class="h-40 bg-slate-900 block overflow-hidden">
+              <img
+                src="{{ article.image_url }}"
+                alt="{{ article.title }}"
+                onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              />
             </a>
-          </div>
+            <div class="p-4">
+              <h3 class="font-editorial text-base font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 mb-2">
+                <a href="{{ url_for('article.article', article_id=article.id) }}">
+                  {{ article.title }}
+                </a>
+              </h3>
+              <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
+                {{ article.summary }}
+              </p>
+            </div>
+            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
+              <a href="{{ url_for('article.article', article_id=article.id) }}" class="text-red-600 hover:underline">
+                Read Story →
+              </a>
+            </div>
+          </article>
           {% endfor %}
         </div>
       {% else %}
-        <div class="empty-state">
-          <div class="empty-icon"><i class="fa-regular fa-bookmark" aria-hidden="true"></i></div>
-          <div>
-            <h3 class="font-display">Your saved stories will live here</h3>
-            <p>Save an article while reading and it’ll be easy to find again here. Your saved-news list will appear once it’s connected.</p>
+        <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-8 sm:p-12 text-center max-w-lg mx-auto">
+          <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+            <i class="fa-regular fa-bookmark"></i>
           </div>
+          <h3 class="font-editorial text-lg font-bold text-slate-900 mb-1">
+            Your Reading List is Empty
+          </h3>
+          <p class="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
+            While exploring articles across the front page and sector desks, use the share or bookmark options to store dispatches here for offline reading.
+          </p>
+          <a
+            href="/"
+            class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition inline-block"
+          >
+            Explore Front Page
+          </a>
         </div>
       {% endif %}
     </section>
 
-    <!-- Editorial Application -->
-    <section class="mt-14" aria-labelledby="editorial-heading">
-      <div class="mb-6">
-        <h2 id="editorial-heading" class="section-title font-display">Editorial Application</h2>
+    <!-- Newsroom Operations & Editorial Console -->
+    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm mb-8" id="settings">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+        <div>
+          <h3 class="font-editorial text-xl font-bold text-slate-900">
+            Newsroom Console Access
+          </h3>
+          <p class="text-xs text-slate-500">
+            Internal editorial tools for running automated scraper pipelines and ingestion feeds.
+          </p>
+        </div>
+        <a
+          href="/run_pipeline"
+          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shrink-0"
+        >
+          Open Console
+        </a>
       </div>
 
-      <div class="editorial-card">
-        <div class="editorial-icon"><i class="fa-solid fa-feather-pointed" aria-hidden="true"></i></div>
-        <div class="editorial-copy">
-          <p>We're working on this page.</p>
+      <div class="flex items-center justify-between pt-2 text-xs text-slate-600">
+        <div>
+          <strong>Sloth News Intelligence Engine</strong> • Pipeline Status: <span class="text-emerald-600 font-bold">Online</span>
         </div>
+        <a href="/auth/login" class="text-red-600 font-bold hover:underline">
+          Re-authenticate
+        </a>
       </div>
     </section>
+
   </main>
 
-  {% include 'footer.html' %}
-
-  <!-- Edit name modal -->
-  <div id="edit-name-backdrop" class="modal-backdrop" aria-hidden="true">
-    <section class="edit-modal" role="dialog" aria-modal="true" aria-labelledby="edit-name-title">
-      <div class="modal-header">
-        <div>
-          <h2 id="edit-name-title" class="font-display">Edit your name</h2>
-          <p>Update how your name appears on Sloth Newz.</p>
-        </div>
-        <button type="button" id="edit-name-close" class="modal-close" aria-label="Close edit name dialog">
-          <i class="fa-solid fa-xmark" aria-hidden="true"></i>
+  <!-- Edit Name Modal -->
+  <div id="edit-name-backdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl animate-fade-in relative">
+      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
+        <h3 class="font-editorial text-xl font-bold text-slate-900">
+          Edit Display Name
+        </h3>
+        <button type="button" id="edit-name-close" class="text-slate-400 hover:text-slate-900 transition">
+          <i class="fa-solid fa-xmark text-lg"></i>
         </button>
       </div>
 
       <form method="post" action="{{ url_for('profile_page') }}">
         <input type="hidden" name="action" value="update_name" />
-        <label class="form-field">
-          <span>First name</span>
-          <input type="text" name="first_name" value="{{ first_name }}" maxlength="60" autocomplete="given-name" required />
-        </label>
-        <label class="form-field">
-          <span>Surname</span>
-          <input type="text" name="last_name" value="{{ last_name }}" maxlength="60" autocomplete="family-name" />
-        </label>
-        <div class="modal-actions">
-          <button type="button" id="edit-name-cancel" class="btn btn-secondary">Cancel</button>
-          <button type="submit" class="btn btn-primary">Save changes</button>
+        <div class="space-y-4 mb-6">
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">First Name</label>
+            <input
+              type="text"
+              name="first_name"
+              value="{{ first_name }}"
+              maxlength="60"
+              required
+              class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-red-600"
+            />
+          </div>
+          <div>
+            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Last Name / Surname</label>
+            <input
+              type="text"
+              name="last_name"
+              value="{{ last_name }}"
+              maxlength="60"
+              class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-red-600"
+            />
+          </div>
+        </div>
+
+        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+          <button
+            type="button"
+            id="edit-name-cancel"
+            class="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 uppercase tracking-wider transition"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shadow"
+          >
+            Save Changes
+          </button>
         </div>
       </form>
-    </section>
+    </div>
   </div>
 
-  <script src="/static/nav.js"></script>
+  <!-- Global Footer -->
+  {% include 'footer.html' %}
+
+  <!-- Core Javascript -->
+  <script src="{{ url_for('static', filename='nav.js') }}"></script>
   <script>
-    (() => {
-      const menuButton = document.getElementById('profile-menu-button');
-      const menu = document.getElementById('profile-menu');
-      const editOpen = document.getElementById('edit-name-open');
-      const backdrop = document.getElementById('edit-name-backdrop');
-      const closeButton = document.getElementById('edit-name-close');
-      const cancelButton = document.getElementById('edit-name-cancel');
-      const firstNameInput = document.querySelector('input[name="first_name"]');
+    const editOpenBtn = document.getElementById('edit-name-open');
+    const editCloseBtn = document.getElementById('edit-name-close');
+    const editCancelBtn = document.getElementById('edit-name-cancel');
+    const modalBackdrop = document.getElementById('edit-name-backdrop');
 
-      function closeMenu() {
-        menu.hidden = true;
-        menuButton.setAttribute('aria-expanded', 'false');
-      }
+    function openModal() {
+      modalBackdrop.classList.remove('hidden');
+      modalBackdrop.classList.add('flex');
+    }
+    function closeModal() {
+      modalBackdrop.classList.add('hidden');
+      modalBackdrop.classList.remove('flex');
+    }
 
-      function openModal() {
-        closeMenu();
-        backdrop.classList.add('is-open');
-        backdrop.setAttribute('aria-hidden', 'false');
-        window.setTimeout(() => firstNameInput && firstNameInput.focus(), 0);
-      }
-
-      function closeModal() {
-        backdrop.classList.remove('is-open');
-        backdrop.setAttribute('aria-hidden', 'true');
-        menuButton.focus();
-      }
-
-      menuButton.addEventListener('click', (event) => {
-        event.stopPropagation();
-        menu.hidden = !menu.hidden;
-        menuButton.setAttribute('aria-expanded', String(!menu.hidden));
+    if (editOpenBtn) editOpenBtn.addEventListener('click', openModal);
+    if (editCloseBtn) editCloseBtn.addEventListener('click', closeModal);
+    if (editCancelBtn) editCancelBtn.addEventListener('click', closeModal);
+    if (modalBackdrop) {
+      modalBackdrop.addEventListener('click', (e) => {
+        if (e.target === modalBackdrop) closeModal();
       });
-
-      editOpen.addEventListener('click', openModal);
-      closeButton.addEventListener('click', closeModal);
-      cancelButton.addEventListener('click', closeModal);
-
-      backdrop.addEventListener('click', (event) => {
-        if (event.target === backdrop) closeModal();
-      });
-
-      document.addEventListener('click', (event) => {
-        if (!menu.contains(event.target) && !menuButton.contains(event.target)) closeMenu();
-      });
-
-      document.addEventListener('keydown', (event) => {
-        if (event.key === 'Escape') {
-          closeMenu();
-          if (backdrop.classList.contains('is-open')) closeModal();
-        }
-      });
-
-      const avatar = document.getElementById('profile-avatar');
-      avatar.addEventListener('error', () => {
-        avatar.src = 'https://cdn-icons-png.flaticon.com/512/847/847969.png';
-      }, { once: true });
-    })();
+    }
   </script>
+
 </body>
 
 </html>
