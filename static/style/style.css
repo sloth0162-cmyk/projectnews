@@ -615,3 +615,13 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* Hide scrollbar while preserving horizontal scrolling */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
