@@ -1,5 +1,5 @@
 <!-- Sloth News Channel: Search & Trending Topics Strip -->
-<div class="max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-2">
+<div class="hidden md:block max-w-7xl mx-auto px-4 sm:px-6 pt-5 pb-2">
   <div class="bg-white border border-slate-200 rounded-xl p-3 sm:p-4 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
     
     <!-- Trending Topics Chips -->
@@ -60,3 +60,48 @@
 
   </div>
 </div>
+<!-- ===== MOBILE: Compact Search + 4 Tags (hidden on md and up) ===== -->
+<div class="md:hidden px-3 pt-3 pb-1">
+  <div class="bg-white border border-slate-200 rounded-lg p-2.5 shadow-sm space-y-2">
+
+    <!-- Compact Search -->
+    <form action="/" method="GET" role="search" class="flex items-center gap-1.5">
+      <div class="relative flex-1">
+        <input
+          type="text"
+          name="search"
+          placeholder="Search news..."
+          value="{{ search_query if search_query is defined else '' }}"
+          class="w-full pl-8 pr-3 py-1.5 text-xs bg-slate-50 border border-slate-300 rounded-md focus:outline-none focus:border-red-600 focus:bg-white text-slate-900 transition"
+          aria-label="Search articles"
+        />
+        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-1/2 -translate-y-1/2 text-slate-400 text-[11px]"></i>
+      </div>
+      <button
+        type="submit"
+        class="w-8 h-8 flex items-center justify-center bg-slate-900 active:bg-red-600 text-white rounded-md shrink-0"
+        aria-label="Search"
+      >
+        <i class="fa-solid fa-arrow-right text-[10px]"></i>
+      </button>
+      {% if search_query %}
+      <a href="/" class="w-8 h-8 flex items-center justify-center text-slate-500 hover:text-red-600 shrink-0" title="Clear search">
+        <i class="fa-solid fa-xmark text-xs"></i>
+      </a>
+      {% endif %}
+    </form>
+
+    <!-- 4 Tags Only -->
+    <div class="flex items-center gap-1.5 overflow-x-auto scrollbar-none text-[11px]">
+      <span class="font-bold text-red-600 flex items-center gap-1 uppercase tracking-wide shrink-0">
+        <i class="fa-solid fa-arrow-trend-up"></i>
+      </span>
+      <a href="/?tag=Market" class="shrink-0 px-2 py-0.5 rounded-full bg-slate-100 active:bg-slate-200 text-slate-700 font-medium">#MarketRally</a>
+      <a href="/?tag=Technology" class="shrink-0 px-2 py-0.5 rounded-full bg-slate-100 active:bg-slate-200 text-slate-700 font-medium">#AI</a>
+      <a href="/?tag=India" class="shrink-0 px-2 py-0.5 rounded-full bg-slate-100 active:bg-slate-200 text-slate-700 font-medium">#IndiaGrowth</a>
+      <a href="/secondpage#crypto" class="shrink-0 px-2 py-0.5 rounded-full bg-slate-100 active:bg-slate-200 text-slate-700 font-medium">#Crypto90K</a>
+    </div>
+
+  </div>
+</div>
+
