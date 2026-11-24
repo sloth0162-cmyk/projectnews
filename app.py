@@ -15,6 +15,7 @@ from second import second
 import time
 import os
 from datetime import datetime
+from market.livestockapi import get_reliance_data
 
 # -----------------------------
 # 🔧 Flask App Setup
@@ -178,13 +179,19 @@ def dashboard_page():
         print(f"⚠️ Error fetching finance_articles: {e}")
         finance_articles = []
 
-
+    #fetch reliance stock data
+    try:
+        reliance_data =get_reliance_data()
+    except Exception as e:
+        print(f" Error reliance data: {e}")
+        reliance_Data=None
     return render_template(
         "dashboard.html",
         articles=articles,
         finance_articles=finance_articles,
         current_tag=tag or "All",
         search_query=search,
+        reliance_data=reliance_data
     )
 
 #about

@@ -169,7 +169,7 @@ document.addEventListener("DOMContentLoaded", () => {
       <div class="news-nav-inner">
         <ul class="channel-links" id="channelLinksList"></ul>
 
-        <div class="channel-actions">
+        <div class="channel-actions"> 
           <form action="/" method="GET" class="relative hidden md:flex items-center" role="search">
             <input
               type="text"

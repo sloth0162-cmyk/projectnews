@@ -11,3 +11,4 @@ class Config:
     FLASK_SECRET_KEY = os.getenv("FLASK_SECRET_KEY", "default_secret")
     PIPELINE_PASSWORD = os.getenv("PIPELINE_PASSWORD", "default_pipeline_password")
     OPENROUTER_API_KEY = os.getenv("OPENROUTER_API_KEY")
+    INDIAN_API_KEY = os.getenv("INDIAN_API_KEY")

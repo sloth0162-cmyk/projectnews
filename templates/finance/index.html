@@ -36,23 +36,7 @@
   <!-- Master News Channel Header -->
   <header></header>
 
-  <!-- Market Strip -->
-  <div class="market-strip">
-    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
-      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
-    </div>
-    {% if market_ticker %}
-      {% for m in market_ticker %}
-      <div class="market-item">
-        <span class="market-sym">{{ m.symbol }}</span>
-        <span class="market-val">{{ m.value }}</span>
-        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
-          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
-        </span>
-      </div>
-      {% endfor %}
-    {% endif %}
-  </div>
+
 
   <!-- Search & Trending Keywords -->
   {% include 'searchbar.html' %}
@@ -95,50 +79,7 @@
       <i class="fa-solid fa-chart-line absolute -right-10 -bottom-10 text-slate-800/40 text-[200px] pointer-events-none select-none"></i>
     </div>
 
-    <!-- Live Market Snapshot Cards -->
-    <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 mb-10">
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">SENSEX</div>
-        <div class="font-bold text-base text-slate-900 mt-1">81,420.5</div>
-        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +0.42%</div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">NIFTY 50</div>
-        <div class="font-bold text-base text-slate-900 mt-1">24,860.2</div>
-        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +0.38%</div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">NASDAQ</div>
-        <div class="font-bold text-base text-slate-900 mt-1">18,342.9</div>
-        <div class="text-xs font-bold text-red-600 mt-0.5">▼ -0.15%</div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">S&P 500</div>
-        <div class="font-bold text-base text-slate-900 mt-1">5,864.6</div>
-        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +0.22%</div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">BTC / USD</div>
-        <div class="font-bold text-base text-slate-900 mt-1">$91,420</div>
-        <div class="text-xs font-bold text-emerald-600 mt-0.5">▲ +2.14%</div>
-      </div>
-      <div class="bg-white border border-slate-200 rounded-xl p-3.5 shadow-sm text-center">
-        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">BRENT CRUDE</div>
-        <div class="font-bold text-base text-slate-900 mt-1">$74.20</div>
-        <div class="text-xs font-bold text-red-600 mt-0.5">▼ -0.81%</div>
-      </div>
-    </div>
-
-    <!-- Financial Reports Grid -->
-    <div class="news-desk-header">
-      <h2 class="news-desk-title">
-        <i class="fa-solid fa-newspaper text-red-600"></i> Financial Dispatches & Intelligence
-      </h2>
-      <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
-        {{ articles|length if articles else 0 }} Reports Filed
-      </span>
-    </div>
-
+  
     {% if articles and articles|length > 0 %}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {% for article in articles %}

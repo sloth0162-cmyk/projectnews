@@ -67,7 +67,7 @@
   <header></header>
 
   <!-- Breaking News Ticker Bar -->
-  <div class="breaking-ticker-wrap">
+  <div class="breaking-ticker-wrap overflow-scroll whitespace-nowrap ">
     <div class="breaking-label">
       <span class="breaking-pulse" aria-hidden="true"></span>
       <span>Breaking</span>
@@ -99,49 +99,52 @@
     </div>
   </div>
 
-  <!-- Financial Market Strip -->
-  <div class="market-strip">
+
+<!-- Financial Market Strip -->
+<div class="market-strip">
+
     <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
-      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
+        <i class="fa-solid fa-chart-line text-red-600"></i>
+        Markets:
     </div>
-    {% if market_ticker %}
-      {% for m in market_ticker %}
-      <div class="market-item">
-        <span class="market-sym">{{ m.symbol }}</span>
-        <span class="market-val">{{ m.value }}</span>
-        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
-          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
+
+    {% if reliance_data %}
+
+    <div class="market-item">
+
+        <span class="market-sym">
+            RELIANCE
         </span>
-      </div>
-      {% endfor %}
+
+        <span class="market-val">
+            ₹{{ reliance_data.current_price.get('NSE', 'N/A') }}
+        </span>
+
+        <span class="market-change {% if reliance_data.percent_change|string|float >= 0 %}up{% else %}down{% endif %}">
+
+            {% if reliance_data.percent_change|string|float >= 0 %}
+                ▲
+            {% else %}
+                ▼
+            {% endif %}
+
+            {{ reliance_data.percent_change }}%
+
+        </span>
+
+    </div>
+
     {% else %}
-      <div class="market-item">
-        <span class="market-sym">SENSEX</span>
-        <span class="market-val">81,420.5</span>
-        <span class="market-change up">▲ +0.42%</span>
-      </div>
-      <div class="market-item">
-        <span class="market-sym">NIFTY 50</span>
-        <span class="market-val">24,860.2</span>
-        <span class="market-change up">▲ +0.38%</span>
-      </div>
-      <div class="market-item">
-        <span class="market-sym">NASDAQ</span>
-        <span class="market-val">18,342.9</span>
-        <span class="market-change down">▼ -0.15%</span>
-      </div>
-      <div class="market-item">
-        <span class="market-sym">BTC/USD</span>
-        <span class="market-val">$91,420</span>
-        <span class="market-change up">▲ +2.14%</span>
-      </div>
-      <div class="market-item">
-        <span class="market-sym">BRENT CRUDE</span>
-        <span class="market-val">$74.20</span>
-        <span class="market-change down">▼ -0.81%</span>
-      </div>
+
+    <div class="market-item">
+        <span class="market-sym">RELIANCE</span>
+        <span class="market-val">Unavailable</span>
+    </div>
+
     {% endif %}
-  </div>
+
+</div>
+
 
   <!-- Search & Trending Keywords Strip -->
   {% include 'searchbar.html' %}

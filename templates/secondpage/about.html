@@ -41,23 +41,7 @@
   <!-- Master News Channel Header -->
   <header></header>
 
-  <!-- Market Strip -->
-  <div class="market-strip">
-    <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
-      <i class="fa-solid fa-chart-line text-red-600"></i> Markets:
-    </div>
-    {% if market_ticker %}
-      {% for m in market_ticker %}
-      <div class="market-item">
-        <span class="market-sym">{{ m.symbol }}</span>
-        <span class="market-val">{{ m.value }}</span>
-        <span class="market-change {% if m.up %}up{% else %}down{% endif %}">
-          {% if m.up %}▲{% else %}▼{% endif %} {{ m.change }}
-        </span>
-      </div>
-      {% endfor %}
-    {% endif %}
-  </div>
+
 
   <!-- Search & Trending Keywords -->
   {% include 'searchbar.html' %}
