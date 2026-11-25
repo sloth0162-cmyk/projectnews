@@ -1,4 +1,19 @@
 # Changelog
+
+## Version 3.1
+**Date:** 24-11-2026
+
+### Added
+1. Added a global loading animation.
+2. Integrated live Reliance market indices.
+
+### Fixed / Improved
+1. Improved website responsiveness across devices.
+2. Made weather information dynamic and city-based.
+
+### Removed
+1. Removed hardcoded market indices.
+2. Removed hardcoded weather information.
 ## Version 3.0
 
 ### Date
