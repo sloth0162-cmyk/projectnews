@@ -1,4 +1,12 @@
-# app.py
+_SENSITIVE_ENV_HINTS = (
+    "KEY",
+    "TOKEN",
+    "SECRET",
+    "PASSWORD",
+    "PASS",
+    "SUPABASE",
+    "DATABASE"
+)
 from flask import Blueprint, Flask, jsonify, render_template, request, redirect, url_for, session, Response
 from agents.scraper_agent import scrape_news
 from agents.summarizer_agent import summarize_text
@@ -300,14 +308,51 @@ def auth_callback():
         "id": user.get("id"),
         "email": user.get("email"),
         "user_metadata": user.get("user_metadata") or {},
+         "access_token": access_token,
     }
 
-    return redirect(url_for("dashboard_page"))
+    return redirect("/")
+
+
+@app.route("/auth/me", methods=["GET"])
+def auth_me():
+    user = session.get("user")
+
+    if not user:
+        return jsonify({
+            "logged_in": False
+        }), 200
+
+    metadata = user.get("user_metadata") or {}
+
+    name = (
+        metadata.get("full_name")
+        or metadata.get("name")
+        or metadata.get("given_name")
+        or "Subscriber"
+    )
+
+    avatar = (
+        metadata.get("avatar_url")
+        or metadata.get("picture")
+        or "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+    )
+
+    return jsonify({
+        "logged_in": True,
+        "user": {
+            "id": user.get("id"),
+            "email": user.get("email"),
+            "name": name,
+            "avatar": avatar
+        }
+    })
 
 
 # -----------------------------
 # Profile
 # -----------------------------
+
 @app.route("/profile", methods=["GET", "POST"])
 def profile_page():
     user = session.get("user")
@@ -325,23 +370,64 @@ def profile_page():
 
         if not first_name:
             notice = "Please enter your first name."
+
         elif len(first_name) > 60 or len(last_name) > 60:
             notice = "Names must be 60 characters or fewer."
+
         else:
-            display_name = " ".join(filter(None, [first_name, last_name]))
+            display_name = " ".join(
+                filter(None, [first_name, last_name])
+            )
 
-            metadata.update({
-                "given_name": first_name,
-                "family_name": last_name,
-                "full_name": display_name,
-                "name": display_name,
-            })
+            access_token = user.get("access_token")
 
-            user["user_metadata"] = metadata
-            session["user"] = user
-            session["profile_notice"] = "Your name was updated for this session."
+            if not access_token:
+                notice = "Your session has expired. Please sign in again."
 
-            return redirect(url_for("profile_page"))
+            else:
+                updated_metadata = {
+                    **metadata,
+                    "given_name": first_name,
+                    "family_name": last_name,
+                    "full_name": display_name,
+                    "name": display_name,
+                }
+
+                try:
+                    response = requests.put(
+                        f"{Config.SUPABASE_URL}/auth/v1/user",
+                        headers={
+                            "apikey": Config.SUPABASE_KEY,
+                            "Authorization": f"Bearer {access_token}",
+                            "Content-Type": "application/json",
+                        },
+                        json={
+                            "data": updated_metadata
+                        },
+                        timeout=10,
+                    )
+
+                    if response.ok:
+                        updated_user = response.json()
+
+                        user["user_metadata"] = (
+                            updated_user.get("user_metadata")
+                            or updated_metadata
+                        )
+
+                        session["user"] = user
+                        session["profile_notice"] = (
+                            "Your profile name was updated successfully."
+                        )
+
+                        return redirect(url_for("profile_page"))
+
+                    print("Profile update failed:", response.text)
+                    notice = "Unable to update your profile. Please try again."
+
+                except requests.RequestException as error:
+                    print("Profile update error:", error)
+                    notice = "Could not connect to the account service."
 
     # Get the user's name.
     full_name = (
@@ -357,12 +443,16 @@ def profile_page():
     if not first_name and full_name:
         parts = full_name.split(maxsplit=1)
         first_name = parts[0]
-        last_name = last_name or (parts[1] if len(parts) > 1 else "")
+        last_name = last_name or (
+            parts[1] if len(parts) > 1 else ""
+        )
 
     first_name = first_name or "New"
     last_name = last_name or ("Sloth" if not full_name else "")
 
-    display_name = " ".join(filter(None, [first_name, last_name]))
+    display_name = " ".join(
+        filter(None, [first_name, last_name])
+    )
 
     # Get the user's profile picture.
     avatar_url = (
@@ -379,13 +469,8 @@ def profile_page():
         avatar_url=avatar_url,
         saved_articles=[],
         notice=notice,
-    )# -----------------------------
-# ⚙️ Run News Pipeline (General)
-# Replace the existing _pipeline_respond + run_pipeline block with this.
-# app.py must have `import os` and `import time` at the top.
-# -----------------------------
+    )
 
-_SENSITIVE_ENV_HINTS = ("KEY", "TOKEN", "SECRET", "PASSWORD", "PASS", "SUPABASE", "DATABASE")
 
 
 def _redact(value, limit=500):

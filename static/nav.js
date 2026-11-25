@@ -5,17 +5,50 @@
  * Includes geolocation-based live weather.
  */
 
-document.addEventListener("DOMContentLoaded", () => {
+
+document.addEventListener("DOMContentLoaded", async () => {
   const header = document.querySelector("header");
   if (!header) return;
 
-  // Retrieve user data from context or window
-  const user = window.NAV_USER || window.CURRENT_USER_DATA || {};
-  const isLoggedIn = user && user.loggedIn === true;
-  const userName = user.name || "Subscriber";
-  const avatar =
-    user.avatar ||
-    "https://cdn-icons-png.flaticon.com/512/847/847969.png";
+  // Default guest state
+  let user = {
+    loggedIn: false,
+    name: "Subscriber",
+    avatar: "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+  };
+
+  // Retrieve user data from Flask session
+  try {
+    const response = await fetch("/auth/me", {
+      credentials: "same-origin",
+      headers: {
+        "Accept": "application/json"
+      },
+      cache: "no-store"
+    });
+
+    if (!response.ok) {
+      throw new Error("Authentication request failed");
+    }
+
+    const data = await response.json();
+
+    if (data.logged_in && data.user) {
+      user = {
+        loggedIn: true,
+        name: data.user.name || "Subscriber",
+        avatar: data.user.avatar ||
+          "https://cdn-icons-png.flaticon.com/512/847/847969.png"
+      };
+    }
+  } catch (error) {
+    console.error("Navbar authentication error:", error);
+  }
+
+  const isLoggedIn = user.loggedIn;
+  const userName = user.name;
+  const avatar = user.avatar;
+
 
   const currentPath = window.location.pathname;
   const currentHash = window.location.hash;
