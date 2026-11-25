@@ -446,6 +446,9 @@
   .news-broadcast-strip .broadcast-meta-strip {
     display: none;
   }
+  .news-channel-nav {
+    display: none;
+}
   .channel-links {
     display: none;
   }

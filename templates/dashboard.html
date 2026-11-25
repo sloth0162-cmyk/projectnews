@@ -66,38 +66,50 @@
   <!-- Master News Channel Header -->
   <header></header>
 
-  <!-- Breaking News Ticker Bar -->
-  <div class="breaking-ticker-wrap hidden md:flex overflow-hidden whitespace-nowrap">
+
+<!-- Breaking News Ticker Bar -->
+
+<!-- Desktop / Tablet: Dynamic Breaking News Marquee -->
+<div class="breaking-ticker-wrap hidden md:flex overflow-hidden whitespace-nowrap">
     <div class="breaking-label">
-      <span class="breaking-pulse" aria-hidden="true"></span>
-      <span>Breaking</span>
+        <span class="breaking-pulse" aria-hidden="true"></span>
+        <span>Breaking</span>
     </div>
+
     <div class="breaking-content">
-      <div class="breaking-marquee">
-        {% if articles and articles|length > 0 %}
-          {% for item in articles[:6] %}
-          <a href="{{ url_for('article.article', article_id=item.id) }}" class="breaking-item">
-            <span class="breaking-dot">●</span>
-            <span>{{ item.title }}</span>
-          </a>
-          {% endfor %}
-        {% else %}
-          <span class="breaking-item">
-            <span class="breaking-dot">●</span>
-            <span>Markets open steady as central banks signal measured policy stance.</span>
-          </span>
-          <span class="breaking-item">
-            <span class="breaking-dot">●</span>
-            <span>Tech earnings surge on institutional AI infrastructure investments.</span>
-          </span>
-          <span class="breaking-item">
-            <span class="breaking-dot">●</span>
-            <span>Sloth News 24/7 Intelligence Desk monitors global trade developments.</span>
-          </span>
-        {% endif %}
-      </div>
+        <div class="breaking-marquee">
+            {% if articles and articles|length > 0 %}
+                {% for item in articles[:6] %}
+                <a href="{{ url_for('article.article', article_id=item.id) }}" class="breaking-item">
+                    <span class="breaking-dot">●</span>
+                    <span>{{ item.title }}</span>
+                </a>
+                {% endfor %}
+            {% else %}
+                <span class="breaking-item">
+                    <span class="breaking-dot">●</span>
+                    <span>Markets open steady as central banks signal measured policy stance.</span>
+                </span>
+                <span class="breaking-item">
+                    <span class="breaking-dot">●</span>
+                    <span>Tech earnings surge on institutional AI infrastructure investments.</span>
+                </span>
+                <span class="breaking-item">
+                    <span class="breaking-dot">●</span>
+                    <span>Sloth News 24/7 Intelligence Desk monitors global trade developments.</span>
+                </span>
+            {% endif %}
+        </div>
     </div>
-  </div>
+</div>
+
+<!-- Mobile: Static Newsroom Slogan -->
+<div class="md:hidden bg-slate-900 border-t border-red-600/40 px-3 py-3 text-center">
+    <p class="text-[10px] sm:text-xs font-bold uppercase tracking-[0.16em] text-slate-300">
+        <span class="text-red-500">●</span>
+        Independent Journalism. Global Intelligence.
+    </p>
+</div>
 
 
 <!-- Financial Market Strip -->
