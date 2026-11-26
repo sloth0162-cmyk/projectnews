@@ -2,7 +2,7 @@ name: Daily News Pipeline
 
 on:
   schedule:
-    - cron: '0 3 * * *'
+    - cron: '57 3 * * *'
   workflow_dispatch:
 
 jobs:
