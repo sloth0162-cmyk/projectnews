@@ -1,8 +1,7 @@
-name: Daily News Pipeline
-
 on:
   schedule:
-    - cron: '57 3 * * *'
+    - cron: '27 9 * * *'
+      timezone: 'Asia/Kolkata'
   workflow_dispatch:
 
 jobs:
