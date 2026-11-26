@@ -348,6 +348,13 @@ def auth_me():
         }
     })
 
+# -----------------------------
+# Logoutroute
+# -----------------------------
+@app.route("/auth/logout", methods=["POST"])
+def logout():
+    session.clear()
+    return redirect("/")
 
 # -----------------------------
 # Profile
@@ -401,9 +408,7 @@ def profile_page():
                             "Authorization": f"Bearer {access_token}",
                             "Content-Type": "application/json",
                         },
-                        json={
-                            "data": updated_metadata
-                        },
+                        json={"data": updated_metadata},
                         timeout=10,
                     )
 

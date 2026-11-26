@@ -1,5 +1,5 @@
 import os
-
+import base64
 import requests
 from dotenv import load_dotenv
 
@@ -20,7 +20,7 @@ HEADERS = {
 
 def generate_image(
     prompt,
-    model="@cf/lykon/dreamshaper-8-lcm",
+    model="@cf/black-forest-labs/flux-1-schnell",
 ):
     payload = {
         "prompt": prompt
@@ -33,8 +33,21 @@ def generate_image(
         timeout=60,
     )
 
+    if not response.ok:
+        print(f"Cloudflare status: {response.status_code}")
+        print(f"Cloudflare response: {response.text[:1500]}")
+
     response.raise_for_status()
+
+    data = response.json()
+
+    if not data.get("success"):
+        raise RuntimeError(
+            f"Cloudflare AI error: {data.get('errors')}"
+        )
+
+    image_base64 = data["result"]["image"]
 
     print("✅ Image generated successfully!")
 
-    return response.content  # image bytes, nothing written to disk
+    return base64.b64decode(image_base64)

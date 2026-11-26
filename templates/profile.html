@@ -4,277 +4,540 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Subscriber Account & Reading Preferences | Sloth News Channel</title>
 
-  <!-- SEO Meta Tags -->
-  <meta name="description" content="Manage your Sloth News Channel reader profile, saved wire dispatches, and newsletter subscription preferences." />
+  <title>Reader Account | Sloth News Channel</title>
+
+  <meta
+    name="description"
+    content="Manage your Sloth News reader account and saved articles."
+  />
   <meta name="robots" content="noindex, nofollow" />
 
-  <!-- Tailwind CSS & Stylesheets -->
+  <!-- Stylesheets -->
   <script src="https://cdn.tailwindcss.com"></script>
-  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
-  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style/style.css') }}"
+  />
+  <link
+    rel="stylesheet"
+    href="{{ url_for('static', filename='style/nav.css') }}"
+  />
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+  />
+
+  <!-- Typography -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet"
+  />
+
+  <style>
+    .account-page {
+      max-width: 960px;
+    }
+
+    .account-card {
+      background: white;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      box-shadow: 0 4px 20px rgba(15, 23, 42, 0.04);
+    }
+
+    .profile-avatar {
+      width: 100px;
+      height: 100px;
+      object-fit: cover;
+      border-radius: 50%;
+      border: 4px solid #f1f5f9;
+    }
+
+    .account-button {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      min-height: 42px;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      transition: background-color 180ms ease,
+                  color 180ms ease,
+                  border-color 180ms ease,
+                  transform 180ms ease;
+    }
+
+    .account-button:hover {
+      transform: translateY(-1px);
+    }
+
+    .account-button:focus-visible,
+    .account-dialog input:focus-visible {
+      outline: 3px solid rgba(220, 38, 38, 0.25);
+      outline-offset: 3px;
+    }
+
+    .account-dialog {
+      width: min(440px, calc(100% - 32px));
+      max-height: calc(100dvh - 32px);
+      margin: auto;
+      padding: 0;
+      border: 1px solid #e2e8f0;
+      border-radius: 20px;
+      background: white;
+      color: #0f172a;
+      overflow: auto;
+      box-shadow: 0 24px 80px rgba(15, 23, 42, 0.22);
+    }
+
+    .account-dialog[open] {
+      animation: dialog-enter 220ms ease-out;
+    }
+
+    .account-dialog::backdrop {
+      background: rgba(15, 23, 42, 0.55);
+      backdrop-filter: blur(4px);
+    }
+
+    @keyframes dialog-enter {
+      from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.98);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *,
+      *::before,
+      *::after {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+      }
+    }
+  </style>
 </head>
 
 <body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
 
-  <!-- Master News Channel Header -->
+  <!-- Global Navigation -->
   <header></header>
 
-  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-10 w-full flex-1">
+  <main class="account-page mx-auto w-full px-4 sm:px-6 py-8 sm:py-12 flex-1">
 
-    <!-- Profile Masthead Header -->
-    <div class="border-b border-slate-200 pb-4 mb-8 flex items-center justify-between">
+    <!-- Account Header -->
+    <div class="flex flex-wrap items-end justify-between gap-4 border-b border-slate-200 pb-5 mb-7">
       <div>
-        <div class="text-xs font-bold uppercase tracking-wider text-red-600 mb-1">
+        <p class="text-xs font-bold uppercase tracking-[0.2em] text-red-600 mb-2">
           Subscriber Center
-        </div>
+        </p>
+
         <h1 class="font-editorial text-3xl sm:text-4xl font-extrabold text-slate-900">
-          Reader Account & Settings
+          Reader Account
         </h1>
+
+        <p class="text-sm text-slate-500 mt-2">
+          Manage your profile and reading preferences.
+        </p>
       </div>
-      <a href="/" class="text-xs font-bold text-slate-700 hover:text-red-600 transition flex items-center gap-1.5">
+
+      <a
+        href="/"
+        class="text-sm font-semibold text-slate-600 hover:text-red-600 transition inline-flex items-center gap-2"
+      >
         <i class="fa-solid fa-arrow-left"></i>
-        <span>Front Page</span>
+        Front Page
       </a>
     </div>
 
+    <!-- Profile Update Notice -->
     {% if notice %}
-      <div class="mb-6 p-4 bg-emerald-50 border border-emerald-200 text-emerald-800 rounded-xl text-xs sm:text-sm font-semibold flex items-center gap-2" role="status">
-        <i class="fa-solid fa-circle-check text-emerald-600"></i>
+      <div
+        class="mb-6 rounded-xl border border-slate-200 bg-white px-4 py-3 text-sm text-slate-700 flex items-start gap-3"
+        role="status"
+      >
+        <i class="fa-solid fa-circle-info text-red-600 mt-0.5"></i>
         <span>{{ notice }}</span>
       </div>
     {% endif %}
 
-    <!-- Profile Information Card -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm mb-10 flex flex-col sm:flex-row items-center sm:items-start justify-between gap-6 relative" aria-label="Profile information">
-      
-      <div class="flex flex-col sm:flex-row items-center gap-5 text-center sm:text-left">
-        <div class="relative">
+    <!-- Profile Card -->
+    <section
+      class="account-card p-6 sm:p-8 mb-8"
+      aria-labelledby="profile-heading"
+    >
+      <div class="flex flex-col sm:flex-row sm:items-center gap-6">
+
+        <div class="relative shrink-0 self-center sm:self-auto">
           <img
             id="profile-avatar"
             src="{{ avatar_url }}"
-            alt="{{ display_name }}"
-            class="w-24 h-24 rounded-full object-cover border-4 border-slate-100 shadow-sm"
+            alt="Profile picture of {{ display_name }}"
+            class="profile-avatar"
             referrerpolicy="no-referrer"
           />
-          <span class="absolute bottom-1 right-1 w-5 h-5 bg-emerald-500 border-2 border-white rounded-full" title="Active Session"></span>
+
+          <span
+            class="absolute bottom-1 right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white"
+            title="Active session"
+          ></span>
         </div>
 
-        <div>
-          <div class="flex items-center justify-center sm:justify-start gap-2 mb-1">
-            <h2 class="font-editorial text-2xl font-bold text-slate-900">
-              {{ display_name }}
-            </h2>
-            <span class="px-2 py-0.5 bg-red-100 text-red-700 font-extrabold text-[10px] tracking-wider uppercase rounded">
+        <div class="flex-1 text-center sm:text-left min-w-0">
+          <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">
+            Your Profile
+          </p>
+
+          <h2
+            id="profile-heading"
+            class="font-editorial text-2xl sm:text-3xl font-bold text-slate-900 break-words"
+          >
+            {{ display_name }}
+          </h2>
+
+          <div class="mt-3 flex justify-center sm:justify-start">
+            <span class="inline-flex items-center gap-2 rounded-full bg-red-50 border border-red-100 px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-red-700">
+              <i class="fa-solid fa-circle-check"></i>
               Subscriber
             </span>
           </div>
-          <p class="text-xs text-slate-500 mb-2">
-            Reader ID: #{{ session.get('user', {}).get('id', 'Guest')[:8] if session.get('user') else 'Guest' }}
-          </p>
-          <div class="text-xs text-slate-600 flex items-center justify-center sm:justify-start gap-2">
-            <span><i class="fa-solid fa-envelope text-slate-400 mr-1"></i>{{ session.get('user', {}).get('email', 'Connected via Google') }}</span>
-          </div>
         </div>
-      </div>
 
-      <div class="relative">
         <button
           type="button"
           id="edit-name-open"
-          class="px-4 py-2 border border-slate-300 hover:border-slate-900 bg-white hover:bg-slate-900 hover:text-white rounded-lg text-xs font-bold uppercase tracking-wider transition flex items-center gap-2"
+          class="account-button border border-slate-300 bg-white text-slate-700 hover:bg-slate-900 hover:border-slate-900 hover:text-white"
         >
-          <i class="fa-solid fa-pen"></i>
-          <span>Edit Name</span>
+          <i class="fa-solid fa-pen-to-square"></i>
+          Edit Name
         </button>
       </div>
-
     </section>
 
-    <!-- Saved News & Bookmarks -->
-    <section class="mb-12" id="bookmarks" aria-labelledby="saved-news-heading">
-      <div class="news-desk-header">
-        <h2 id="saved-news-heading" class="news-desk-title">
-          <i class="fa-regular fa-bookmark"></i> Saved Wire Dispatches
-        </h2>
-        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+    <!-- Saved Articles -->
+    <section id="bookmarks" class="mb-8" aria-labelledby="saved-news-heading">
+
+      <div class="flex items-center justify-between gap-3 mb-5">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-widest text-red-600 mb-1">
+            Reading List
+          </p>
+
+          <h2
+            id="saved-news-heading"
+            class="font-editorial text-2xl font-bold text-slate-900"
+          >
+            <i class="fa-regular fa-bookmark text-slate-400 mr-2"></i>
+            Saved Wire Dispatches
+          </h2>
+        </div>
+
+        <span class="shrink-0 rounded-full bg-slate-200 px-3 py-1 text-xs font-bold text-slate-600">
           {{ saved_articles|length if saved_articles else 0 }} Saved
         </span>
       </div>
 
       {% if saved_articles and saved_articles|length > 0 %}
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
+
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+
           {% for article in saved_articles %}
-          <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all flex flex-col justify-between group">
-            <a href="{{ url_for('article.article', article_id=article.id) }}" class="h-40 bg-slate-900 block overflow-hidden">
-              <img
-                src="{{ article.image_url }}"
-                alt="{{ article.title }}"
-                onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
-                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-              />
-            </a>
-            <div class="p-4">
-              <h3 class="font-editorial text-base font-bold text-slate-900 group-hover:text-red-600 transition line-clamp-2 mb-2">
-                <a href="{{ url_for('article.article', article_id=article.id) }}">
-                  {{ article.title }}
-                </a>
-              </h3>
-              <p class="text-xs text-slate-600 line-clamp-2 leading-relaxed">
-                {{ article.summary }}
-              </p>
-            </div>
-            <div class="px-4 py-2.5 bg-slate-50 border-t border-slate-100 flex items-center justify-between text-xs font-semibold">
-              <a href="{{ url_for('article.article', article_id=article.id) }}" class="text-red-600 hover:underline">
-                Read Story →
+            <article class="account-card overflow-hidden flex flex-col group">
+
+              <a
+                href="{{ url_for('article.article', article_id=article.id) }}"
+                class="block h-40 bg-slate-900 overflow-hidden"
+              >
+                <img
+                  src="{{ article.image_url }}"
+                  alt="{{ article.title }}"
+                  loading="lazy"
+                  onerror="this.onerror=null; this.src='/static/images/news-placeholder.svg';"
+                  class="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                />
               </a>
-            </div>
-          </article>
+
+              <div class="p-4 flex-1">
+                <h3 class="font-editorial text-lg font-bold text-slate-900 mb-2 group-hover:text-red-600 transition">
+                  <a href="{{ url_for('article.article', article_id=article.id) }}">
+                    {{ article.title }}
+                  </a>
+                </h3>
+
+                <p class="text-sm text-slate-600 leading-relaxed line-clamp-2">
+                  {{ article.summary }}
+                </p>
+              </div>
+
+              <div class="px-4 py-3 border-t border-slate-100 bg-slate-50">
+                <a
+                  href="{{ url_for('article.article', article_id=article.id) }}"
+                  class="text-xs font-bold text-red-600 hover:underline"
+                >
+                  Read Story
+                  <i class="fa-solid fa-arrow-right ml-1"></i>
+                </a>
+              </div>
+
+            </article>
           {% endfor %}
+
         </div>
+
       {% else %}
-        <div class="bg-white border border-dashed border-slate-300 rounded-2xl p-8 sm:p-12 text-center max-w-lg mx-auto">
-          <div class="w-14 h-14 bg-slate-100 text-slate-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+
+        <div class="account-card border-dashed p-8 sm:p-12 text-center">
+          <div class="w-14 h-14 mx-auto mb-4 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 text-xl">
             <i class="fa-regular fa-bookmark"></i>
           </div>
-          <h3 class="font-editorial text-lg font-bold text-slate-900 mb-1">
-            Your Reading List is Empty
+
+          <h3 class="font-editorial text-xl font-bold text-slate-900 mb-2">
+            Your Reading List Is Empty
           </h3>
-          <p class="text-xs sm:text-sm text-slate-500 mb-6 leading-relaxed">
-            While exploring articles across the front page and sector desks, use the share or bookmark options to store dispatches here for offline reading.
+
+          <p class="text-sm text-slate-500 leading-relaxed max-w-md mx-auto mb-5">
+            Saved articles will appear here when you bookmark stories
+            from across the news desk.
           </p>
+
           <a
             href="/"
-            class="px-5 py-2.5 bg-slate-900 hover:bg-slate-800 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition inline-block"
+            class="account-button bg-slate-900 text-white hover:bg-slate-800"
           >
             Explore Front Page
+            <i class="fa-solid fa-arrow-right"></i>
           </a>
         </div>
+
       {% endif %}
     </section>
 
-    <!-- Newsroom Operations & Editorial Console -->
-    <section class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-sm mb-8" id="settings">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-4">
+    <!-- Account Settings -->
+    <section
+      id="settings"
+      class="account-card p-6 sm:p-8"
+      aria-labelledby="settings-heading"
+    >
+      <div class="flex items-start gap-4">
+        <div class="w-11 h-11 shrink-0 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600">
+          <i class="fa-solid fa-gear"></i>
+        </div>
+
         <div>
-          <h3 class="font-editorial text-xl font-bold text-slate-900">
-            Newsroom Console Access
-          </h3>
-          <p class="text-xs text-slate-500">
-            Internal editorial tools for running automated scraper pipelines and ingestion feeds.
+          <h2
+            id="settings-heading"
+            class="font-editorial text-xl font-bold text-slate-900"
+          >
+            Account Settings
+          </h2>
+
+          <p class="text-sm text-slate-500 mt-1">
+            Manage your reader session.
           </p>
         </div>
-        <a
-          href="/run_pipeline"
-          class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shrink-0"
-        >
-          Open Console
-        </a>
       </div>
 
-      <div class="flex items-center justify-between pt-2 text-xs text-slate-600">
+      <div class="mt-6 pt-5 border-t border-slate-200 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <strong>Sloth News Intelligence Engine</strong> • Pipeline Status: <span class="text-emerald-600 font-bold">Online</span>
+          <p class="text-sm font-semibold text-slate-800">
+            Sign out of your account
+          </p>
+
+          <p class="text-xs text-slate-500 mt-1">
+            End your current Sloth News session.
+          </p>
         </div>
-        <a href="/auth/login" class="text-red-600 font-bold hover:underline">
-          Re-authenticate
-        </a>
+
+        <form action="/auth/logout" method="post">
+          <button
+            type="submit"
+            class="account-button border border-red-200 text-red-600 bg-white hover:bg-red-50"
+          >
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+            Sign Out
+          </button>
+        </form>
       </div>
     </section>
 
   </main>
 
-  <!-- Edit Name Modal -->
-  <div id="edit-name-backdrop" class="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
-    <div class="bg-white border border-slate-200 rounded-2xl max-w-md w-full p-6 sm:p-8 shadow-2xl animate-fade-in relative">
-      <div class="flex items-center justify-between pb-4 border-b border-slate-200 mb-5">
-        <h3 class="font-editorial text-xl font-bold text-slate-900">
-          Edit Display Name
-        </h3>
-        <button type="button" id="edit-name-close" class="text-slate-400 hover:text-slate-900 transition">
-          <i class="fa-solid fa-xmark text-lg"></i>
+  <!-- Edit Name Dialog -->
+  <dialog
+    id="edit-name-dialog"
+    class="account-dialog"
+    aria-labelledby="edit-name-title"
+  >
+    <div class="p-6 sm:p-7">
+
+      <div class="flex items-start justify-between gap-4 pb-4 border-b border-slate-200 mb-5">
+        <div>
+          <p class="text-[11px] font-bold uppercase tracking-widest text-red-600 mb-1">
+            Profile Settings
+          </p>
+
+          <h2
+            id="edit-name-title"
+            class="font-editorial text-2xl font-bold text-slate-900"
+          >
+            Edit Display Name
+          </h2>
+        </div>
+
+        <button
+          type="button"
+          id="edit-name-close"
+          class="w-9 h-9 rounded-full text-slate-400 hover:bg-slate-100 hover:text-slate-900 transition"
+          aria-label="Close edit name dialog"
+        >
+          <i class="fa-solid fa-xmark"></i>
         </button>
       </div>
 
-      <form method="post" action="{{ url_for('profile_page') }}">
+      <form
+        id="edit-name-form"
+        method="post"
+        action="{{ url_for('profile_page') }}"
+      >
         <input type="hidden" name="action" value="update_name" />
+
         <div class="space-y-4 mb-6">
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">First Name</label>
+            <label
+              for="first-name"
+              class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2"
+            >
+              First Name
+            </label>
+
             <input
+              id="first-name"
               type="text"
               name="first_name"
               value="{{ first_name }}"
               maxlength="60"
+              autocomplete="given-name"
               required
-              class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-red-600"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-sm focus:outline-none focus:border-red-500 focus:bg-white transition"
             />
           </div>
+
           <div>
-            <label class="block text-xs font-bold text-slate-700 uppercase tracking-wider mb-1.5">Last Name / Surname</label>
+            <label
+              for="last-name"
+              class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-2"
+            >
+              Last Name
+            </label>
+
             <input
+              id="last-name"
               type="text"
               name="last_name"
               value="{{ last_name }}"
               maxlength="60"
-              class="w-full px-3.5 py-2 rounded-lg border border-slate-300 text-sm focus:outline-none focus:border-red-600"
+              autocomplete="family-name"
+              class="w-full px-4 py-3 rounded-xl border border-slate-300 bg-slate-50 text-sm focus:outline-none focus:border-red-500 focus:bg-white transition"
             />
           </div>
         </div>
 
-        <div class="flex items-center justify-end gap-3 pt-4 border-t border-slate-100">
+        <div class="flex flex-col-reverse sm:flex-row justify-end gap-3 pt-4 border-t border-slate-100">
           <button
             type="button"
             id="edit-name-cancel"
-            class="px-4 py-2 border border-slate-300 hover:bg-slate-100 rounded-lg text-xs font-bold text-slate-700 uppercase tracking-wider transition"
+            class="account-button border border-slate-300 text-slate-700 hover:bg-slate-100"
           >
             Cancel
           </button>
+
           <button
             type="submit"
-            class="px-5 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shadow"
+            id="save-name-button"
+            class="account-button bg-red-600 text-white hover:bg-red-700"
           >
+            <i class="fa-solid fa-check"></i>
             Save Changes
           </button>
         </div>
       </form>
     </div>
-  </div>
+  </dialog>
 
   <!-- Global Footer -->
   {% include 'footer.html' %}
 
-  <!-- Core Javascript -->
+  <!-- Scripts -->
   <script src="{{ url_for('static', filename='nav.js') }}"></script>
+
   <script>
-    const editOpenBtn = document.getElementById('edit-name-open');
-    const editCloseBtn = document.getElementById('edit-name-close');
-    const editCancelBtn = document.getElementById('edit-name-cancel');
-    const modalBackdrop = document.getElementById('edit-name-backdrop');
+    (() => {
+      const dialog = document.getElementById("edit-name-dialog");
+      const openButton = document.getElementById("edit-name-open");
+      const closeButton = document.getElementById("edit-name-close");
+      const cancelButton = document.getElementById("edit-name-cancel");
+      const form = document.getElementById("edit-name-form");
+      const saveButton = document.getElementById("save-name-button");
 
-    function openModal() {
-      modalBackdrop.classList.remove('hidden');
-      modalBackdrop.classList.add('flex');
-    }
-    function closeModal() {
-      modalBackdrop.classList.add('hidden');
-      modalBackdrop.classList.remove('flex');
-    }
+      if (!dialog || !openButton) return;
 
-    if (editOpenBtn) editOpenBtn.addEventListener('click', openModal);
-    if (editCloseBtn) editCloseBtn.addEventListener('click', closeModal);
-    if (editCancelBtn) editCancelBtn.addEventListener('click', closeModal);
-    if (modalBackdrop) {
-      modalBackdrop.addEventListener('click', (e) => {
-        if (e.target === modalBackdrop) closeModal();
+      function openDialog() {
+        dialog.showModal();
+        document.body.style.overflow = "hidden";
+
+        const firstName = document.getElementById("first-name");
+        if (firstName) firstName.focus();
+      }
+
+      function closeDialog() {
+        if (dialog.open) dialog.close();
+      }
+
+      openButton.addEventListener("click", openDialog);
+
+      if (closeButton) {
+        closeButton.addEventListener("click", closeDialog);
+      }
+
+      if (cancelButton) {
+        cancelButton.addEventListener("click", closeDialog);
+      }
+
+      // Close when the user clicks outside the dialog.
+      dialog.addEventListener("click", (event) => {
+        if (event.target === dialog) {
+          closeDialog();
+        }
       });
-    }
+
+      // Also runs when the user presses Escape.
+      dialog.addEventListener("close", () => {
+        document.body.style.overflow = "";
+        openButton.focus();
+      });
+
+      // Prevent duplicate submissions while saving.
+      if (form && saveButton) {
+        form.addEventListener("submit", () => {
+          saveButton.disabled = true;
+          saveButton.textContent = "Saving...";
+        });
+      }
+    })();
   </script>
-{% include "loader.html" %}
+
+  {% include "loader.html" %}
+
 </body>
 </html>

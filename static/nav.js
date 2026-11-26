@@ -256,10 +256,15 @@ document.addEventListener("DOMContentLoaded", async () => {
 
                   <hr class="my-1 border-slate-200">
 
-                  <a href="/auth/login" class="text-red-600 hover:text-red-700">
-                    <i class="fa-solid fa-arrow-right-from-bracket text-red-500"></i>
-                    Sign Out
-                  </a>
+                  <form action="/auth/logout" method="POST">
+  <button
+    type="submit"
+    class="text-red-600 hover:text-red-700"
+  >
+    <i class="fa-solid fa-arrow-right-from-bracket text-red-500"></i>
+    Sign Out
+  </button>
+</form>
                 `
                 : `
                   <a href="/profile">
