@@ -1,5 +1,19 @@
 # Changelog
 
+## Version 3.2
+**Date:** 25-11-2026
+
+### Fixed / Improved
+1. Fixed the authentication bug and connected Flask sessions with the navigation system.
+2. Reworked the profile system to support persistent name updates through Supabase Auth.
+3. Improved authentication compatibility across desktop and Android.
+
+### Added
+1. Integrated a functional newsletter subscription system into the footer.
+2. Connected newsletter subscriptions to Supabase for email storage.
+3. Added duplicate subscription detection and subscriber reactivation.
+4. Added subscription success and error notifications.
+
 ## Version 3.1
 **Date:** 24-11-2026
 

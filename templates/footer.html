@@ -1,3 +1,4 @@
+
 <!-- Sloth News Network: Global Institutional Footer -->
 <footer class="bg-slate-950 text-slate-400 border-t border-slate-800 mt-16 pt-14 pb-8">
   <div class="max-w-7xl mx-auto px-4 sm:px-6">
@@ -16,21 +17,27 @@
         </p>
       </div>
 
+      <!-- Newsletter Subscription Form -->
       <form
-        onsubmit="event.preventDefault(); showNewsToast('Subscribed! Welcome to Sloth News Intelligence Briefing.'); this.reset();"
+        id="newsletterForm"
         class="flex flex-col sm:flex-row items-center gap-2.5 w-full lg:w-auto"
       >
         <div class="relative w-full sm:w-72">
           <input
             type="email"
+            id="newsletterEmail"
+            name="email"
             required
+            maxlength="254"
             placeholder="Enter your email address..."
             class="w-full px-4 py-2.5 rounded-lg bg-slate-950 border border-slate-700 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-red-500"
           />
         </div>
+
         <button
           type="submit"
-          class="w-full sm:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shrink-0"
+          id="newsletterSubmit"
+          class="w-full sm:w-auto px-5 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-lg text-xs font-bold uppercase tracking-wider transition shrink-0 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           Subscribe Free
         </button>
@@ -150,5 +157,62 @@
 <script>
   // Ensure correct footer year
   const fy = document.getElementById("footerYear");
-  if (fy) fy.textContent = new Date().getFullYear();
+  if (fy) {
+    fy.textContent = new Date().getFullYear();
+  }
+
+  // Newsletter subscription
+  const newsletterForm = document.getElementById("newsletterForm");
+
+  if (newsletterForm) {
+    const emailInput = document.getElementById("newsletterEmail");
+    const submitButton = document.getElementById("newsletterSubmit");
+
+    newsletterForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+
+      const email = emailInput.value.trim();
+
+      if (!email) return;
+
+      submitButton.disabled = true;
+      submitButton.textContent = "Subscribing...";
+
+      try {
+        const response = await fetch("/secondpage/subscribe", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify({ email })
+        });
+
+        const data = await response.json();
+
+        if (typeof showNewsToast === "function") {
+          showNewsToast(data.message);
+        } else {
+          alert(data.message);
+        }
+
+        if (data.success) {
+          newsletterForm.reset();
+        }
+
+      } catch (error) {
+        console.error("[newsletter] Subscription error:", error);
+
+        if (typeof showNewsToast === "function") {
+          showNewsToast("Unable to subscribe. Please try again.");
+        } else {
+          alert("Unable to subscribe. Please try again.");
+        }
+
+      } finally {
+        submitButton.disabled = false;
+        submitButton.textContent = "Subscribe Free";
+      }
+    });
+  }
 </script>
