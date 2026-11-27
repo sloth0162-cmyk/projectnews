@@ -267,7 +267,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 </form>
                 `
                 : `
-                  <a href="/profile">
+                  <a href="/subscriber">
                     <i class="fa-solid fa-user text-slate-400"></i>
                     Reader Profile
                   </a>
