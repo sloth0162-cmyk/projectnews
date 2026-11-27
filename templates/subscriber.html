@@ -1,20 +1,25 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Subscriber Center | Sloth News Channel</title>
+  <meta name="theme-color" content="#0b1120" />
 
-  <title>Subscriber Center | Sloth News</title>
-
+  <!-- Tailwind CSS & Project Stylesheets -->
   <script src="https://cdn.tailwindcss.com"></script>
-
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
-    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
-  >
+  />
 
   <style>
+    /* Page Loader */
     #page-loader {
       position: fixed;
       inset: 0;
@@ -22,7 +27,7 @@
       display: flex;
       align-items: center;
       justify-content: center;
-      background: white;
+      background: #ffffff;
       transition: opacity 0.3s ease;
     }
 
@@ -30,12 +35,88 @@
       opacity: 0;
       pointer-events: none;
     }
+
+    /* Subtle Newsprint Canvas Background (Matches bg-slate-50 homepage) */
+    .snn-paper-bg {
+      background-color: #f8fafc;
+      background-image: radial-gradient(#cbd5e1 0.85px, transparent 0.85px);
+      background-size: 22px 22px;
+    }
+
+    /* Subtle Dark Broadcast Header Pattern inside Lead Card */
+    .snn-dispatch-banner {
+      background-color: #0b1120;
+      background-image:
+        radial-gradient(circle at 90% 15%, rgba(220, 38, 38, 0.28), transparent 48%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 100% 100%, 28px 28px, 28px 28px;
+    }
+
+    /* Proportionate Staggered Entrance Animations */
+    @keyframes snnFadeUp {
+      from {
+        opacity: 0;
+        transform: translateY(14px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .snn-enter {
+      opacity: 0;
+      animation: snnFadeUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .snn-delay-1 { animation-delay: 0.06s; }
+    .snn-delay-2 { animation-delay: 0.14s; }
+    .snn-delay-3 { animation-delay: 0.22s; }
+
+    /* Scroll Reveal for Lower Sections */
+    .snn-reveal {
+      opacity: 0;
+      transform: translateY(14px);
+      transition:
+        opacity 0.55s cubic-bezier(0.16, 1, 0.3, 1),
+        transform 0.55s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .snn-reveal.is-visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* Clean Editorial Card Hover */
+    .snn-card-lift {
+      transition:
+        transform 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1),
+        border-color 0.25s ease;
+    }
+
+    .snn-card-lift:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 24px -8px rgba(15, 23, 42, 0.09);
+      border-color: #cbd5e1;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .snn-enter,
+      .snn-reveal {
+        opacity: 1 !important;
+        transform: none !important;
+        animation: none !important;
+        transition: none !important;
+      }
+    }
   </style>
 </head>
 
-<body class="min-h-screen flex flex-col bg-slate-50 text-slate-900">
+<body class="snn-paper-bg text-slate-900 min-h-screen flex flex-col">
 
-  <!-- Loading screen -->
+  <!-- Loading Screen -->
   <div id="page-loader" role="status" aria-label="Loading page">
     <div class="text-center">
       <div class="mx-auto h-10 w-10 animate-spin rounded-full border-4 border-slate-200 border-t-red-600"></div>
@@ -45,210 +126,513 @@
     </div>
   </div>
 
-  <!-- nav.js generates the navbar inside this header -->
+  <!-- Master News Channel Header (populated by nav.js) -->
   <header></header>
 
-  <main class="flex-1">
+  <!-- Broadcast Desk Strip (Matches dashboard.html ticker bar) -->
+  <div class="breaking-ticker-wrap hidden md:flex overflow-hidden whitespace-nowrap">
+    <div class="breaking-label">
+      <span class="breaking-pulse" aria-hidden="true"></span>
+      <span>Subscriber Desk</span>
+    </div>
 
-    <!-- Hero -->
-    <section class="bg-slate-950 text-white">
-      <div class="mx-auto max-w-6xl px-6 py-16 md:py-24">
-        <div class="max-w-3xl">
+    <div class="breaking-content">
+      <div class="flex items-center gap-6 px-6 text-xs font-medium text-slate-200">
+        <span class="inline-flex items-center gap-2">
+          <span class="breaking-dot">●</span>
+          Personal Reader Profile &amp; Display Identity
+        </span>
+        <span class="inline-flex items-center gap-2">
+          <span class="breaking-dot">●</span>
+          Saved Articles &amp; Bookmarked Dispatches
+        </span>
+        <span class="inline-flex items-center gap-2">
+          <span class="breaking-dot">●</span>
+          Verified One-Click Google Sign-In
+        </span>
+      </div>
+    </div>
+  </div>
 
-          <div class="mb-5 inline-flex items-center gap-2 rounded-full border border-slate-700 bg-slate-900 px-4 py-2 text-xs font-bold uppercase tracking-widest text-red-400">
-            <i class="fa-solid fa-newspaper"></i>
-            Sloth News Subscriber Center
+  <!-- Mobile Newsroom Slogan Strip -->
+  <div class="md:hidden bg-slate-900 border-t border-red-600/40 px-3 py-2.5 text-center">
+    <p class="text-[10px] font-bold uppercase tracking-[0.16em] text-slate-300">
+      <span class="text-red-500">●</span>
+      Sloth News Subscriber Center
+    </p>
+  </div>
+
+  <!-- Sub-Header Strip (Matches dashboard.html market-strip) -->
+  <div class="market-strip justify-between">
+    <div class="flex items-center gap-5">
+      <div class="font-bold text-xs uppercase tracking-wider text-slate-400 shrink-0 flex items-center gap-1.5 pl-2">
+        <i class="fa-solid fa-id-card text-red-600"></i>
+        Access:
+      </div>
+
+      <div class="market-item">
+        <span class="market-sym">MEMBERSHIP</span>
+        <span class="market-change up">FREE READER PASS</span>
+      </div>
+
+      <div class="hidden sm:inline-flex market-item">
+        <span class="market-sym">AUTH</span>
+        <span class="market-val text-slate-700">Google OAuth</span>
+      </div>
+    </div>
+
+    <a href="/" class="text-xs font-bold text-slate-600 hover:text-red-600 transition pr-2 shrink-0">
+      ← Back to Front Page
+    </a>
+  </div>
+
+  <!-- Main Content Container (Matches dashboard.html max-w-7xl layout) -->
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 py-6 w-full flex-1">
+
+    <!-- Quick Section Navigation Bar (Matches dashboard.html channel filter bar) -->
+    <div class="snn-enter flex flex-wrap items-center justify-between gap-3 mb-6 pb-4 border-b border-slate-200">
+      <div class="flex items-center gap-2 overflow-x-auto pb-1 max-w-full scrollbar-none">
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider shrink-0 mr-1">
+          Portal:
+        </span>
+        <a href="#subscriber-hero" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-slate-900 text-white shadow-sm shrink-0">
+          Subscriber Center
+        </a>
+        <a href="#benefits" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-100 transition-all shrink-0">
+          Account Benefits
+        </a>
+        <a href="#how-it-works" class="px-3.5 py-1.5 rounded-full text-xs font-bold bg-white border border-slate-200 text-slate-700 hover:border-slate-400 hover:bg-slate-100 transition-all shrink-0">
+          How It Works
+        </a>
+      </div>
+
+      <div class="text-xs text-slate-500 font-medium shrink-0">
+        Edition: <strong class="text-slate-800">Reader Account</strong>
+      </div>
+    </div>
+
+    <!-- ====================================================================
+         1. HERO SECTION (12-Column Editorial Split matching dashboard.html)
+         ==================================================================== -->
+    <section id="subscriber-hero" class="mb-12">
+      <div class="news-desk-header snn-enter snn-delay-1">
+        <h1 class="news-desk-title">
+          <i class="fa-solid fa-newspaper"></i> Sloth News Subscriber Center
+        </h1>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider hidden sm:inline">
+          Reader Portal
+        </span>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+
+        <!-- Left Lead Editorial Card (7 Cols) -->
+        <div class="snn-enter snn-delay-2 lg:col-span-7 bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm flex flex-col justify-between">
+          <!-- Top Editorial Visual Banner -->
+          <div class="snn-dispatch-banner px-6 py-7 sm:px-8 sm:py-8 text-white border-b border-slate-800 relative">
+            <div class="flex flex-wrap items-center justify-between gap-2 mb-4">
+              <span class="inline-flex items-center gap-1.5 bg-red-600 text-white font-extrabold text-[11px] tracking-wider uppercase px-2.5 py-1 rounded shadow-sm">
+                <i class="fa-solid fa-bolt"></i> Reader Access
+              </span>
+              <span class="text-[11px] font-mono uppercase tracking-wider text-slate-400">
+                SNN // ACCOUNT DESK
+              </span>
+            </div>
+
+            <h2 class="font-editorial text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight leading-[1.12] text-white">
+              Your news. <span class="text-red-500">Your account.</span>
+            </h2>
           </div>
 
-          <h1 class="text-4xl font-extrabold tracking-tight sm:text-5xl lg:text-6xl">
-            Your news.
-            <span class="text-red-500">Your account.</span>
-          </h1>
+          <!-- Card Body & Primary CTAs -->
+          <div class="p-6 sm:p-8 flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center gap-2.5 text-xs text-slate-500 mb-3">
+                <span class="font-bold text-red-600 uppercase tracking-wider">Sloth News Network</span>
+                <span>•</span>
+                <span>Personal Dashboard</span>
+                <span>•</span>
+                <span>Instant Setup</span>
+              </div>
 
-          <p class="mt-6 max-w-2xl text-base leading-8 text-slate-300 sm:text-lg">
-            Sign in to Sloth News to access your personal reader
-            profile, manage your account and return to your
-            subscriber dashboard.
-          </p>
+              <p class="text-slate-600 text-sm sm:text-base leading-relaxed">
+                Sign in to Sloth News to access your personal reader profile, manage your account settings, and return directly to your saved articles and subscriber dashboard.
+              </p>
 
-          <div class="mt-8 flex flex-wrap gap-3">
-            <a
-              href="{{ url_for('auth.login_google') }}"
-              class="inline-flex items-center justify-center gap-3 rounded-lg bg-red-600 px-6 py-3 font-bold text-white transition hover:bg-red-700"
-            >
-              <i class="fa-brands fa-google"></i>
-              Sign in with Google
-            </a>
+              <div class="mt-7 flex flex-wrap items-center gap-3">
+                <a
+                  href="{{ url_for('auth.login_google') }}"
+                  class="group inline-flex items-center justify-center gap-2.5 rounded-lg bg-red-600 px-6 py-3 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-red-700 hover:shadow"
+                >
+                  <i class="fa-brands fa-google"></i>
+                  <span>Sign in with Google</span>
+                  <i class="fa-solid fa-arrow-right text-xs transition-transform duration-200 group-hover:translate-x-1"></i>
+                </a>
 
-            <a
-              href="#benefits"
-              class="inline-flex items-center justify-center rounded-lg border border-slate-600 px-6 py-3 font-semibold text-white transition hover:bg-slate-800"
-            >
-              Explore benefits
-            </a>
+                <a
+                  href="#benefits"
+                  class="inline-flex items-center justify-center gap-2 rounded-lg border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-800 transition-all duration-200 hover:border-slate-400 hover:bg-slate-50"
+                >
+                  <span>Explore benefits</span>
+                  <i class="fa-solid fa-chevron-down text-[10px] text-slate-500"></i>
+                </a>
+              </div>
+            </div>
+
+            <div class="mt-7 pt-4 border-t border-slate-100 flex flex-wrap items-center justify-between gap-2 text-xs text-slate-500">
+              <span class="inline-flex items-center gap-1.5 font-medium">
+                <i class="fa-solid fa-shield-halved text-red-600"></i>
+                Secured via Google Authentication
+              </span>
+              <span class="text-slate-400">No separate password required</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Reader Pass Summary & Wire Checklist (5 Cols, matches dashboard.html) -->
+        <div class="snn-enter snn-delay-3 lg:col-span-5 flex flex-col gap-5">
+
+          <!-- Top Compact Card -->
+          <div class="snn-card-lift bg-white border border-slate-200 rounded-xl p-5 shadow-sm">
+            <div class="flex items-start justify-between gap-4">
+              <div>
+                <span class="text-[10px] font-extrabold uppercase tracking-wider text-red-600">
+                  Subscriber Credential
+                </span>
+                <h3 class="font-editorial text-xl font-bold text-slate-900 mt-1">
+                  One Account Across SNN
+                </h3>
+                <p class="text-xs text-slate-600 leading-relaxed mt-1.5">
+                  Keep your display name, reading bookmarks, and session preferences unified whenever you visit Sloth News.
+                </p>
+              </div>
+              <div class="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-slate-900 text-white">
+                <i class="fa-solid fa-id-badge text-lg text-red-500"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Fast Wire Style Feature Checklist -->
+          <div class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm flex-1 flex flex-col justify-between">
+            <div>
+              <div class="flex items-center justify-between pb-3 border-b border-slate-200 mb-2">
+                <h3 class="font-bold text-xs uppercase tracking-wider text-slate-800 flex items-center gap-1.5">
+                  <i class="fa-solid fa-bolt text-red-600"></i> Included With Your Account
+                </h3>
+                <span class="text-[11px] font-bold text-slate-400 uppercase">Free</span>
+              </div>
+
+              <div class="divide-y divide-slate-100">
+                <div class="py-3 flex items-start gap-3">
+                  <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-red-50 text-red-600 text-xs">
+                    <i class="fa-solid fa-user"></i>
+                  </span>
+                  <div>
+                    <p class="text-xs font-bold text-slate-900">Editable Reader Display Name</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Personalize how your profile appears in your dashboard.</p>
+                  </div>
+                </div>
+
+                <div class="py-3 flex items-start gap-3">
+                  <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-red-50 text-red-600 text-xs">
+                    <i class="fa-solid fa-bookmark"></i>
+                  </span>
+                  <div>
+                    <p class="text-xs font-bold text-slate-900">Saved Articles Section</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Revisit bookmarked reports and briefings anytime.</p>
+                  </div>
+                </div>
+
+                <div class="py-3 flex items-start gap-3">
+                  <span class="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded bg-red-50 text-red-600 text-xs">
+                    <i class="fa-solid fa-right-from-bracket"></i>
+                  </span>
+                  <div>
+                    <p class="text-xs font-bold text-slate-900">Full Session Control</p>
+                    <p class="text-[11px] text-slate-500 mt-0.5">Sign in quickly or sign out cleanly on any device.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-[11px]">
+              <span class="text-slate-500 font-medium">Ready in under 10 seconds</span>
+              <a href="{{ url_for('auth.login_google') }}" class="font-bold text-red-600 hover:text-red-700 transition">
+                Sign in now →
+              </a>
+            </div>
           </div>
 
         </div>
       </div>
     </section>
 
-    <!-- Account benefits -->
-    <section id="benefits" class="mx-auto max-w-6xl px-6 py-14">
-
-      <div class="mb-8 max-w-2xl">
-        <p class="text-xs font-bold uppercase tracking-widest text-red-600">
-          Account benefits
-        </p>
-
-        <h2 class="mt-2 text-3xl font-bold tracking-tight">
-          More than just a news feed
+    <!-- ====================================================================
+         2. ACCOUNT BENEFITS (3-Column Grid matching Latest Channel Wire)
+         ==================================================================== -->
+    <section id="benefits" class="mb-12">
+      <div class="snn-reveal news-desk-header">
+        <h2 class="news-desk-title">
+          <i class="fa-solid fa-layer-group"></i> Account Benefits
         </h2>
-
-        <p class="mt-3 leading-7 text-slate-600">
-          Your account gives you a dedicated place to manage
-          your reader identity and access your personal dashboard.
-        </p>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          More Than Just a News Feed
+        </span>
       </div>
 
-      <div class="grid gap-5 md:grid-cols-3">
+      <p class="snn-reveal text-sm sm:text-base text-slate-600 max-w-2xl mb-6 leading-relaxed">
+        Your account gives you a dedicated place to manage your reader identity and access your personal dashboard.
+      </p>
 
-        <article class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-50 text-xl text-red-600">
-            <i class="fa-solid fa-user"></i>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+        <!-- Benefit 1 -->
+        <article class="snn-reveal snn-card-lift bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between" style="transition-delay: 0.05s;">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-red-50 text-lg text-red-600">
+                <i class="fa-solid fa-user"></i>
+              </div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                01 • Identity
+              </span>
+            </div>
+
+            <h3 class="font-editorial text-xl font-bold text-slate-900 mb-2">
+              Personal profile
+            </h3>
+
+            <p class="text-sm leading-relaxed text-slate-600">
+              Access your reader profile and update your display name anytime directly from your account dashboard.
+            </p>
           </div>
 
-          <h3 class="text-lg font-bold">Personal profile</h3>
-
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            Access your reader profile and update your display
-            name from your account dashboard.
-          </p>
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="font-bold text-red-600 uppercase tracking-wider">SNN Profile</span>
+            <span class="text-slate-400">Custom Display Name</span>
+          </div>
         </article>
 
-        <article class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-50 text-xl text-red-600">
-            <i class="fa-solid fa-bookmark"></i>
+        <!-- Benefit 2 -->
+        <article class="snn-reveal snn-card-lift bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between" style="transition-delay: 0.12s;">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-red-50 text-lg text-red-600">
+                <i class="fa-solid fa-bookmark"></i>
+              </div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                02 • Workspace
+              </span>
+            </div>
+
+            <h3 class="font-editorial text-xl font-bold text-slate-900 mb-2">
+              Reader dashboard
+            </h3>
+
+            <p class="text-sm leading-relaxed text-slate-600">
+              Find your account information and the saved articles section organized together in one convenient place.
+            </p>
           </div>
 
-          <h3 class="text-lg font-bold">Reader dashboard</h3>
-
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            Find your account information and the saved articles
-            section in one convenient place.
-          </p>
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="font-bold text-red-600 uppercase tracking-wider">Saved Wire</span>
+            <span class="text-slate-400">Centralized Hub</span>
+          </div>
         </article>
 
-        <article class="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
-          <div class="mb-4 flex h-12 w-12 items-center justify-center rounded-lg bg-red-50 text-xl text-red-600">
-            <i class="fa-solid fa-shield-halved"></i>
+        <!-- Benefit 3 -->
+        <article class="snn-reveal snn-card-lift bg-white border border-slate-200 rounded-xl p-6 shadow-sm flex flex-col justify-between" style="transition-delay: 0.19s;">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex h-11 w-11 items-center justify-center rounded-lg bg-red-50 text-lg text-red-600">
+                <i class="fa-solid fa-shield-halved"></i>
+              </div>
+              <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">
+                03 • Security
+              </span>
+            </div>
+
+            <h3 class="font-editorial text-xl font-bold text-slate-900 mb-2">
+              Account access
+            </h3>
+
+            <p class="text-sm leading-relaxed text-slate-600">
+              Use Google sign-in to access your account seamlessly and sign out whenever you choose.
+            </p>
           </div>
 
-          <h3 class="text-lg font-bold">Account access</h3>
-
-          <p class="mt-2 text-sm leading-6 text-slate-600">
-            Use Google sign-in to access your account and sign
-            out whenever you choose.
-          </p>
+          <div class="mt-5 pt-3 border-t border-slate-100 flex items-center justify-between text-xs">
+            <span class="font-bold text-red-600 uppercase tracking-wider">Google OAuth</span>
+            <span class="text-slate-400">One-Click Sign-In</span>
+          </div>
         </article>
 
       </div>
     </section>
 
-    <!-- How it works -->
-    <section class="border-y border-slate-200 bg-white">
-      <div class="mx-auto max-w-6xl px-6 py-12">
+    <!-- ====================================================================
+         3. HOW IT WORKS
+         ==================================================================== -->
+    <section id="how-it-works" class="mb-12">
+      <div class="snn-reveal news-desk-header">
+        <h2 class="news-desk-title">
+          <i class="fa-solid fa-compass"></i> How It Works
+        </h2>
+        <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">
+          3-Step Workflow
+        </span>
+      </div>
 
-        <h2 class="text-2xl font-bold">How it works</h2>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
 
-        <div class="mt-6 grid gap-6 md:grid-cols-3">
-
-          <div>
-            <span class="text-sm font-bold text-red-600">01</span>
-            <h3 class="mt-2 font-bold">Sign in with Google</h3>
-            <p class="mt-1 text-sm leading-6 text-slate-600">
-              Use your Google account to continue.
-            </p>
+        <div class="snn-reveal snn-card-lift bg-white border border-slate-200 rounded-xl p-6 shadow-sm" style="transition-delay: 0.05s;">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs font-extrabold text-white">
+              01
+            </span>
+            <span class="text-xs font-bold uppercase tracking-wider text-red-600">Authenticate</span>
           </div>
-
-          <div>
-            <span class="text-sm font-bold text-red-600">02</span>
-            <h3 class="mt-2 font-bold">Open your dashboard</h3>
-            <p class="mt-1 text-sm leading-6 text-slate-600">
-              Access your profile and account settings.
-            </p>
-          </div>
-
-          <div>
-            <span class="text-sm font-bold text-red-600">03</span>
-            <h3 class="mt-2 font-bold">Manage your account</h3>
-            <p class="mt-1 text-sm leading-6 text-slate-600">
-              Update your display name or sign out when finished.
-            </p>
-          </div>
-
+          <h3 class="font-editorial text-lg font-bold text-slate-900">
+            Sign in with Google
+          </h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+            Use your Google account to continue directly without creating a new password.
+          </p>
         </div>
+
+        <div class="snn-reveal snn-card-lift bg-white border border-slate-200 rounded-xl p-6 shadow-sm" style="transition-delay: 0.12s;">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-red-600 text-xs font-extrabold text-white">
+              02
+            </span>
+            <span class="text-xs font-bold uppercase tracking-wider text-red-600">Navigate</span>
+          </div>
+          <h3 class="font-editorial text-lg font-bold text-slate-900">
+            Open your dashboard
+          </h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+            Access your reader profile, saved articles, and account settings in one place.
+          </p>
+        </div>
+
+        <div class="snn-reveal snn-card-lift bg-white border border-slate-200 rounded-xl p-6 shadow-sm" style="transition-delay: 0.19s;">
+          <div class="flex items-center gap-3 mb-3">
+            <span class="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-slate-900 text-xs font-extrabold text-white">
+              03
+            </span>
+            <span class="text-xs font-bold uppercase tracking-wider text-red-600">Customize</span>
+          </div>
+          <h3 class="font-editorial text-lg font-bold text-slate-900">
+            Manage your account
+          </h3>
+          <p class="mt-1.5 text-sm leading-relaxed text-slate-600">
+            Update your display name anytime or sign out cleanly when you are finished.
+          </p>
+        </div>
+
       </div>
     </section>
 
-    <!-- Final call to action -->
-    <section class="mx-auto max-w-6xl px-6 py-12">
-      <div class="rounded-2xl bg-red-600 px-6 py-10 text-center text-white sm:px-12">
-
-        <h2 class="text-2xl font-bold sm:text-3xl">
-          Ready to access your account?
-        </h2>
-
-        <p class="mx-auto mt-3 max-w-xl text-sm leading-6 text-red-50">
-          Sign in to continue to your Sloth News reader dashboard.
-        </p>
+    <!-- ====================================================================
+         4. FINAL CALL TO ACTION BANNER
+         ==================================================================== -->
+    <section class="snn-reveal mb-6">
+      <div class="snn-dispatch-banner border border-slate-800 border-t-4 border-t-red-600 rounded-2xl px-6 py-10 sm:px-12 text-white shadow-md flex flex-col lg:flex-row items-center justify-between gap-6">
+        <div class="text-center lg:text-left max-w-2xl">
+          <span class="text-xs font-extrabold uppercase tracking-widest text-red-400">
+            Sloth News Network • Subscriber Access
+          </span>
+          <h2 class="font-editorial text-2xl sm:text-3xl font-extrabold mt-1.5">
+            Ready to access your account?
+          </h2>
+          <p class="mt-2 text-sm text-slate-300 leading-relaxed">
+            Sign in with Google to continue straight to your personal Sloth News reader dashboard.
+          </p>
+        </div>
 
         <a
           href="{{ url_for('auth.login_google') }}"
-          class="mt-6 inline-flex items-center justify-center gap-2 rounded-lg bg-white px-6 py-3 font-bold text-red-700 transition hover:bg-red-50"
+          class="group shrink-0 inline-flex items-center justify-center gap-2.5 rounded-lg bg-red-600 px-6 py-3.5 text-sm font-bold text-white shadow-sm transition-all duration-200 hover:bg-red-700"
         >
           <i class="fa-brands fa-google"></i>
-          Continue with Google
+          <span>Continue with Google</span>
+          <i class="fa-solid fa-arrow-right text-xs transition-transform duration-200 group-hover:translate-x-1"></i>
         </a>
-
       </div>
     </section>
 
   </main>
 
   <!-- Footer -->
-  <footer class="border-t border-slate-200 bg-white">
-    <div class="mx-auto flex max-w-6xl flex-col items-center justify-between gap-4 px-6 py-6 text-sm text-slate-500 sm:flex-row">
-
-      <p>
-        &copy; {{ current_year | default(2026) }} Sloth News
+  <footer class="border-t border-slate-200 bg-white mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col items-center justify-between gap-4 px-4 sm:px-6 py-6 text-sm text-slate-500 sm:flex-row">
+      <p class="font-medium text-slate-700">
+        &copy; {{ current_year | default(2026) }} <span class="font-editorial font-bold text-slate-900">Sloth News</span>
       </p>
 
-      <div class="flex gap-5">
-        <a href="/" class="hover:text-red-600">Front Page</a>
-        <a href="/about" class="hover:text-red-600">About</a>
+      <div class="flex items-center gap-5 font-semibold text-xs uppercase tracking-wider">
+        <a href="/" class="hover:text-red-600 transition">Front Page</a>
+        <a href="/about" class="hover:text-red-600 transition">About</a>
       </div>
-
     </div>
   </footer>
 
-  <!-- Shared navigation -->
+  <!-- Back to Top Floating Button (Matches dashboard.html) -->
+  <button type="button" class="back-to-top-btn" id="backToTopBtn" aria-label="Back to top">
+    <i class="fa-solid fa-arrow-up"></i>
+  </button>
+
+  <!-- Shared Navigation -->
   <script src="{{ url_for('static', filename='nav.js') }}"></script>
 
-  <!-- Remove the loading screen after the page loads -->
+  <!-- Page Loader, Scroll Reveal & Back-to-Top Logic -->
   <script>
     window.addEventListener("load", () => {
       const loader = document.getElementById("page-loader");
-
       if (loader) {
         loader.classList.add("hidden-loader");
-
         setTimeout(() => {
           loader.remove();
         }, 300);
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", () => {
+      // Subtle Scroll Reveal
+      const revealEls = document.querySelectorAll(".snn-reveal");
+      if ("IntersectionObserver" in window) {
+        const observer = new IntersectionObserver(
+          (entries, obs) => {
+            entries.forEach((entry) => {
+              if (entry.isIntersecting) {
+                entry.target.classList.add("is-visible");
+                obs.unobserve(entry.target);
+              }
+            });
+          },
+          { threshold: 0.1 }
+        );
+        revealEls.forEach((el) => observer.observe(el));
+      } else {
+        revealEls.forEach((el) => el.classList.add("is-visible"));
+      }
+
+      // Back to Top Button
+      const bttBtn = document.getElementById("backToTopBtn");
+      if (bttBtn) {
+        window.addEventListener("scroll", () => {
+          if (window.scrollY > 350) {
+            bttBtn.classList.add("visible");
+          } else {
+            bttBtn.classList.remove("visible");
+          }
+        });
+        bttBtn.addEventListener("click", () => {
+          window.scrollTo({ top: 0, behavior: "smooth" });
+        });
       }
     });
   </script>
 
 </body>
 </html>
-ss
