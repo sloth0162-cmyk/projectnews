@@ -128,7 +128,15 @@ def auth_me():
 def logout():
     session.clear()
     return redirect("/")
+# -----------------------------
+# Subscriber Page
+# -----------------------------
+@auth_bp.route("/subscriber")
+def subscriber_page():
+    if session.get("user"):
+        return redirect(url_for("auth.profile_page"))
 
+    return render_template("subscriber.html")
 # -----------------------------
 # Profile
 # -----------------------------
