@@ -29,7 +29,19 @@
   <meta name="twitter:title" content="{{ article.title }}" />
   <meta name="twitter:description" content="{{ article.summary[:200] | striptags }}" />
   <meta name="twitter:image" content="{{ article.image_url }}" />
+<style>
+  /* keep the entrance animation but leave no transform behind,
+     so fixed-position children (the mobile sheet) work correctly */
+  .animate-fade-in { animation-fill-mode: backwards; }
 
+  @keyframes sheetUp {
+    from { transform: translateY(100%); }
+    to   { transform: translateY(0); }
+  }
+  @media (max-width: 639px) {
+    #article-menu[open] .menu-panel { animation: sheetUp .25s cubic-bezier(.16,1,.3,1); }
+  }
+</style>
   <!-- Schema.org Structured Data: NewsArticle & BreadcrumbList -->
   <script type="application/ld+json">
   {
@@ -177,51 +189,63 @@
         </div>
 
         <!-- Social Share Bar -->
-     <div class="flex items-center gap-3">
-  <span class="text-xs text-slate-500 font-semibold">
+<!-- Article actions -->
+<div class="flex items-center gap-3 ml-auto">
+  <span class="text-xs text-slate-500 font-semibold whitespace-nowrap">
     <i class="fa-regular fa-eye mr-1"></i>1 View
   </span>
 
-  <details class="relative" id="article-menu">
+  <details class="sm:relative" id="article-menu">
     <summary
-      class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200
-             flex items-center justify-center cursor-pointer"
+      class="list-none w-11 h-11 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-slate-200
+             active:bg-slate-300 flex items-center justify-center cursor-pointer select-none
+             [&::-webkit-details-marker]:hidden"
       aria-label="Article options"
     >
       <i class="fa-solid fa-ellipsis-vertical"></i>
     </summary>
 
-    <div class="absolute right-0 top-11 z-50 w-48 bg-white
-                border border-slate-200 rounded-xl shadow-lg p-1">
+    <!-- Backdrop (mobile only) -->
+    <div id="menu-backdrop" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] sm:hidden"></div>
 
-      <button
-        type="button"
-        id="share-article"
-        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 rounded-lg"
-      >
-        <i class="fa-solid fa-share-nodes mr-2"></i> Share
+    <!-- Panel: bottom sheet on mobile, dropdown on desktop -->
+    <div class="menu-panel fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl
+                px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]
+                sm:absolute sm:inset-auto sm:right-0 sm:top-11 sm:w-52 sm:rounded-xl
+                sm:border sm:border-slate-200 sm:shadow-lg sm:p-1">
+
+      <!-- Drag handle + title (mobile only) -->
+      <div class="sm:hidden mb-3">
+        <div class="mx-auto w-10 h-1.5 rounded-full bg-slate-300 mb-3"></div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Article options</p>
+      </div>
+
+      <button type="button" id="share-article"
+        class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
+               hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
+        <i class="fa-solid fa-share-nodes w-5 text-center text-slate-600"></i> Share
       </button>
 
-      <button
-        type="button"
-        id="download-article"
-        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 rounded-lg"
-      >
-        <i class="fa-solid fa-download mr-2"></i> Download
+      <button type="button" id="download-article"
+        class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
+               hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
+        <i class="fa-solid fa-download w-5 text-center text-slate-600"></i> Download
       </button>
 
-      <button
-        type="button"
-        id="save-article"
+      <button type="button" id="save-article"
         data-url="{{ url_for('saved_articles.manage_saved_article', article_id=article.id) }}"
         data-saved="{{ 'true' if is_saved else 'false' }}"
         data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
-        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 rounded-lg"
-      >
-        <i class="fa-regular fa-bookmark mr-2"></i>
-        <span id="save-label">
-          {{ 'Saved' if is_saved else 'Save Article' }}
-        </span>
+        class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
+               hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
+        <i id="save-icon" class="{{ 'fa-solid' if is_saved else 'fa-regular' }} fa-bookmark w-5 text-center text-slate-600"></i>
+        <span id="save-label">{{ 'Saved' if is_saved else 'Save Article' }}</span>
+      </button>
+
+      <!-- Cancel (mobile only) -->
+      <button type="button" id="menu-cancel"
+        class="sm:hidden mt-2 w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold">
+        Cancel
       </button>
     </div>
   </details>
@@ -456,83 +480,81 @@
       });
     }
   </script>
-  <script>
+<script>
   const menu = document.getElementById("article-menu");
   const shareButton = document.getElementById("share-article");
   const downloadButton = document.getElementById("download-article");
   const saveButton = document.getElementById("save-article");
+  const backdrop = document.getElementById("menu-backdrop");
+  const cancelBtn = document.getElementById("menu-cancel");
 
-  if (menu) {
-    document.addEventListener("click", (event) => {
-      if (!menu.contains(event.target)) {
-        menu.open = false;
-      }
-    });
-  }
+  const closeMenu = () => { if (menu) menu.open = false; };
+
+  // Close on: backdrop tap, Cancel button, Esc key, tap outside the menu
+  backdrop?.addEventListener("click", closeMenu);
+  cancelBtn?.addEventListener("click", closeMenu);
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+  document.addEventListener("click", (event) => {
+    if (menu && !menu.contains(event.target)) closeMenu();
+  });
+
+  // Lock page scroll while the mobile sheet is open
+  menu?.addEventListener("toggle", () => {
+    document.body.style.overflow =
+      menu.open && window.matchMedia("(max-width: 639px)").matches ? "hidden" : "";
+  });
 
   shareButton?.addEventListener("click", async () => {
     const url = window.location.href;
-
     try {
       if (navigator.share) {
-        await navigator.share({
-          title: document.title,
-          url: url
-        });
+        await navigator.share({ title: document.title, url });
       } else {
         await navigator.clipboard.writeText(url);
         alert("Article link copied.");
       }
     } catch (error) {
-      if (error.name !== "AbortError") {
-        console.error("Share failed:", error);
-      }
+      if (error.name !== "AbortError") console.error("Share failed:", error);
     }
-
-    menu.open = false;
+    closeMenu();
   });
 
   downloadButton?.addEventListener("click", () => {
-    menu.open = false;
+    closeMenu();
     window.print();
   });
 
   saveButton?.addEventListener("click", async () => {
     if (saveButton.dataset.loggedIn !== "true") {
-    alert("Please sign in to save articles.");
+      alert("Please sign in to save articles.");
+      const next = encodeURIComponent(window.location.pathname + window.location.search);
+      window.location.href = `/auth/login?next=${next}`;
+      return;
+    }
 
-    const next = encodeURIComponent(
-        window.location.pathname + window.location.search
-    );
-
-    window.location.href = `/auth/login?next=${next}`;
-    return;
-}
     const saved = saveButton.dataset.saved === "true";
-
     saveButton.disabled = true;
 
     try {
       const response = await fetch(saveButton.dataset.url, {
         method: saved ? "DELETE" : "POST"
       });
-
-      if (!response.ok) {
-        throw new Error("Unable to update saved article.");
-      }
+      if (!response.ok) throw new Error("Unable to update saved article.");
 
       const result = await response.json();
-
       saveButton.dataset.saved = String(result.saved);
-
       document.getElementById("save-label").textContent =
         result.saved ? "Saved" : "Save Article";
 
+      // fill / unfill the bookmark icon
+      const icon = document.getElementById("save-icon");
+      icon.classList.toggle("fa-solid", result.saved);
+      icon.classList.toggle("fa-regular", !result.saved);
     } catch (error) {
       alert(error.message);
     } finally {
       saveButton.disabled = false;
-      menu.open = false;
+      closeMenu();
     }
   });
 </script>
