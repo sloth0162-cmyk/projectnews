@@ -1,3 +1,11 @@
+{% macro card_menu(a) %}
+<button type="button" class="card-menu-btn" aria-label="Article options"
+ data-url="{{ url_for('article.article', article_id=a.id) }}"
+ data-title="{{ a.title }}"
+ data-save="{{ url_for('saved_articles.manage_saved_article', article_id=a.id) }}"
+ data-saved="{{ 'true' if a.id in (saved_ids|default([])) else 'false' }}"
+ onclick="openCardMenu(this)"><i class="fa-solid fa-ellipsis-vertical"></i></button>
+{% endmacro %}
 <!DOCTYPE html>
 <html lang="en">
 
@@ -56,7 +64,14 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style/style.css') }}" />
   <link rel="stylesheet" href="{{ url_for('static', filename='style/nav.css') }}" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <style>
+.card-menu-btn{width:36px;height:36px;border-radius:50%;border:1px solid #e2e8f0;background:white;color:#334155;cursor:pointer;flex-shrink:0}
+#card-menu-dialog{border:0;border-radius:16px;padding:20px;width:min(92vw,360px);box-shadow:0 12px 50px #0004}
+#card-menu-dialog::backdrop{background:#0007}
+#card-menu-dialog button{display:block;width:100%;text-align:left;padding:12px;border-radius:8px}
+#card-menu-dialog button:hover{background:#f1f5f9}
+</style>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
 </head>
@@ -247,9 +262,10 @@
                 <i class="fa-solid fa-arrow-right text-[10px]"></i>
               </a>
               <div class="flex items-center gap-2 text-slate-400 text-xs">
-                <button type="button" onclick="navigator.clipboard.writeText('{{ request.url_root }}article/{{ lead.id }}'); showNewsToast('Article link copied to clipboard!');" class="hover:text-slate-700" title="Share story">
+                <button type="button" onclick="navigator.clipboard.writeText('{{ url_for('article.article', article_id=lead.id, _external=True) }}')" class="hover:text-slate-700" title="Share story">
                   <i class="fa-solid fa-share-nodes"></i>
                 </button>
+                {{ card_menu(lead) }}
               </div>
             </div>
           </div>
@@ -287,6 +303,7 @@
                   </p>
                 </div>
                 <div class="mt-2 pt-2 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+{{ card_menu(second_art) }}
                   <span>2 min read</span>
                   <a href="{{ url_for('article.article', article_id=second_art.id) }}" class="font-bold text-slate-900 hover:text-red-600">
                     Read →
@@ -382,7 +399,7 @@
                 <span>Full Story</span>
                 <i class="fa-solid fa-chevron-right text-[10px]"></i>
               </a>
-              <span class="text-slate-400 text-[11px]">Sloth Newsroom</span>
+              {{ card_menu(article) }}
             </div>
           </div>
         </article>
@@ -448,6 +465,47 @@
     }
   </script>
   {% include "loader.html" %}
+<dialog id="card-menu-dialog">
+<h3 class="font-bold text-slate-900 mb-3">Article options</h3>
+<button id="card-share">Share article</button>
+<button id="card-save">Save article</button>
+<button id="card-print">Print / Download PDF</button>
+<button onclick="document.getElementById('card-menu-dialog').close()">Close</button>
+</dialog>
+<script>
+let activeCard;
+function openCardMenu(button) {
+  activeCard = button;
+  document.getElementById('card-save').textContent =
+    button.dataset.saved === 'true' ? 'Remove saved article' : 'Save article';
+  document.getElementById('card-menu-dialog').showModal();
+}
+document.getElementById('card-share').onclick = async () => {
+  try {
+    await navigator.clipboard.writeText(new URL(activeCard.dataset.url, location.origin).href);
+    alert('Article link copied');
+  } catch(e) { prompt('Copy article link:', activeCard.dataset.url); }
+};
+document.getElementById('card-print').onclick = () => {
+  const w = window.open(activeCard.dataset.url, '_blank'); if(w) alert('Use Print on the article page.');
+};
+document.getElementById('card-save').onclick = async () => {
+  {% if not session.get('user') %}
+  alert('Please sign in to save articles.');
+  location.href = '/login/google?next=' + encodeURIComponent(activeCard.dataset.url);
+  {% else %}
+  try {
+    const r = await fetch(activeCard.dataset.save, {
+      method:'POST', headers:{'Accept':'application/json'}
+    });
+    if (!r.ok) throw new Error('Save failed');
+    activeCard.dataset.saved = activeCard.dataset.saved === 'true' ? 'false' : 'true';
+    document.getElementById('card-save').textContent =
+      activeCard.dataset.saved === 'true' ? 'Remove saved article' : 'Save article';
+  } catch(e) { alert('Could not update saved article.'); }
+  {% endif %}
+};
+</script>
 </body>
 
 </html>
