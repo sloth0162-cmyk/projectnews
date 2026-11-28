@@ -29,19 +29,7 @@
   <meta name="twitter:title" content="{{ article.title }}" />
   <meta name="twitter:description" content="{{ article.summary[:200] | striptags }}" />
   <meta name="twitter:image" content="{{ article.image_url }}" />
-<style>
-  /* keep the entrance animation but leave no transform behind,
-     so fixed-position children (the mobile sheet) work correctly */
-  .animate-fade-in { animation-fill-mode: backwards; }
 
-  @keyframes sheetUp {
-    from { transform: translateY(100%); }
-    to   { transform: translateY(0); }
-  }
-  @media (max-width: 639px) {
-    #article-menu[open] .menu-panel { animation: sheetUp .25s cubic-bezier(.16,1,.3,1); }
-  }
-</style>
   <!-- Schema.org Structured Data: NewsArticle & BreadcrumbList -->
   <script type="application/ld+json">
   {
@@ -112,9 +100,58 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;800&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,600;0,6..72,700;0,6..72,800;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+
+  <style>
+    /* Keep the entrance animation without leaving a transform behind,
+       so fixed-position children (the mobile sheet) work correctly */
+    .animate-fade-in { animation-fill-mode: backwards; }
+
+    @keyframes sheetUp {
+      from { transform: translateY(100%); }
+      to   { transform: translateY(0); }
+    }
+
+    @media (max-width: 639px) {
+      #article-menu[open] .menu-panel {
+        animation: sheetUp .25s cubic-bezier(.16,1,.3,1);
+      }
+
+      .article-headline {
+        font-size: clamp(1.6rem, 6.5vw, 2.15rem);
+        line-height: 1.22;
+        margin-bottom: 1rem;
+      }
+
+      .article-byline-bar {
+        padding: 0.85rem 0;
+        margin-bottom: 1.5rem;
+      }
+
+      .article-body-text {
+        font-size: 1rem;
+        line-height: 1.75;
+      }
+
+      .article-body-text p:first-of-type::first-letter {
+        font-size: 3.35rem;
+        padding-right: 8px;
+      }
+
+      .news-desk-title {
+        font-size: 1.3rem;
+      }
+
+      .back-to-top-btn {
+        bottom: 1rem;
+        right: 1rem;
+        width: 40px;
+        height: 40px;
+      }
+    }
+  </style>
 </head>
 
-<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col">
+<body class="bg-slate-50 text-slate-900 min-h-screen flex flex-col overflow-x-hidden">
 
   <!-- Reading Progress Bar -->
   <div class="reading-progress-bar" id="readingProgressBar"></div>
@@ -123,138 +160,137 @@
   <header></header>
 
   <!-- Article View Area -->
-  <main class="max-w-4xl mx-auto px-4 sm:px-6 py-8 w-full flex-1">
+  <main class="max-w-4xl mx-auto px-3.5 sm:px-6 py-5 sm:py-8 w-full flex-1">
 
     {% if article %}
     <!-- Breadcrumb Bar -->
-    <nav aria-label="Breadcrumb" class="mb-6 flex items-center justify-between text-xs text-slate-500 border-b border-slate-200 pb-3">
-      <ol class="flex items-center gap-2">
-        <li>
+    <nav aria-label="Breadcrumb" class="mb-4 sm:mb-6 flex items-center justify-between gap-3 text-xs text-slate-500 border-b border-slate-200 pb-3">
+      <ol class="flex items-center gap-1.5 sm:gap-2 min-w-0 flex-1">
+        <li class="shrink-0">
           <a href="/" class="hover:text-red-600 transition font-medium">Home</a>
         </li>
-        <li><span class="text-slate-300">/</span></li>
-        <li>
-          <a href="/thirdpage" class="hover:text-red-600 transition font-medium">Wire Dispatches</a>
+        <li class="shrink-0"><span class="text-slate-300">/</span></li>
+        <li class="shrink-0">
+          <a href="/thirdpage" class="hover:text-red-600 transition font-medium whitespace-nowrap">Wire Dispatches</a>
         </li>
-        <li><span class="text-slate-300">/</span></li>
-        <li class="font-bold text-slate-800 truncate max-w-[200px] sm:max-w-[350px]">
+        <li class="shrink-0"><span class="text-slate-300">/</span></li>
+        <li class="font-bold text-slate-800 truncate min-w-0">
           {{ article.title }}
         </li>
       </ol>
 
-      <a href="javascript:history.back()" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-red-600 transition">
+      <a href="javascript:history.back()" class="inline-flex items-center gap-1.5 text-xs font-bold text-slate-700 hover:text-red-600 transition shrink-0 py-1">
         <i class="fa-solid fa-arrow-left"></i>
         <span>Back</span>
       </a>
     </nav>
 
     <!-- Article Reader Box -->
-    <article class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-10 shadow-sm animate-fade-in">
+    <article class="bg-white border border-slate-200 rounded-xl sm:rounded-2xl p-4 sm:p-7 md:p-10 shadow-sm animate-fade-in">
 
       <!-- Category Tag & Metadata -->
-      <div class="flex flex-wrap items-center gap-3 mb-4">
+      <div class="flex flex-wrap items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
         <span class="bg-red-600 text-white font-extrabold text-[11px] tracking-wider uppercase px-2.5 py-1 rounded">
           Newsroom Wire
         </span>
         <span class="text-xs font-semibold text-slate-500">
           <i class="fa-regular fa-clock mr-1"></i>3 min read
         </span>
-        <span class="text-slate-300">•</span>
+        <span class="text-slate-300 hidden sm:inline">•</span>
         <span class="text-xs font-semibold text-slate-500">
           <i class="fa-solid fa-shield-halved text-emerald-600 mr-1"></i>Fact-Checked
         </span>
       </div>
 
       <!-- Main Headline -->
-      <h1 class="article-headline font-editorial">
+      <h1 class="article-headline font-editorial break-words">
         {{ article.title }}
       </h1>
 
       <!-- Byline Bar -->
       <div class="article-byline-bar">
-        <div class="byline-author">
+        <div class="byline-author min-w-0 flex-1">
           <img
             src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=120&q=80"
             alt="SNN Newsdesk"
-            class="byline-avatar"
+            class="byline-avatar shrink-0"
           />
-          <div>
-            <div class="font-bold text-slate-900 text-sm">
+          <div class="min-w-0">
+            <div class="font-bold text-slate-900 text-sm truncate">
               By Sloth News Intelligence Desk
             </div>
-            <div class="text-xs text-slate-500">
+            <div class="text-xs text-slate-500 leading-snug">
               Published on {{ edition_date if edition_date else 'Nov 16, 2026' }} • Verified Dispatch
             </div>
           </div>
         </div>
 
-        <!-- Social Share Bar -->
-<!-- Article actions -->
-<div class="flex items-center gap-3 ml-auto">
-  <span class="text-xs text-slate-500 font-semibold whitespace-nowrap">
-    <i class="fa-regular fa-eye mr-1"></i>1 View
-  </span>
+        <!-- Article actions -->
+        <div class="flex items-center justify-between sm:justify-end gap-3 w-full sm:w-auto pt-2.5 sm:pt-0 border-t sm:border-t-0 border-slate-100">
+          <span class="text-xs text-slate-500 font-semibold whitespace-nowrap">
+            <i class="fa-regular fa-eye mr-1"></i>1 View
+          </span>
 
-  <details class="sm:relative" id="article-menu">
-    <summary
-      class="list-none w-11 h-11 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-slate-200
-             active:bg-slate-300 flex items-center justify-center cursor-pointer select-none
-             [&::-webkit-details-marker]:hidden"
-      aria-label="Article options"
-    >
-      <i class="fa-solid fa-ellipsis-vertical"></i>
-    </summary>
+          <details class="sm:relative" id="article-menu">
+            <summary
+              class="list-none w-11 h-11 sm:w-9 sm:h-9 rounded-full bg-slate-100 hover:bg-slate-200
+                     active:bg-slate-300 flex items-center justify-center cursor-pointer select-none
+                     [&::-webkit-details-marker]:hidden"
+              aria-label="Article options"
+            >
+              <i class="fa-solid fa-ellipsis-vertical"></i>
+            </summary>
 
-    <!-- Backdrop (mobile only) -->
-    <div id="menu-backdrop" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] sm:hidden"></div>
+            <!-- Backdrop (mobile only) -->
+            <div id="menu-backdrop" class="fixed inset-0 z-40 bg-slate-900/50 backdrop-blur-[2px] sm:hidden"></div>
 
-    <!-- Panel: bottom sheet on mobile, dropdown on desktop -->
-    <div class="menu-panel fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl
-                px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]
-                sm:absolute sm:inset-auto sm:right-0 sm:top-11 sm:w-52 sm:rounded-xl
-                sm:border sm:border-slate-200 sm:shadow-lg sm:p-1">
+            <!-- Panel: bottom sheet on mobile, dropdown on desktop -->
+            <div class="menu-panel fixed inset-x-0 bottom-0 z-50 bg-white rounded-t-2xl shadow-2xl
+                        px-4 pt-3 pb-[calc(1rem+env(safe-area-inset-bottom))]
+                        sm:absolute sm:inset-auto sm:right-0 sm:top-11 sm:w-52 sm:rounded-xl
+                        sm:border sm:border-slate-200 sm:shadow-lg sm:p-1">
 
-      <!-- Drag handle + title (mobile only) -->
-      <div class="sm:hidden mb-3">
-        <div class="mx-auto w-10 h-1.5 rounded-full bg-slate-300 mb-3"></div>
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Article options</p>
-      </div>
+              <!-- Drag handle + title (mobile only) -->
+              <div class="sm:hidden mb-3">
+                <div class="mx-auto w-10 h-1.5 rounded-full bg-slate-300 mb-3"></div>
+                <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Article options</p>
+              </div>
 
-      <button type="button" id="share-article"
-        class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
-               hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
-        <i class="fa-solid fa-share-nodes w-5 text-center text-slate-600"></i> Share
-      </button>
+              <button type="button" id="share-article"
+                class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
+                       hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
+                <i class="fa-solid fa-share-nodes w-5 text-center text-slate-600"></i> Share
+              </button>
 
-      <button type="button" id="download-article"
-        class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
-               hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
-        <i class="fa-solid fa-download w-5 text-center text-slate-600"></i> Download
-      </button>
+              <button type="button" id="download-article"
+                class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
+                       hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
+                <i class="fa-solid fa-download w-5 text-center text-slate-600"></i> Download
+              </button>
 
-      <button type="button" id="save-article"
-        data-url="{{ url_for('saved_articles.manage_saved_article', article_id=article.id) }}"
-        data-saved="{{ 'true' if is_saved else 'false' }}"
-        data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
-        class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
-               hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
-        <i id="save-icon" class="{{ 'fa-solid' if is_saved else 'fa-regular' }} fa-bookmark w-5 text-center text-slate-600"></i>
-        <span id="save-label">{{ 'Saved' if is_saved else 'Save Article' }}</span>
-      </button>
+              <button type="button" id="save-article"
+                data-url="{{ url_for('saved_articles.manage_saved_article', article_id=article.id) }}"
+                data-saved="{{ 'true' if is_saved else 'false' }}"
+                data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
+                class="w-full flex items-center gap-3 text-left px-3 py-3.5 sm:py-2 text-base sm:text-sm
+                       hover:bg-slate-100 active:bg-slate-200 rounded-xl sm:rounded-lg">
+                <i id="save-icon" class="{{ 'fa-solid' if is_saved else 'fa-regular' }} fa-bookmark w-5 text-center text-slate-600"></i>
+                <span id="save-label">{{ 'Saved' if is_saved else 'Save Article' }}</span>
+              </button>
 
-      <!-- Cancel (mobile only) -->
-      <button type="button" id="menu-cancel"
-        class="sm:hidden mt-2 w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold">
-        Cancel
-      </button>
-    </div>
-  </details>
-</div>
+              <!-- Cancel (mobile only) -->
+              <button type="button" id="menu-cancel"
+                class="sm:hidden mt-2 w-full py-3 rounded-xl bg-slate-900 text-white text-sm font-bold">
+                Cancel
+              </button>
+            </div>
+          </details>
+        </div>
       </div>
 
       <!-- Featured Image with Photo Credit -->
-      <figure class="mb-8">
-        <div class="rounded-xl overflow-hidden bg-slate-900 border border-slate-200 aspect-video relative">
+      <figure class="mb-6 sm:mb-8">
+        <div class="rounded-lg sm:rounded-xl overflow-hidden bg-slate-900 border border-slate-200 aspect-video relative">
           <img
             src="{{ article.image_url }}"
             alt="{{ article.title }}"
@@ -262,14 +298,14 @@
             class="w-full h-full object-cover"
           />
         </div>
-        <figcaption class="mt-2.5 text-xs text-slate-500 flex items-center justify-between italic">
+        <figcaption class="mt-2.5 text-xs text-slate-500 flex flex-col sm:flex-row sm:items-center justify-between gap-1 italic">
           <span>Editorial Press Image via Sloth News Network Global Wire</span>
-          <span class="font-normal uppercase tracking-wider text-[10px] text-slate-400">Photo Ref: #{{ article.id }}</span>
+          <span class="font-normal uppercase tracking-wider text-[10px] text-slate-400 shrink-0">Photo Ref: #{{ article.id }}</span>
         </figcaption>
       </figure>
 
       <!-- Key Takeaways Box -->
-      <div class="bg-slate-50 border-l-4 border-red-600 rounded-r-xl p-5 mb-8">
+      <div class="bg-slate-50 border-l-4 border-red-600 rounded-r-xl p-4 sm:p-5 mb-6 sm:mb-8">
         <h3 class="font-bold text-xs uppercase tracking-wider text-slate-900 mb-2 flex items-center gap-1.5">
           <i class="fa-solid fa-list-check text-red-600"></i> Executive Briefing & Key Points
         </h3>
@@ -290,17 +326,17 @@
       </div>
 
       <!-- Article Body Content -->
-      <div class="article-body-text">
-        <p class="leading-relaxed mb-6">
+      <div class="article-body-text break-words">
+        <p class="leading-relaxed mb-5 sm:mb-6">
           {{ article.summary }}
         </p>
 
-        <p class="leading-relaxed text-slate-700 mb-6">
+        <p class="leading-relaxed text-slate-700 mb-5 sm:mb-6">
           The Sloth News Network intelligence desk continues to monitor real-time updates surrounding this story. Readers and subscribers are encouraged to follow our market wire and verified social broadcasts for further developments as official briefings and market responses unfold.
         </p>
 
         <!-- Editorial Pull Quote -->
-        <blockquote class="my-8 p-6 bg-slate-900 text-white rounded-xl border-l-4 border-red-600 font-editorial text-lg italic leading-relaxed">
+        <blockquote class="my-6 sm:my-8 p-4 sm:p-6 bg-slate-900 text-white rounded-xl border-l-4 border-red-600 font-editorial text-base sm:text-lg italic leading-relaxed">
           "Accurate, rapid intelligence is the cornerstone of informed modern decision-making across global markets and governance."
           <div class="mt-3 font-sans-ui text-xs font-bold text-red-400 not-italic uppercase tracking-wider">
             — Sloth News Editorial Desk
@@ -309,68 +345,68 @@
       </div>
 
       <!-- Tags & Actions Bottom Strip -->
-<div class="mt-10 pt-6 border-t border-slate-200
-            flex flex-wrap items-center justify-between gap-4">
+      <div class="mt-8 sm:mt-10 pt-5 sm:pt-6 border-t border-slate-200
+                  flex flex-col sm:flex-row sm:items-center justify-between gap-4">
 
-  <div class="flex items-center gap-2">
-    <span class="text-xs font-bold text-slate-500 uppercase">
-      Topic Tags:
-    </span>
+        <div class="flex flex-wrap items-center gap-2">
+          <span class="text-xs font-bold text-slate-500 uppercase">
+            Topic Tags:
+          </span>
 
-    <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
-      #News
-    </span>
+          <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
+            #News
+          </span>
 
-    <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
-      #WorldWire
-    </span>
+          <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
+            #WorldWire
+          </span>
 
-    <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
-      #Intelligence
-    </span>
-  </div>
+          <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
+            #Intelligence
+          </span>
+        </div>
 
-  <div class="flex items-center gap-2">
-    <button
-      type="button"
-      disabled
-      title="Coming soon"
-      class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs"
-    >
-      <i class="fa-regular fa-thumbs-up mr-1"></i> 0
-    </button>
+        <div class="flex items-center gap-2 self-start sm:self-auto">
+          <button
+            type="button"
+            disabled
+            title="Coming soon"
+            class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs"
+          >
+            <i class="fa-regular fa-thumbs-up mr-1"></i> 0
+          </button>
 
-    <button
-      type="button"
-      disabled
-      title="Coming soon"
-      class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs"
-    >
-      <i class="fa-regular fa-thumbs-down mr-1"></i> 0
-    </button>
-  </div>
-</div>
+          <button
+            type="button"
+            disabled
+            title="Coming soon"
+            class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs"
+          >
+            <i class="fa-regular fa-thumbs-down mr-1"></i> 0
+          </button>
+        </div>
+      </div>
 
       <!-- Daily Briefing Newsletter Signup Box -->
-      <div class="mt-10 bg-slate-900 text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
-        <div>
-          <h4 class="font-editorial text-xl font-bold mb-1 text-white">
+      <div class="mt-8 sm:mt-10 bg-slate-900 text-white rounded-xl p-5 sm:p-8 flex flex-col md:flex-row items-stretch md:items-center justify-between gap-5 sm:gap-6">
+        <div class="text-left">
+          <h4 class="font-editorial text-lg sm:text-xl font-bold mb-1 text-white">
             Receive The Daily Morning Briefing
           </h4>
           <p class="text-xs text-slate-400 max-w-md">
             Join 45,000+ professionals reading our 24/7 fact-checked intelligence brief every morning.
           </p>
         </div>
-        <form onsubmit="event.preventDefault(); showNewsToast('Subscribed! You will receive the daily morning brief.'); this.reset();" class="flex items-center gap-2 w-full md:w-auto">
+        <form onsubmit="event.preventDefault(); showNewsToast('Subscribed! You will receive the daily morning brief.'); this.reset();" class="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-2 w-full md:w-auto">
           <input
             type="email"
             required
             placeholder="Enter work email..."
-            class="px-3.5 py-2 rounded-lg bg-slate-800 border border-slate-700 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-red-500 w-full sm:w-60"
+            class="px-3.5 py-2.5 sm:py-2 rounded-lg bg-slate-800 border border-slate-700 text-base sm:text-xs text-white placeholder-slate-400 focus:outline-none focus:border-red-500 w-full md:w-60"
           />
           <button
             type="submit"
-            class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition shrink-0"
+            class="px-4 py-2.5 sm:py-2 bg-red-600 hover:bg-red-700 text-white text-xs font-bold uppercase tracking-wider rounded-lg transition shrink-0 w-full sm:w-auto"
           >
             Subscribe
           </button>
@@ -381,18 +417,18 @@
 
     <!-- Related Articles / More From Newsroom -->
     {% if related_articles and related_articles|length > 0 %}
-    <section class="mt-12">
-      <div class="news-desk-header">
+    <section class="mt-10 sm:mt-12">
+      <div class="news-desk-header gap-2">
         <h2 class="news-desk-title">
           <i class="fa-solid fa-newspaper"></i> Related Dispatches
         </h2>
-        <a href="/" class="news-desk-link">
+        <a href="/" class="news-desk-link shrink-0">
           <span>All News</span>
           <i class="fa-solid fa-arrow-right"></i>
         </a>
       </div>
 
-      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         {% for r in related_articles %}
         <article class="bg-white border border-slate-200 rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all group flex flex-col">
           <a href="{{ url_for('article.article', article_id=r.id) }}" class="aspect-video bg-slate-900 block overflow-hidden">
@@ -425,11 +461,11 @@
 
     {% else %}
     <!-- 404 Article Not Found -->
-    <div class="bg-white border border-slate-200 rounded-2xl p-12 text-center max-w-lg mx-auto my-12">
+    <div class="bg-white border border-slate-200 rounded-2xl p-6 sm:p-12 text-center max-w-lg mx-auto my-8 sm:my-12">
       <div class="w-16 h-16 bg-red-50 text-red-600 rounded-full flex items-center justify-center mx-auto mb-4 text-2xl">
         <i class="fa-solid fa-triangle-exclamation"></i>
       </div>
-      <h2 class="text-2xl font-bold font-editorial text-slate-900 mb-2">Dispatch Not Found</h2>
+      <h2 class="text-xl sm:text-2xl font-bold font-editorial text-slate-900 mb-2">Dispatch Not Found</h2>
       <p class="text-slate-500 text-sm mb-6">
         The news article requested does not exist or may have been archived by the newsroom editors.
       </p>
@@ -458,7 +494,7 @@
       if (progressBar) {
         const scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
         const scrollHeight = document.documentElement.scrollHeight - document.documentElement.clientHeight;
-        const scrolled = (scrollTop / scrollHeight) * 100;
+        const scrolled = scrollHeight > 0 ? (scrollTop / scrollHeight) * 100 : 0;
         progressBar.style.width = scrolled + '%';
       }
 
@@ -480,85 +516,85 @@
       });
     }
   </script>
-<script>
-  const menu = document.getElementById("article-menu");
-  const shareButton = document.getElementById("share-article");
-  const downloadButton = document.getElementById("download-article");
-  const saveButton = document.getElementById("save-article");
-  const backdrop = document.getElementById("menu-backdrop");
-  const cancelBtn = document.getElementById("menu-cancel");
+  <script>
+    const menu = document.getElementById("article-menu");
+    const shareButton = document.getElementById("share-article");
+    const downloadButton = document.getElementById("download-article");
+    const saveButton = document.getElementById("save-article");
+    const backdrop = document.getElementById("menu-backdrop");
+    const cancelBtn = document.getElementById("menu-cancel");
 
-  const closeMenu = () => { if (menu) menu.open = false; };
+    const closeMenu = () => { if (menu) menu.open = false; };
 
-  // Close on: backdrop tap, Cancel button, Esc key, tap outside the menu
-  backdrop?.addEventListener("click", closeMenu);
-  cancelBtn?.addEventListener("click", closeMenu);
-  document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
-  document.addEventListener("click", (event) => {
-    if (menu && !menu.contains(event.target)) closeMenu();
-  });
+    // Close on: backdrop tap, Cancel button, Esc key, tap outside the menu
+    backdrop?.addEventListener("click", closeMenu);
+    cancelBtn?.addEventListener("click", closeMenu);
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeMenu(); });
+    document.addEventListener("click", (event) => {
+      if (menu && !menu.contains(event.target)) closeMenu();
+    });
 
-  // Lock page scroll while the mobile sheet is open
-  menu?.addEventListener("toggle", () => {
-    document.body.style.overflow =
-      menu.open && window.matchMedia("(max-width: 639px)").matches ? "hidden" : "";
-  });
+    // Lock page scroll while the mobile sheet is open
+    menu?.addEventListener("toggle", () => {
+      document.body.style.overflow =
+        menu.open && window.matchMedia("(max-width: 639px)").matches ? "hidden" : "";
+    });
 
-  shareButton?.addEventListener("click", async () => {
-    const url = window.location.href;
-    try {
-      if (navigator.share) {
-        await navigator.share({ title: document.title, url });
-      } else {
-        await navigator.clipboard.writeText(url);
-        alert("Article link copied.");
+    shareButton?.addEventListener("click", async () => {
+      const url = window.location.href;
+      try {
+        if (navigator.share) {
+          await navigator.share({ title: document.title, url });
+        } else {
+          await navigator.clipboard.writeText(url);
+          alert("Article link copied.");
+        }
+      } catch (error) {
+        if (error.name !== "AbortError") console.error("Share failed:", error);
       }
-    } catch (error) {
-      if (error.name !== "AbortError") console.error("Share failed:", error);
-    }
-    closeMenu();
-  });
-
-  downloadButton?.addEventListener("click", () => {
-    closeMenu();
-    window.print();
-  });
-
-  saveButton?.addEventListener("click", async () => {
-    if (saveButton.dataset.loggedIn !== "true") {
-      alert("Please sign in to save articles.");
-      const next = encodeURIComponent(window.location.pathname + window.location.search);
-      window.location.href = `/auth/login?next=${next}`;
-      return;
-    }
-
-    const saved = saveButton.dataset.saved === "true";
-    saveButton.disabled = true;
-
-    try {
-      const response = await fetch(saveButton.dataset.url, {
-        method: saved ? "DELETE" : "POST"
-      });
-      if (!response.ok) throw new Error("Unable to update saved article.");
-
-      const result = await response.json();
-      saveButton.dataset.saved = String(result.saved);
-      document.getElementById("save-label").textContent =
-        result.saved ? "Saved" : "Save Article";
-
-      // fill / unfill the bookmark icon
-      const icon = document.getElementById("save-icon");
-      icon.classList.toggle("fa-solid", result.saved);
-      icon.classList.toggle("fa-regular", !result.saved);
-    } catch (error) {
-      alert(error.message);
-    } finally {
-      saveButton.disabled = false;
       closeMenu();
-    }
-  });
-</script>
-{% include "loader.html" %}
+    });
+
+    downloadButton?.addEventListener("click", () => {
+      closeMenu();
+      window.print();
+    });
+
+    saveButton?.addEventListener("click", async () => {
+      if (saveButton.dataset.loggedIn !== "true") {
+        alert("Please sign in to save articles.");
+        const next = encodeURIComponent(window.location.pathname + window.location.search);
+        window.location.href = `/auth/login?next=${next}`;
+        return;
+      }
+
+      const saved = saveButton.dataset.saved === "true";
+      saveButton.disabled = true;
+
+      try {
+        const response = await fetch(saveButton.dataset.url, {
+          method: saved ? "DELETE" : "POST"
+        });
+        if (!response.ok) throw new Error("Unable to update saved article.");
+
+        const result = await response.json();
+        saveButton.dataset.saved = String(result.saved);
+        document.getElementById("save-label").textContent =
+          result.saved ? "Saved" : "Save Article";
+
+        // fill / unfill the bookmark icon
+        const icon = document.getElementById("save-icon");
+        icon.classList.toggle("fa-solid", result.saved);
+        icon.classList.toggle("fa-regular", !result.saved);
+      } catch (error) {
+        alert(error.message);
+      } finally {
+        saveButton.disabled = false;
+        closeMenu();
+      }
+    });
+  </script>
+  {% include "loader.html" %}
 </body>
 
 </html>
