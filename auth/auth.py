@@ -7,10 +7,12 @@ from flask import (
     url_for,
     session,
 )
+from auth.savedarticles import get_saved_articles
 
 import requests
 
 from config import Config
+
 
 auth_bp = Blueprint("auth", __name__)
 # -----------------------------
@@ -253,6 +255,6 @@ def profile_page():
         last_name=last_name,
         display_name=display_name,
         avatar_url=avatar_url,
-        saved_articles=[],
+        saved_articles=get_saved_articles(user["id"]),
         notice=notice,
     )

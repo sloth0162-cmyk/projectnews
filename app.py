@@ -25,7 +25,7 @@ import os
 from datetime import datetime
 from market.livestockapi import get_reliance_data
 from auth.auth import auth_bp
-
+from auth.savedarticles import saved_articles_bp
 # -----------------------------
 # 🔧 Flask App Setup
 # -----------------------------
@@ -38,7 +38,7 @@ PIPELINE_PASSWORD = Config.PIPELINE_PASSWORD
 app.register_blueprint(article_bp)
 app.register_blueprint(second, url_prefix="/secondpage")
 app.register_blueprint(auth_bp)
-
+app.register_blueprint(saved_articles_bp)
 
 # -----------------------------
 # 🌐 Global News Context Processor

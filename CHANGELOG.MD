@@ -4,15 +4,20 @@
 **Date:** 25-11-2026
 
 ### Fixed / Improved
-1. Fixed the authentication bug and connected Flask sessions with the navigation system.
+1. Fixed authentication bugs and connected Flask sessions with the navigation system.
 2. Reworked the profile system to support persistent name updates through Supabase Auth.
-3. Improved authentication compatibility across desktop and Android.
+3. Fixed the logout functionality and improved account navigation.
+4. Improved authentication compatibility across desktop and Android.
+5. Completed production-level testing and mobile compatibility checks for the authentication system.
 
 ### Added
-1. Integrated a functional newsletter subscription system into the footer.
-2. Connected newsletter subscriptions to Supabase for email storage.
-3. Added duplicate subscription detection and subscriber reactivation.
-4. Added subscription success and error notifications.
+1. Created a dedicated authentication module (`auth/auth.py`) to separate authentication and profile routes from the main `app.py` file.
+2. Added a Reader Profile page with account information and profile management.
+3. Added a Subscriber Center page for signed-out users, providing information about account benefits and Google sign-in.
+4. Integrated a functional newsletter subscription system into the footer.
+5. Connected newsletter subscriptions to Supabase for email storage.
+6. Added duplicate subscription detection and subscriber reactivation.
+7. Added subscription success and error notifications.
 
 ## Version 3.1
 **Date:** 24-11-2026

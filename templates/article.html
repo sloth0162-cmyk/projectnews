@@ -177,41 +177,55 @@
         </div>
 
         <!-- Social Share Bar -->
-        <div class="flex items-center gap-2">
-          <span class="text-xs text-slate-400 font-bold uppercase tracking-wider mr-1 hidden sm:inline">Share:</span>
-          <button
-            type="button"
-            onclick="window.open('https://twitter.com/intent/tweet?text=' + encodeURIComponent('{{ article.title }}') + '&url=' + encodeURIComponent(window.location.href), '_blank')"
-            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-900 hover:text-white flex items-center justify-center text-slate-600 transition"
-            title="Share on X / Twitter"
-          >
-            <i class="fa-brands fa-x-twitter text-xs"></i>
-          </button>
-          <button
-            type="button"
-            onclick="window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + encodeURIComponent(window.location.href), '_blank')"
-            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-blue-700 hover:text-white flex items-center justify-center text-slate-600 transition"
-            title="Share on LinkedIn"
-          >
-            <i class="fa-brands fa-linkedin-in text-xs"></i>
-          </button>
-          <button
-            type="button"
-            onclick="window.open('https://api.whatsapp.com/send?text=' + encodeURIComponent('{{ article.title }} - ' + window.location.href), '_blank')"
-            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-emerald-600 hover:text-white flex items-center justify-center text-slate-600 transition"
-            title="Share on WhatsApp"
-          >
-            <i class="fa-brands fa-whatsapp text-xs"></i>
-          </button>
-          <button
-            type="button"
-            onclick="navigator.clipboard.writeText(window.location.href); showNewsToast('Article link copied to clipboard!');"
-            class="w-8 h-8 rounded-full bg-slate-100 hover:bg-red-600 hover:text-white flex items-center justify-center text-slate-600 transition"
-            title="Copy Article Link"
-          >
-            <i class="fa-solid fa-link text-xs"></i>
-          </button>
-        </div>
+     <div class="flex items-center gap-3">
+  <span class="text-xs text-slate-500 font-semibold">
+    <i class="fa-regular fa-eye mr-1"></i>1 View
+  </span>
+
+  <details class="relative" id="article-menu">
+    <summary
+      class="w-9 h-9 rounded-full bg-slate-100 hover:bg-slate-200
+             flex items-center justify-center cursor-pointer"
+      aria-label="Article options"
+    >
+      <i class="fa-solid fa-ellipsis-vertical"></i>
+    </summary>
+
+    <div class="absolute right-0 top-11 z-50 w-48 bg-white
+                border border-slate-200 rounded-xl shadow-lg p-1">
+
+      <button
+        type="button"
+        id="share-article"
+        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 rounded-lg"
+      >
+        <i class="fa-solid fa-share-nodes mr-2"></i> Share
+      </button>
+
+      <button
+        type="button"
+        id="download-article"
+        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 rounded-lg"
+      >
+        <i class="fa-solid fa-download mr-2"></i> Download
+      </button>
+
+      <button
+        type="button"
+        id="save-article"
+        data-url="{{ url_for('saved_articles.manage_saved_article', article_id=article.id) }}"
+        data-saved="{{ 'true' if is_saved else 'false' }}"
+        data-logged-in="{{ 'true' if session.get('user') else 'false' }}"
+        class="w-full text-left px-3 py-2 text-sm hover:bg-slate-100 rounded-lg"
+      >
+        <i class="fa-regular fa-bookmark mr-2"></i>
+        <span id="save-label">
+          {{ 'Saved' if is_saved else 'Save Article' }}
+        </span>
+      </button>
+    </div>
+  </details>
+</div>
       </div>
 
       <!-- Featured Image with Photo Credit -->
@@ -271,23 +285,47 @@
       </div>
 
       <!-- Tags & Actions Bottom Strip -->
-      <div class="mt-10 pt-6 border-t border-slate-200 flex flex-wrap items-center justify-between gap-4">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-bold text-slate-500 uppercase tracking-wider">Topic Tags:</span>
-          <span class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-md">#News</span>
-          <span class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-md">#WorldWire</span>
-          <span class="px-2.5 py-1 bg-slate-100 text-slate-800 text-xs font-semibold rounded-md">#Intelligence</span>
-        </div>
+<div class="mt-10 pt-6 border-t border-slate-200
+            flex flex-wrap items-center justify-between gap-4">
 
-        <button
-          type="button"
-          onclick="window.print()"
-          class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold text-slate-700 hover:text-slate-900 bg-slate-100 rounded-lg transition"
-        >
-          <i class="fa-solid fa-print"></i>
-          <span>Print Dispatch</span>
-        </button>
-      </div>
+  <div class="flex items-center gap-2">
+    <span class="text-xs font-bold text-slate-500 uppercase">
+      Topic Tags:
+    </span>
+
+    <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
+      #News
+    </span>
+
+    <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
+      #WorldWire
+    </span>
+
+    <span class="px-2.5 py-1 bg-slate-100 text-xs font-semibold rounded-md">
+      #Intelligence
+    </span>
+  </div>
+
+  <div class="flex items-center gap-2">
+    <button
+      type="button"
+      disabled
+      title="Coming soon"
+      class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs"
+    >
+      <i class="fa-regular fa-thumbs-up mr-1"></i> 0
+    </button>
+
+    <button
+      type="button"
+      disabled
+      title="Coming soon"
+      class="px-3 py-2 rounded-lg bg-slate-100 text-slate-600 text-xs"
+    >
+      <i class="fa-regular fa-thumbs-down mr-1"></i> 0
+    </button>
+  </div>
+</div>
 
       <!-- Daily Briefing Newsletter Signup Box -->
       <div class="mt-10 bg-slate-900 text-white rounded-xl p-6 sm:p-8 flex flex-col md:flex-row items-center justify-between gap-6">
@@ -418,6 +456,81 @@
       });
     }
   </script>
+  <script>
+  const menu = document.getElementById("article-menu");
+  const shareButton = document.getElementById("share-article");
+  const downloadButton = document.getElementById("download-article");
+  const saveButton = document.getElementById("save-article");
+
+  if (menu) {
+    document.addEventListener("click", (event) => {
+      if (!menu.contains(event.target)) {
+        menu.open = false;
+      }
+    });
+  }
+
+  shareButton?.addEventListener("click", async () => {
+    const url = window.location.href;
+
+    try {
+      if (navigator.share) {
+        await navigator.share({
+          title: document.title,
+          url: url
+        });
+      } else {
+        await navigator.clipboard.writeText(url);
+        alert("Article link copied.");
+      }
+    } catch (error) {
+      if (error.name !== "AbortError") {
+        console.error("Share failed:", error);
+      }
+    }
+
+    menu.open = false;
+  });
+
+  downloadButton?.addEventListener("click", () => {
+    menu.open = false;
+    window.print();
+  });
+
+  saveButton?.addEventListener("click", async () => {
+    if (saveButton.dataset.loggedIn !== "true") {
+      window.location.href = "/auth/login";
+      return;
+    }
+
+    const saved = saveButton.dataset.saved === "true";
+
+    saveButton.disabled = true;
+
+    try {
+      const response = await fetch(saveButton.dataset.url, {
+        method: saved ? "DELETE" : "POST"
+      });
+
+      if (!response.ok) {
+        throw new Error("Unable to update saved article.");
+      }
+
+      const result = await response.json();
+
+      saveButton.dataset.saved = String(result.saved);
+
+      document.getElementById("save-label").textContent =
+        result.saved ? "Saved" : "Save Article";
+
+    } catch (error) {
+      alert(error.message);
+    } finally {
+      saveButton.disabled = false;
+      menu.open = false;
+    }
+  });
+</script>
 {% include "loader.html" %}
 </body>
 
