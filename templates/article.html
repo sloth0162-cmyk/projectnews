@@ -499,10 +499,15 @@
 
   saveButton?.addEventListener("click", async () => {
     if (saveButton.dataset.loggedIn !== "true") {
-      window.location.href = "/auth/login";
-      return;
-    }
+    alert("Please sign in to save articles.");
 
+    const next = encodeURIComponent(
+        window.location.pathname + window.location.search
+    );
+
+    window.location.href = `/auth/login?next=${next}`;
+    return;
+}
     const saved = saveButton.dataset.saved === "true";
 
     saveButton.disabled = true;

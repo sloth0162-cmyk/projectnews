@@ -20,14 +20,23 @@ auth_bp = Blueprint("auth", __name__)
 # -----------------------------
 @auth_bp.route("/auth/login")
 def login_google():
-    callback_url = url_for("auth.auth_callback", _external=True)
+    next_url = request.args.get("next", "/")
+
+    # Only allow local redirect paths.
+    if not next_url.startswith("/") or next_url.startswith("//"):
+        next_url = "/"
+
+    session["login_next"] = next_url
+
+    callback_url = url_for(
+        "auth.auth_callback",
+        _external=True
+    )
 
     return redirect(
         f"{Config.SUPABASE_URL}/auth/v1/authorize"
         f"?provider=google&redirect_to={callback_url}"
     )
-
-
 @auth_bp.route("/auth/callback", methods=["GET", "POST"])
 def auth_callback():
     access_token = (
@@ -85,9 +94,9 @@ def auth_callback():
         "user_metadata": user.get("user_metadata") or {},
          "access_token": access_token,
     }
-
-    return redirect("/")
-
+# Return to the page that requested login.
+    next_url = session.pop("login_next", "/")
+    return redirect(next_url)
 
 @auth_bp.route("/auth/me", methods=["GET"])
 def auth_me():
